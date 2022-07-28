@@ -91,6 +91,8 @@ double HPCCG_residual(double *b, double *x,
   double normr = 0.0;
   int max_iter = 100;
   double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
+  double sum;
+  int cur_nnz;
 
   ////// HPCCG
   int nrow = A.local_nrow;
@@ -103,20 +105,16 @@ double HPCCG_residual(double *b, double *x,
   double alpha = 1.0, beta = 0.0;
 
   for (int i = 0; i < nrow; i++)
-    x[i] = x[i] + beta * p[i];
+    p[i] = x[i] + beta * x[i];
 
   // HPC_sparsemv(A, p, Ap);
   for (int i = 0; i < nrow; i++)
   {
-    double sum = 0.0;
-    double *cur_vals = A.ptr_to_vals_in_row[i];
-
-    int *cur_inds = A.ptr_to_inds_in_row[i];
-
-    int cur_nnz = A.nnz_in_row[i];
+    sum = 0.0;
+    cur_nnz = A.nnz_in_row[i];
 
     for (int j = 0; j < cur_nnz; j++)
-      sum += cur_vals[j] * p[cur_inds[j]];
+      sum += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
     Ap[i] = sum;
   }
 
@@ -132,6 +130,7 @@ double HPCCG_residual(double *b, double *x,
     if (k == 1)
     {
       //// waxpby(nrow, 1.0, r, 0.0, r, p);
+      beta = 0.0;
       for (int i = 0; i < nrow; i++)
         p[i] = r[i] + beta * r[i];
     }
@@ -150,25 +149,23 @@ double HPCCG_residual(double *b, double *x,
     //// HPC_sparsemv(A, p, Ap);
     for (int i = 0; i < nrow; i++)
     {
-      double sum = 0.0;
-      double *cur_vals = A.ptr_to_vals_in_row[i];
-
-      int *cur_inds = A.ptr_to_inds_in_row[i];
-
-      int cur_nnz = A.nnz_in_row[i];
+      sum = 0.0;
+      cur_nnz = A.nnz_in_row[i];
 
       for (int j = 0; j < cur_nnz; j++)
-        sum += cur_vals[j] * p[cur_inds[j]];
+        sum += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
       Ap[i] = sum;
     }
 
-    beta = 0.0;
+    // waxpby(nrow, 1.0, x, alpha, p, x);
+    // beta = 0.0;
     beta = ddot(nrow, p, Ap);
     beta = rtrans / beta;
 
     for (int i = 0; i < nrow; i++)
       x[i] = x[i] + beta * p[i];
 
+    // waxpby(nrow, 1.0, r, -alpha, Ap, r);
     beta = -beta;
     for (int i = 0; i < nrow; i++)
       r[i] = r[i] + beta * Ap[i];
@@ -180,10 +177,11 @@ double HPCCG_residual(double *b, double *x,
   // All processors are needed here.
 
   double residual = 0.0;
+  double diff;
 
   for (int i = 0; i < nrow; i++)
   {
-    double diff = fabs(x[i] - xexact[i]);
+    diff = fabs(x[i] - xexact[i]);
     if (diff > residual)
       residual = diff;
   }
@@ -191,12 +189,75 @@ double HPCCG_residual(double *b, double *x,
   return residual;
 }
 
+void printVals(double* arr, int n) {
+  for(int i = 0; i < n; i++ )
+    cout << arr[i] << " ";
+  cout << endl;
+}
+
+#include "Derivative.h"
+
+void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
+  // auto df = clad::gradient(HPCCG_residual);
+  // auto df = clad::estimate_error(HPCCG_residual);
+
+
+  double *x_diff = new double[nrow]();
+  clad::array_ref<double> d_x(x_diff, nrow);
+  
+  double *b_diff = new double[nrow]();
+  clad::array_ref<double> d_b(b_diff, nrow);
+
+  double *xexact_diff = new double[nrow]();
+  clad::array_ref<double> d_xexact(xexact_diff, nrow);
+
+  double *r = new double[nrow]();
+  double *r_diff = new double[nrow]();
+  clad::array_ref<double> d_r(r_diff, nrow);
+
+  double *p = new double[ncol]();
+  double *p_diff = new double[ncol]();
+  clad::array_ref<double> d_p(p_diff, ncol);
+
+  double *Ap = new double[nrow]();
+  double *Ap_diff = new double[nrow]();
+  clad::array_ref<double> d_Ap(Ap_diff, nrow);
+
+  double _final_error = 0;
+
+  cout << "b: ";
+  printVals(b, nrow);
+  cout << "x: ";
+  printVals(x, nrow);
+  cout << "x exact: ";
+  printVals(xexact, nrow);
+
+  HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
+
+  cout << "\nFinal error in HPCCG =" << _final_error << endl;
+
+  cout << "Gradients are: " << endl;
+  cout << "b: ";
+  printVals(d_b.ptr(), nrow);
+  cout << "x: ";
+  printVals(d_x.ptr(), nrow);
+
+  delete[] b_diff;
+  delete[] x_diff;
+  delete[] xexact_diff;
+  delete[] p;
+  delete[] p_diff;
+  delete[] Ap;
+  delete[] Ap_diff;
+  delete[] r;
+  delete[] r_diff;
+}
+
 int main(int argc, char *argv[])
 {
-  // clad::gradient(HPCCG_residual);
-  clad::estimate_error(HPCCG_residual);
 
   double *x, *b, *xexact;
+  double *x_diff, *b_diff, *xexact_diff;
   double norm, d;
   int ierr = 0;
   int i, j;
@@ -238,19 +299,21 @@ int main(int argc, char *argv[])
   double *p = new double[ncol]; // In parallel case, A is rectangular
   double *Ap = new double[nrow];
 
-  double residual = HPCCG_residual(b, x, xexact, r, p, Ap);
+  // double residual = HPCCG_residual(b, x, xexact, r, p, Ap);
+
+  // cout << std::setprecision(5) << "Difference between computed and exact (residual)  = "
+  //      << residual << ".\n"
+  //      << endl;
+
+  executeGradient(nrow, ncol, x, b, xexact);
 
   delete[] p;
   delete[] Ap;
   delete[] r;
 
-  cout << std::setprecision(5) << "Difference between computed and exact (residual)  = "
-       << residual << ".\n"
-       << endl;
-
   delete[] x;
-  delete[] b;
   delete[] xexact;
+  delete[] b;
 
   return 0;
 }
