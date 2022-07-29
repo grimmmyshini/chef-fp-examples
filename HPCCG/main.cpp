@@ -83,15 +83,15 @@ double HPCCG_residual(double *b, double *x,
                       double *xexact, double *r, double *p,
                       double *Ap);
 
+template <typename precision>
 double HPCCG_residual(double *b, double *x,
-                      double *xexact, double *r, double *p,
-                      double *Ap)
+                      double *xexact, precision *r, precision *p,
+                      precision *Ap)
 {
   int niters = 0;
-  double normr = 0.0;
+  precision normr = 0.0;
   int max_iter = 100;
-  double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
-  double sum;
+  precision tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
   int cur_nnz;
 
   ////// HPCCG
@@ -99,10 +99,10 @@ double HPCCG_residual(double *b, double *x,
   int ncol = A.local_ncol;
 
   normr = 0.0;
-  double rtrans = 0.0;
-  double oldrtrans = 0.0;
+  precision rtrans = 0.0;
+  precision oldrtrans = 0.0;
 
-  double alpha = 1.0, beta = 0.0;
+  precision beta = 0.0;
 
   for (int i = 0; i < nrow; i++)
     p[i] = x[i] + beta * x[i];
@@ -110,12 +110,9 @@ double HPCCG_residual(double *b, double *x,
   // HPC_sparsemv(A, p, Ap);
   for (int i = 0; i < nrow; i++)
   {
-    sum = 0.0;
     cur_nnz = A.nnz_in_row[i];
-
     for (int j = 0; j < cur_nnz; j++)
-      sum += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
-    Ap[i] = sum;
+      Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
   }
 
   beta = -1.0;
@@ -149,12 +146,10 @@ double HPCCG_residual(double *b, double *x,
     //// HPC_sparsemv(A, p, Ap);
     for (int i = 0; i < nrow; i++)
     {
-      sum = 0.0;
       cur_nnz = A.nnz_in_row[i];
-
       for (int j = 0; j < cur_nnz; j++)
-        sum += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
-      Ap[i] = sum;
+        Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
+      
     }
 
     // waxpby(nrow, 1.0, x, alpha, p, x);
@@ -176,20 +171,20 @@ double HPCCG_residual(double *b, double *x,
   // Compute difference between known exact solution and computed solution
   // All processors are needed here.
 
-  double residual = 0.0;
-  double diff;
+  precision residual = 0.0;
+  precision diff = 0;
 
   for (int i = 0; i < nrow; i++)
   {
     diff = fabs(x[i] - xexact[i]);
-    if (diff > residual)
-      residual = diff;
+    if(diff > residual) residual = diff;
   }
 
   return residual;
 }
 
-void printVals(double* arr, int n) {
+template <typename T>
+void printVals(T* arr, int n) {
   for(int i = 0; i < n; i++ )
     cout << arr[i] << " ";
   cout << endl;
@@ -199,7 +194,7 @@ void printVals(double* arr, int n) {
 
 void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
   // auto df = clad::gradient(HPCCG_residual);
-  // auto df = clad::estimate_error(HPCCG_residual);
+  auto df = clad::estimate_error<true>(HPCCG_residual<double>);
 
 
   double *x_diff = new double[nrow]();
@@ -225,22 +220,22 @@ void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
 
   double _final_error = 0;
 
-  cout << "b: ";
-  printVals(b, nrow);
-  cout << "x: ";
-  printVals(x, nrow);
-  cout << "x exact: ";
-  printVals(xexact, nrow);
+  // cout << "b: ";
+  // printVals(b, nrow);
+  // cout << "x: ";
+  // printVals(x, nrow);
+  // cout << "x exact: ";
+  // printVals(xexact, nrow);
 
-  HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
+  HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error, cout);
 
   cout << "\nFinal error in HPCCG =" << _final_error << endl;
 
-  cout << "Gradients are: " << endl;
-  cout << "b: ";
-  printVals(d_b.ptr(), nrow);
-  cout << "x: ";
-  printVals(d_x.ptr(), nrow);
+  // cout << "Gradients are: " << endl;
+  // cout << "b: ";
+  // printVals(d_b.ptr(), nrow);
+  // cout << "x: ";
+  // printVals(d_x.ptr(), nrow);
 
   delete[] b_diff;
   delete[] x_diff;
@@ -252,6 +247,21 @@ void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
   delete[] r;
   delete[] r_diff;
 }
+
+template <typename precision = double>
+precision executefunction(int nrow, int ncol, double* x, double* b, double* xexact) {
+  precision *r = new precision[nrow];
+  precision *p = new precision[ncol]; // In parallel case, A is rectangular
+  precision *Ap = new precision[nrow];
+
+  precision residual = HPCCG_residual<precision>(b, x, xexact, r, p, Ap);
+
+  delete[] p;
+  delete[] Ap;
+  delete[] r;
+
+  return residual;
+} 
 
 int main(int argc, char *argv[])
 {
@@ -295,21 +305,10 @@ int main(int argc, char *argv[])
   int nrow = A.local_nrow;
   int ncol = A.local_ncol;
 
-  double *r = new double[nrow];
-  double *p = new double[ncol]; // In parallel case, A is rectangular
-  double *Ap = new double[nrow];
-
-  // double residual = HPCCG_residual(b, x, xexact, r, p, Ap);
-
-  // cout << std::setprecision(5) << "Difference between computed and exact (residual)  = "
-  //      << residual << ".\n"
-  //      << endl;
+  
+  // cout << "Actual Error: " << executefunction<double>(nrow, ncol, x, b, xexact);
 
   executeGradient(nrow, ncol, x, b, xexact);
-
-  delete[] p;
-  delete[] Ap;
-  delete[] r;
 
   delete[] x;
   delete[] xexact;

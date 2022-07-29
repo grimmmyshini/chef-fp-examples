@@ -29,7 +29,8 @@
 #ifndef DDOT_H
 #define DDOT_H
 
-double ddot(int n, double * x, double * y)
+template <typename S, typename T>
+double ddot(int n, S * x, T * y)
 {
   double local_result = 0.0;
 

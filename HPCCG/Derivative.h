@@ -1,4 +1,5 @@
-void ddot_pullback(int n, double *x, double *y, double _d_y0, clad::array_ref<int> _d_n, clad::array_ref<double> _d_x, clad::array_ref<double> _d_y, double &_final_error) {
+void ddot_pullback(int n, double *x, double *y, double _d_y0, clad::array_ref<int> _d_n, clad::array_ref<double> _d_x, clad::array_ref<double> _d_y, double &_final_error, std::ostream &_error_stream) {
+    double _d_local_result = 0;
     double _delta_local_result = 0;
     double _EERepl_local_result0;
     bool _cond0;
@@ -14,29 +15,22 @@ void ddot_pullback(int n, double *x, double *y, double _d_y0, clad::array_ref<in
     clad::tape<double> _t11 = {};
     clad::tape<int> _t12 = {};
     clad::tape<double> _EERepl_local_result2 = {};
-    double _d_local_result = 0;
     double local_result = 0.;
     _EERepl_local_result0 = local_result;
     _cond0 = y == x;
     if (_cond0) {
         _t0 = 0;
-        {
-            int _d_i = 0;
-            for (int i = 0; i < n; i++) {
-                _t0++;
-                local_result += clad::push(_t4, x[clad::push(_t2, i)]) * clad::push(_t1, x[clad::push(_t5, i)]);
-                clad::push(_EERepl_local_result1, local_result);
-            }
+        for (int i = 0; i < n; i++) {
+            _t0++;
+            local_result += clad::push(_t4, x[clad::push(_t2, i)]) * clad::push(_t1, x[clad::push(_t5, i)]);
+            clad::push(_EERepl_local_result1, local_result);
         }
     } else {
         _t7 = 0;
-        {
-            int _d_i = 0;
-            for (int i = 0; i < n; i++) {
-                _t7++;
-                local_result += clad::push(_t11, x[clad::push(_t9, i)]) * clad::push(_t8, y[clad::push(_t12, i)]);
-                clad::push(_EERepl_local_result2, local_result);
-            }
+        for (int i = 0; i < n; i++) {
+            _t7++;
+            local_result += clad::push(_t11, x[clad::push(_t9, i)]) * clad::push(_t8, y[clad::push(_t12, i)]);
+            clad::push(_EERepl_local_result2, local_result);
         }
     }
     double ddot_return = local_result;
@@ -55,6 +49,7 @@ void ddot_pullback(int n, double *x, double *y, double _d_y0, clad::array_ref<in
             _d_x[_t6] += _r1;
             double _r2 = clad::pop(_EERepl_local_result1);
             _delta_local_result += std::abs(_r_d0 * _r2 * 1.1920928955078125E-7);
+            // _error_stream << "local_result" << " : " << std::abs(_r_d0 * _r2 * 1.1920928955078125E-7) << "\n";
             _d_local_result -= _r_d0;
         }
     else
@@ -69,14 +64,19 @@ void ddot_pullback(int n, double *x, double *y, double _d_y0, clad::array_ref<in
             _d_y[_t13] += _r4;
             double _r5 = clad::pop(_EERepl_local_result2);
             _delta_local_result += std::abs(_r_d1 * _r5 * 1.1920928955078125E-7);
+            // _error_stream << "local_result" << " : " << std::abs(_r_d1 * _r5 * 1.1920928955078125E-7) << "\n";
             _d_local_result -= _r_d1;
         }
-    _delta_local_result += std::abs(_d_local_result * _EERepl_local_result0 * 1.1920928955078125E-7);
+    {
+        _delta_local_result += std::abs(_d_local_result * _EERepl_local_result0 * 1.1920928955078125E-7);
+        // _error_stream << "local_result" << " : " << std::abs(_d_local_result * _EERepl_local_result0 * 1.1920928955078125E-7) << "\n";
+    }
     clad::array<double> _delta_x(_d_x.size());
     int i = 0;
     for (; i < _d_x.size(); i++) {
         double _t14 = std::abs(_d_x[i] * x[i] * 1.1920928955078125E-7);
         _delta_x[i] += _t14;
+        // _error_stream << "x" << " : " << _t14 << "\n";
         _final_error += _t14;
     }
     clad::array<double> _delta_y(_d_y.size());
@@ -84,23 +84,37 @@ void ddot_pullback(int n, double *x, double *y, double _d_y0, clad::array_ref<in
     for (; i < _d_y.size(); i++) {
         double _t15 = std::abs(_d_y[i] * y[i] * 1.1920928955078125E-7);
         _delta_y[i] += _t15;
+        // _error_stream << "y" << " : " << _t15 << "\n";
         _final_error += _t15;
     }
     _final_error += _delta_local_result;
+    // _error_stream << "\nFinal error contribution by y = " << _delta_y << "\n";
+    // _error_stream << "\nFinal error contribution by x = " << _delta_x << "\n";
+    // _error_stream << "\nFinal error contribution by local_result = " << _delta_local_result << "\n";
 }
-
-void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double *p, double *Ap, clad::array_ref<double> _d_b, clad::array_ref<double> _d_x, clad::array_ref<double> _d_xexact, clad::array_ref<double> _d_r, clad::array_ref<double> _d_p, clad::array_ref<double> _d_Ap, double &_final_error) {
+void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double *p, double *Ap, clad::array_ref<double> _d_b, clad::array_ref<double> _d_x, clad::array_ref<double> _d_xexact, clad::array_ref<double> _d_r, clad::array_ref<double> _d_p, clad::array_ref<double> _d_Ap, double &_final_error, std::ostream &_error_stream) {
+    int _d_niters = 0;
+    double _d_normr = 0;
     double _delta_normr = 0;
     double _EERepl_normr0;
+    int _d_max_iter = 0;
+    double _d_tolerance = 0;
     double _delta_tolerance = 0;
     double _EERepl_tolerance0;
+    double _d_sum = 0;
     double _delta_sum = 0;
     double _EERepl_sum0;
+    int _d_cur_nnz = 0;
+    int _d_nrow = 0;
+    int _d_ncol = 0;
     double _EERepl_normr1;
+    double _d_rtrans = 0;
     double _delta_rtrans = 0;
     double _EERepl_rtrans0;
+    double _d_oldrtrans = 0;
     double _delta_oldrtrans = 0;
     double _EERepl_oldrtrans0;
+    double _d_alpha = 0, _d_beta = 0;
     double _delta_alpha = 0;
     double _EERepl_alpha0;
     double _delta_alpha0 = 0;
@@ -152,6 +166,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     double _t40;
     double _EERepl_normr2;
     unsigned long _t41;
+    int _d_k = 0;
     clad::tape<bool> _t43 = {};
     clad::tape<double> _EERepl_beta2 = {};
     clad::tape<unsigned long> _t44 = {};
@@ -217,87 +232,62 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<double> _t108 = {};
     clad::tape<int> _t109 = {};
     clad::tape<double> _EERepl_r2 = {};
+    double _d_residual = 0;
     double _delta_residual = 0;
     double _EERepl_residual0;
-    double _delta_diff = 0;
-    double _EERepl_diff0;
     unsigned long _t111;
     clad::tape<int> _t112 = {};
     clad::tape<int> _t114 = {};
     clad::tape<double> _t116 = {};
-    clad::tape<double> _EERepl_diff1 = {};
-    clad::tape<bool> _t119 = {};
-    int _d_niters = 0;
+    clad::tape<double> _EERepl_residual1 = {};
     int niters = 0;
-    double _d_normr = 0;
     double normr = 0.;
     _EERepl_normr0 = normr;
-    int _d_max_iter = 0;
     int max_iter = 100;
-    double _d_tolerance = 0;
     double tolerance = 0.;
     _EERepl_tolerance0 = tolerance;
-    double _d_sum = 0;
     double sum;
     _EERepl_sum0 = sum;
-    int _d_cur_nnz = 0;
     int cur_nnz;
-    int _d_nrow = 0;
     int nrow = A.local_nrow;
-    int _d_ncol = 0;
     int ncol = A.local_ncol;
     normr = 0.;
     _EERepl_normr1 = normr;
-    double _d_rtrans = 0;
     double rtrans = 0.;
     _EERepl_rtrans0 = rtrans;
-    double _d_oldrtrans = 0;
     double oldrtrans = 0.;
     _EERepl_oldrtrans0 = oldrtrans;
-    double _d_alpha = 0, _d_beta = 0;
     double alpha = 1., beta = 0.;
     _EERepl_beta0 = beta;
     _EERepl_alpha1 = alpha;
     _EERepl_alpha0 = alpha;
     _t0 = 0;
-    {
-        int _d_i = 0;
-        for (int i = 0; i < nrow; i++) {
-            _t0++;
-            p[clad::push(_t1, i)] = x[clad::push(_t3, i)] + clad::push(_t6, beta) * clad::push(_t5, x[clad::push(_t7, i)]);
-            clad::push(_EERepl_p1, p[clad::push(_t1, i)]);
-        }
+    for (int i = 0; i < nrow; i++) {
+        _t0++;
+        p[clad::push(_t1, i)] = x[clad::push(_t3, i)] + clad::push(_t6, beta) * clad::push(_t5, x[clad::push(_t7, i)]);
+        clad::push(_EERepl_p1, p[clad::push(_t1, i)]);
     }
     _t9 = 0;
-    {
-        int _d_i = 0;
-        for (int i = 0; i < nrow; i++) {
-            _t9++;
-            sum = 0.;
-            clad::push(_EERepl_sum1, sum);
-            cur_nnz = A.nnz_in_row[clad::push(_t10, i)];
-            clad::push(_t12, 0UL);
-            {
-                int _d_j = 0;
-                for (int j = 0; j < cur_nnz; j++) {
-                    clad::back(_t12)++;
-                    sum += clad::push(_t18, A.ptr_to_vals_in_row[clad::push(_t14, i)][clad::push(_t16, j)]) * clad::push(_t13, p[clad::push(_t23, A.ptr_to_inds_in_row[clad::push(_t19, i)][clad::push(_t21, j)])]);
-                    clad::push(_EERepl_sum2, sum);
-                }
-            }
-            Ap[clad::push(_t25, i)] = sum;
+    for (int i = 0; i < nrow; i++) {
+        _t9++;
+        sum = 0.;
+        clad::push(_EERepl_sum1, sum);
+        cur_nnz = A.nnz_in_row[clad::push(_t10, i)];
+        clad::push(_t12, 0UL);
+        for (int j = 0; j < cur_nnz; j++) {
+            clad::back(_t12)++;
+            sum += clad::push(_t18, A.ptr_to_vals_in_row[clad::push(_t14, i)][clad::push(_t16, j)]) * clad::push(_t13, p[clad::push(_t23, A.ptr_to_inds_in_row[clad::push(_t19, i)][clad::push(_t21, j)])]);
+            clad::push(_EERepl_sum2, sum);
         }
+        Ap[clad::push(_t25, i)] = sum;
     }
     beta = -1.;
     _EERepl_beta1 = beta;
     _t27 = 0;
-    {
-        int _d_i = 0;
-        for (int i = 0; i < nrow; i++) {
-            _t27++;
-            r[clad::push(_t28, i)] = b[clad::push(_t30, i)] + clad::push(_t33, beta) * clad::push(_t32, Ap[clad::push(_t34, i)]);
-            clad::push(_EERepl_r1, r[clad::push(_t28, i)]);
-        }
+    for (int i = 0; i < nrow; i++) {
+        _t27++;
+        r[clad::push(_t28, i)] = b[clad::push(_t30, i)] + clad::push(_t33, beta) * clad::push(_t32, Ap[clad::push(_t34, i)]);
+        clad::push(_EERepl_r1, r[clad::push(_t28, i)]);
     }
     _t36 = nrow;
     _t37 = r;
@@ -308,143 +298,106 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     normr = sqrt(_t40);
     _EERepl_normr2 = normr;
     _t41 = 0;
-    int _d_k = 0;
-    {
-        _d_k = 0;
-        for (int k = 1; k < max_iter && normr > tolerance; k++) {
-            _t41++;
-            bool _t42 = k == 1;
-            {
-                if (_t42) {
-                    beta = 0.;
-                    clad::push(_EERepl_beta2, beta);
-                    clad::push(_t44, 0UL);
-                    {
-                        int _d_i = 0;
-                        for (int i = 0; i < nrow; i++) {
-                            clad::back(_t44)++;
-                            p[clad::push(_t45, i)] = r[clad::push(_t47, i)] + clad::push(_t50, beta) * clad::push(_t49, r[clad::push(_t51, i)]);
-                            clad::push(_EERepl_p2, p[clad::push(_t45, i)]);
-                        }
-                    }
-                } else {
-                    oldrtrans = rtrans;
-                    clad::push(_t54, r);
-                    clad::push(_t55, r);
-                    rtrans = ddot(clad::push(_t53, nrow), r, r);
-                    clad::push(_EERepl_rtrans2, rtrans);
-                    beta = clad::push(_t58, rtrans) / clad::push(_t57, oldrtrans);
-                    clad::push(_EERepl_beta3, beta);
-                    clad::push(_t59, 0UL);
-                    {
-                        int _d_i = 0;
-                        for (int i = 0; i < nrow; i++) {
-                            clad::back(_t59)++;
-                            p[clad::push(_t60, i)] = r[clad::push(_t62, i)] + clad::push(_t65, beta) * clad::push(_t64, p[clad::push(_t66, i)]);
-                            clad::push(_EERepl_p3, p[clad::push(_t60, i)]);
-                        }
-                    }
-                }
-                clad::push(_t43, _t42);
-            }
-            normr = sqrt(clad::push(_t68, rtrans));
-            clad::push(_EERepl_normr3, normr);
-            clad::push(_t69, 0UL);
-            {
-                int _d_i = 0;
+    for (int k = 1; k < max_iter && normr > tolerance; k++) {
+        _t41++;
+        bool _t42 = k == 1;
+        {
+            if (_t42) {
+                beta = 0.;
+                clad::push(_EERepl_beta2, beta);
+                clad::push(_t44, 0UL);
                 for (int i = 0; i < nrow; i++) {
-                    clad::back(_t69)++;
-                    sum = 0.;
-                    clad::push(_EERepl_sum3, sum);
-                    cur_nnz = A.nnz_in_row[clad::push(_t70, i)];
-                    clad::push(_t72, 0UL);
-                    {
-                        int _d_j = 0;
-                        for (int j = 0; j < cur_nnz; j++) {
-                            clad::back(_t72)++;
-                            sum += clad::push(_t78, A.ptr_to_vals_in_row[clad::push(_t74, i)][clad::push(_t76, j)]) * clad::push(_t73, p[clad::push(_t83, A.ptr_to_inds_in_row[clad::push(_t79, i)][clad::push(_t81, j)])]);
-                            clad::push(_EERepl_sum4, sum);
-                        }
-                    }
-                    Ap[clad::push(_t85, i)] = sum;
+                    clad::back(_t44)++;
+                    p[clad::push(_t45, i)] = r[clad::push(_t47, i)] + clad::push(_t50, beta) * clad::push(_t49, r[clad::push(_t51, i)]);
+                    clad::push(_EERepl_p2, p[clad::push(_t45, i)]);
                 }
-            }
-            clad::push(_t88, p);
-            clad::push(_t89, Ap);
-            beta = ddot(clad::push(_t87, nrow), p, Ap);
-            clad::push(_EERepl_beta4, beta);
-            beta = clad::push(_t92, rtrans) / clad::push(_t91, beta);
-            clad::push(_EERepl_beta5, beta);
-            clad::push(_t93, 0UL);
-            {
-                int _d_i = 0;
+            } else {
+                oldrtrans = rtrans;
+                clad::push(_t54, r);
+                clad::push(_t55, r);
+                rtrans = ddot(clad::push(_t53, nrow), r, r);
+                clad::push(_EERepl_rtrans2, rtrans);
+                beta = clad::push(_t58, rtrans) / clad::push(_t57, oldrtrans);
+                clad::push(_EERepl_beta3, beta);
+                clad::push(_t59, 0UL);
                 for (int i = 0; i < nrow; i++) {
-                    clad::back(_t93)++;
-                    x[clad::push(_t94, i)] = x[clad::push(_t96, i)] + clad::push(_t99, beta) * clad::push(_t98, p[clad::push(_t100, i)]);
-                    clad::push(_EERepl_x1, x[clad::push(_t94, i)]);
+                    clad::back(_t59)++;
+                    p[clad::push(_t60, i)] = r[clad::push(_t62, i)] + clad::push(_t65, beta) * clad::push(_t64, p[clad::push(_t66, i)]);
+                    clad::push(_EERepl_p3, p[clad::push(_t60, i)]);
                 }
             }
-            beta = -beta;
-            clad::push(_EERepl_beta6, beta);
-            clad::push(_t102, 0UL);
-            {
-                int _d_i = 0;
-                for (int i = 0; i < nrow; i++) {
-                    clad::back(_t102)++;
-                    r[clad::push(_t103, i)] = r[clad::push(_t105, i)] + clad::push(_t108, beta) * clad::push(_t107, Ap[clad::push(_t109, i)]);
-                    clad::push(_EERepl_r2, r[clad::push(_t103, i)]);
-                }
-            }
-            niters = k;
+            clad::push(_t43, _t42);
         }
+        normr = sqrt(clad::push(_t68, rtrans));
+        clad::push(_EERepl_normr3, normr);
+        clad::push(_t69, 0UL);
+        for (int i = 0; i < nrow; i++) {
+            clad::back(_t69)++;
+            sum = 0.;
+            clad::push(_EERepl_sum3, sum);
+            cur_nnz = A.nnz_in_row[clad::push(_t70, i)];
+            clad::push(_t72, 0UL);
+            for (int j = 0; j < cur_nnz; j++) {
+                clad::back(_t72)++;
+                sum += clad::push(_t78, A.ptr_to_vals_in_row[clad::push(_t74, i)][clad::push(_t76, j)]) * clad::push(_t73, p[clad::push(_t83, A.ptr_to_inds_in_row[clad::push(_t79, i)][clad::push(_t81, j)])]);
+                clad::push(_EERepl_sum4, sum);
+            }
+            Ap[clad::push(_t85, i)] = sum;
+        }
+        clad::push(_t88, p);
+        clad::push(_t89, Ap);
+        beta = ddot(clad::push(_t87, nrow), p, Ap);
+        clad::push(_EERepl_beta4, beta);
+        beta = clad::push(_t92, rtrans) / clad::push(_t91, beta);
+        clad::push(_EERepl_beta5, beta);
+        clad::push(_t93, 0UL);
+        for (int i = 0; i < nrow; i++) {
+            clad::back(_t93)++;
+            x[clad::push(_t94, i)] = x[clad::push(_t96, i)] + clad::push(_t99, beta) * clad::push(_t98, p[clad::push(_t100, i)]);
+            clad::push(_EERepl_x1, x[clad::push(_t94, i)]);
+        }
+        beta = -beta;
+        clad::push(_EERepl_beta6, beta);
+        clad::push(_t102, 0UL);
+        for (int i = 0; i < nrow; i++) {
+            clad::back(_t102)++;
+            r[clad::push(_t103, i)] = r[clad::push(_t105, i)] + clad::push(_t108, beta) * clad::push(_t107, Ap[clad::push(_t109, i)]);
+            clad::push(_EERepl_r2, r[clad::push(_t103, i)]);
+        }
+        niters = k;
     }
-    double _d_residual = 0;
     double residual = 0.;
     _EERepl_residual0 = residual;
-    double _d_diff = 0;
-    double diff;
-    _EERepl_diff0 = diff;
     _t111 = 0;
-    {
-        int _d_i = 0;
-        for (int i = 0; i < nrow; i++) {
-            _t111++;
-            diff = fabs(clad::push(_t116, x[clad::push(_t112, i)] - xexact[clad::push(_t114, i)]));
-            clad::push(_EERepl_diff1, diff);
-            bool _t118 = diff > residual;
-            {
-                if (_t118)
-                    residual = diff;
-                clad::push(_t119, _t118);
-            }
-        }
+    for (int i = 0; i < nrow; i++) {
+        _t111++;
+        residual += fabs(clad::push(_t116, x[clad::push(_t112, i)] - xexact[clad::push(_t114, i)]));
+        clad::push(_EERepl_residual1, residual);
     }
     double HPCCG_residual_return = residual;
     goto _label0;
   _label0:
     _d_residual += 1;
     for (; _t111; _t111--) {
-        if (clad::pop(_t119)) {
-            double _r_d28 = _d_residual;
-            _d_diff += _r_d28;
-            _d_residual -= _r_d28;
-        }
         {
-            double _r_d27 = _d_diff;
-            double _changed_ = clad::pop(_t116);
-            double _r60 =
-                _r_d27 * numerical_diff::forward_central_difference(
-                             fabs, _changed_, 0, 0, _changed_);
+            double _r_d27 = _d_residual;
+            _d_residual += _r_d27;
+            double _temp_var = clad::pop(_t116);
+            double _r60 = _r_d27 * numerical_diff::forward_central_difference(fabs, _temp_var, 0, 0, _temp_var);
             int _t113 = clad::pop(_t112);
             _d_x[_t113] += _r60;
             int _t115 = clad::pop(_t114);
             _d_xexact[_t115] += -_r60;
-            double _r61 = clad::pop(_EERepl_diff1);
-            _delta_diff += std::abs(_r_d27 * _r61 * 1.1920928955078125E-7);
-            _d_diff -= _r_d27;
+            double _r61 = clad::pop(_EERepl_residual1);
+            _delta_residual += std::abs(_r_d27 * _r61 * 1.1920928955078125E-7);
+            // _error_stream << "residual" << " : " << std::abs(_r_d27 * _r61 * 1.1920928955078125E-7) << "\n";
+            _d_residual -= _r_d27;
         }
     }
-    _delta_residual += std::abs(_d_residual * _EERepl_residual0 * 1.1920928955078125E-7);
+    {
+        _delta_residual += std::abs(_d_residual * _EERepl_residual0 * 1.1920928955078125E-7);
+        // _error_stream << "residual" << " : " << std::abs(_d_residual * _EERepl_residual0 * 1.1920928955078125E-7) << "\n";
+    }
     for (; _t41; _t41--) {
         {
             int _r_d26 = _d_niters;
@@ -466,6 +419,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                 int _r59 = clad::pop(_t103);
                 _delta_r[_r59] += std::abs(_r_d25 * _r58 * 1.1920928955078125E-7);
                 _final_error += _delta_r[_r59];
+                // _error_stream << "r" << " : " << std::abs(_r_d25 * _r58 * 1.1920928955078125E-7) << "\n";
                 _d_r[_t104] -= _r_d25;
                 _d_r[_t104];
             }
@@ -476,6 +430,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
             _d_beta += -_r_d24;
             double _r55 = clad::pop(_EERepl_beta6);
             _delta_beta += std::abs(_r_d24 * _r55 * 1.1920928955078125E-7);
+            // _error_stream << "beta" << " : " << std::abs(_r_d24 * _r55 * 1.1920928955078125E-7) << "\n";
             _d_beta -= _r_d24;
         }
         {
@@ -493,6 +448,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                 int _r54 = clad::pop(_t94);
                 _delta_x[_r54] += std::abs(_r_d23 * _r53 * 1.1920928955078125E-7);
                 _final_error += _delta_x[_r54];
+                // _error_stream << "x" << " : " << std::abs(_r_d23 * _r53 * 1.1920928955078125E-7) << "\n";
                 _d_x[_t95] -= _r_d23;
                 _d_x[_t95];
             }
@@ -507,6 +463,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
             _d_beta += _r49;
             double _r50 = clad::pop(_EERepl_beta5);
             _delta_beta += std::abs(_r_d22 * _r50 * 1.1920928955078125E-7);
+            // _error_stream << "beta" << " : " << std::abs(_r_d22 * _r50 * 1.1920928955078125E-7) << "\n";
             _d_beta -= _r_d22;
         }
         {
@@ -515,13 +472,14 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
             double *_r45 = clad::pop(_t89);
             int _grad6 = 0;
             double _t90 = 0;
-            ddot_pullback(clad::pop(_t87), _r43, _r45, _r_d21, &_grad6, _d_p, _d_Ap, _t90);
+            ddot_pullback(clad::pop(_t87), _r43, _r45, _r_d21, &_grad6, _d_p, _d_Ap, _t90, _error_stream);
             int _r41 = _grad6;
             _d_nrow += _r41;
             clad::array<double> _r42(_d_p);
             clad::array<double> _r44(_d_Ap);
             double _r46 = clad::pop(_EERepl_beta4);
             _delta_beta += _t90;
+            // _error_stream << "beta" << " : " << _t90 << "\n";
             _d_beta -= _r_d21;
         }
         {
@@ -547,6 +505,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                         _d_p[_t84] += _r39;
                         double _r40 = clad::pop(_EERepl_sum4);
                         _delta_sum += std::abs(_r_d19 * _r40 * 1.1920928955078125E-7);
+                        // _error_stream << "sum" << " : " << std::abs(_r_d19 * _r40 * 1.1920928955078125E-7) << "\n";
                         _d_sum -= _r_d19;
                     }
                     clad::pop(_t72);
@@ -560,6 +519,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                     double _r_d17 = _d_sum;
                     double _r37 = clad::pop(_EERepl_sum3);
                     _delta_sum += std::abs(_r_d17 * _r37 * 1.1920928955078125E-7);
+                    // _error_stream << "sum" << " : " << std::abs(_r_d17 * _r37 * 1.1920928955078125E-7) << "\n";
                     _d_sum -= _r_d17;
                 }
             }
@@ -571,6 +531,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
             _d_rtrans += _r35;
             double _r36 = clad::pop(_EERepl_normr3);
             _delta_normr += std::abs(_r_d16 * _r36 * 1.1920928955078125E-7);
+            // _error_stream << "normr" << " : " << std::abs(_r_d16 * _r36 * 1.1920928955078125E-7) << "\n";
             _d_normr -= _r_d16;
         }
         if (clad::pop(_t43)) {
@@ -589,6 +550,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                     int _r20 = clad::pop(_t45);
                     _delta_p[_r20] += std::abs(_r_d11 * _r19 * 1.1920928955078125E-7);
                     _final_error += _delta_p[_r20];
+                    // _error_stream << "p" << " : " << std::abs(_r_d11 * _r19 * 1.1920928955078125E-7) << "\n";
                     _d_p[_t46] -= _r_d11;
                     _d_p[_t46];
                 }
@@ -598,6 +560,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                 double _r_d10 = _d_beta;
                 double _r16 = clad::pop(_EERepl_beta2);
                 _delta_beta += std::abs(_r_d10 * _r16 * 1.1920928955078125E-7);
+                // _error_stream << "beta" << " : " << std::abs(_r_d10 * _r16 * 1.1920928955078125E-7) << "\n";
                 _d_beta -= _r_d10;
             }
         } else {
@@ -616,6 +579,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                     int _r34 = clad::pop(_t60);
                     _delta_p[_r34] += std::abs(_r_d15 * _r33 * 1.1920928955078125E-7);
                     _final_error += _delta_p[_r34];
+                    // _error_stream << "p" << " : " << std::abs(_r_d15 * _r33 * 1.1920928955078125E-7) << "\n";
                     _d_p[_t61] -= _r_d15;
                     _d_p[_t61];
                 }
@@ -630,6 +594,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                 _d_oldrtrans += _r29;
                 double _r30 = clad::pop(_EERepl_beta3);
                 _delta_beta += std::abs(_r_d14 * _r30 * 1.1920928955078125E-7);
+                // _error_stream << "beta" << " : " << std::abs(_r_d14 * _r30 * 1.1920928955078125E-7) << "\n";
                 _d_beta -= _r_d14;
             }
             {
@@ -638,13 +603,14 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                 double *_r25 = clad::pop(_t55);
                 int _grad3 = 0;
                 double _t56 = 0;
-                ddot_pullback(clad::pop(_t53), _r23, _r25, _r_d13, &_grad3, _d_r, _d_r, _t56);
+                ddot_pullback(clad::pop(_t53), _r23, _r25, _r_d13, &_grad3, _d_r, _d_r, _t56, _error_stream);
                 int _r21 = _grad3;
                 _d_nrow += _r21;
                 clad::array<double> _r22(_d_r);
                 clad::array<double> _r24(_d_r);
                 double _r26 = clad::pop(_EERepl_rtrans2);
                 _delta_rtrans += _t56;
+                // _error_stream << "rtrans" << " : " << _t56 << "\n";
                 _d_rtrans -= _r_d13;
             }
             {
@@ -659,18 +625,20 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
         double _r15 = _r_d9 * clad::custom_derivatives::sqrt_pushforward(_t40, 1.).pushforward;
         _d_rtrans += _r15;
         _delta_normr += std::abs(_r_d9 * _EERepl_normr2 * 1.1920928955078125E-7);
+        // _error_stream << "normr" << " : " << std::abs(_r_d9 * _EERepl_normr2 * 1.1920928955078125E-7) << "\n";
         _d_normr -= _r_d9;
     }
     {
         double _r_d8 = _d_rtrans;
         int _grad0 = 0;
         double _t39 = 0;
-        ddot_pullback(_t36, _t37, _t38, _r_d8, &_grad0, _d_r, _d_r, _t39);
+        ddot_pullback(_t36, _t37, _t38, _r_d8, &_grad0, _d_r, _d_r, _t39, _error_stream);
         int _r12 = _grad0;
         _d_nrow += _r12;
         clad::array<double> _r13(_d_r);
         clad::array<double> _r14(_d_r);
         _delta_rtrans += _t39;
+        // _error_stream << "rtrans" << " : " << _t39 << "\n";
         _d_rtrans -= _r_d8;
     }
     for (; _t27; _t27--) {
@@ -687,12 +655,14 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
         int _r11 = clad::pop(_t28);
         _delta_r[_r11] += std::abs(_r_d7 * _r10 * 1.1920928955078125E-7);
         _final_error += _delta_r[_r11];
+        // _error_stream << "r" << " : " << std::abs(_r_d7 * _r10 * 1.1920928955078125E-7) << "\n";
         _d_r[_t29] -= _r_d7;
         _d_r[_t29];
     }
     {
         double _r_d6 = _d_beta;
         _delta_beta += std::abs(_r_d6 * _EERepl_beta1 * 1.1920928955078125E-7);
+        // _error_stream << "beta" << " : " << std::abs(_r_d6 * _EERepl_beta1 * 1.1920928955078125E-7) << "\n";
         _d_beta -= _r_d6;
     }
     for (; _t9; _t9--) {
@@ -717,6 +687,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
                 _d_p[_t24] += _r6;
                 double _r7 = clad::pop(_EERepl_sum2);
                 _delta_sum += std::abs(_r_d4 * _r7 * 1.1920928955078125E-7);
+                // _error_stream << "sum" << " : " << std::abs(_r_d4 * _r7 * 1.1920928955078125E-7) << "\n";
                 _d_sum -= _r_d4;
             }
             clad::pop(_t12);
@@ -730,6 +701,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
             double _r_d2 = _d_sum;
             double _r4 = clad::pop(_EERepl_sum1);
             _delta_sum += std::abs(_r_d2 * _r4 * 1.1920928955078125E-7);
+            // _error_stream << "sum" << " : " << std::abs(_r_d2 * _r4 * 1.1920928955078125E-7) << "\n";
             _d_sum -= _r_d2;
         }
     }
@@ -747,60 +719,108 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
         int _r3 = clad::pop(_t1);
         _delta_p[_r3] += std::abs(_r_d1 * _r2 * 1.1920928955078125E-7);
         _final_error += _delta_p[_r3];
+        // _error_stream << "p" << " : " << std::abs(_r_d1 * _r2 * 1.1920928955078125E-7) << "\n";
         _d_p[_t2] -= _r_d1;
         _d_p[_t2];
     }
     {
         _delta_alpha += std::abs(_d_alpha * _EERepl_alpha0 * 1.1920928955078125E-7);
+        // _error_stream << "alpha" << " : " << std::abs(_d_alpha * _EERepl_alpha0 * 1.1920928955078125E-7) << "\n";
         _delta_alpha0 += std::abs(_d_alpha * _EERepl_alpha1 * 1.1920928955078125E-7);
+        // _error_stream << "alpha" << " : " << std::abs(_d_alpha * _EERepl_alpha1 * 1.1920928955078125E-7) << "\n";
     }
-    _delta_oldrtrans += std::abs(_d_oldrtrans * _EERepl_oldrtrans0 * 1.1920928955078125E-7);
-    _delta_rtrans += std::abs(_d_rtrans * _EERepl_rtrans0 * 1.1920928955078125E-7);
+    {
+        _delta_oldrtrans += std::abs(_d_oldrtrans * _EERepl_oldrtrans0 * 1.1920928955078125E-7);
+        // _error_stream << "oldrtrans" << " : " << std::abs(_d_oldrtrans * _EERepl_oldrtrans0 * 1.1920928955078125E-7) << "\n";
+    }
+    {
+        _delta_rtrans += std::abs(_d_rtrans * _EERepl_rtrans0 * 1.1920928955078125E-7);
+        // _error_stream << "rtrans" << " : " << std::abs(_d_rtrans * _EERepl_rtrans0 * 1.1920928955078125E-7) << "\n";
+    }
     {
         double _r_d0 = _d_normr;
         _delta_normr += std::abs(_r_d0 * _EERepl_normr1 * 1.1920928955078125E-7);
+        // _error_stream << "normr" << " : " << std::abs(_r_d0 * _EERepl_normr1 * 1.1920928955078125E-7) << "\n";
         _d_normr -= _r_d0;
     }
-    _delta_tolerance += std::abs(_d_tolerance * _EERepl_tolerance0 * 1.1920928955078125E-7);
-    _delta_normr += std::abs(_d_normr * _EERepl_normr0 * 1.1920928955078125E-7);
+    {
+        _delta_tolerance += std::abs(_d_tolerance * _EERepl_tolerance0 * 1.1920928955078125E-7);
+        // _error_stream << "tolerance" << " : " << std::abs(_d_tolerance * _EERepl_tolerance0 * 1.1920928955078125E-7) << "\n";
+    }
+    {
+        _delta_normr += std::abs(_d_normr * _EERepl_normr0 * 1.1920928955078125E-7);
+        // _error_stream << "normr" << " : " << std::abs(_d_normr * _EERepl_normr0 * 1.1920928955078125E-7) << "\n";
+    }
     clad::array<double> _delta_b(_d_b.size());
+    double _delta_b_sum = 0;
     int i = 0;
     for (; i < _d_b.size(); i++) {
-        double _t120 = std::abs(_d_b[i] * b[i] * 1.1920928955078125E-7);
-        _delta_b[i] += _t120;
-        _final_error += _t120;
+        double _t118 = std::abs(_d_b[i] * b[i] * 1.1920928955078125E-7);
+        _delta_b[i] += _t118;
+        // _error_stream << "b" << " : " << _t118 << "\n";
+        _delta_b_sum += _t118;
+        _final_error += _t118;
     }
     i = 0;
+    double _delta_x_sum = 0;
     for (; i < _d_x.size(); i++) {
-        double _t121 = std::abs(_d_x[i] * _EERepl_x0[i] * 1.1920928955078125E-7);
-        _delta_x[i] += _t121;
-        _final_error += _t121;
+        double _t119 = std::abs(_d_x[i] * _EERepl_x0[i] * 1.1920928955078125E-7);
+        _delta_x[i] += _t119;
+        // _error_stream << "x" << " : " << _t119 << "\n";
+        _delta_x_sum += _delta_x[i];
+        _final_error += _t119;
     }
     clad::array<double> _delta_xexact(_d_xexact.size());
+    double _delta_xexact_sum = 0;
     i = 0;
     for (; i < _d_xexact.size(); i++) {
-        double _t122 = std::abs(_d_xexact[i] * xexact[i] * 1.1920928955078125E-7);
-        _delta_xexact[i] += _t122;
-        _final_error += _t122;
+        double _t120 = std::abs(_d_xexact[i] * xexact[i] * 1.1920928955078125E-7);
+        _delta_xexact[i] += _t120;
+        // _error_stream << "xexact" << " : " << _t120 << "\n";
+        _delta_xexact_sum += _delta_xexact[i];
+        _final_error += _t120;
     }
+    double _delta_r_sum = 0;
     i = 0;
     for (; i < _d_r.size(); i++) {
-        double _t123 = std::abs(_d_r[i] * _EERepl_r0[i] * 1.1920928955078125E-7);
-        _delta_r[i] += _t123;
-        _final_error += _t123;
+        double _t121 = std::abs(_d_r[i] * _EERepl_r0[i] * 1.1920928955078125E-7);
+        _delta_r[i] += _t121;
+        // _error_stream << "r" << " : " << _t121 << "\n";
+        _delta_r_sum += _delta_r[i];
+        _final_error += _t121;
     }
+    double _delta_p_sum = 0;
     i = 0;
     for (; i < _d_p.size(); i++) {
-        double _t124 = std::abs(_d_p[i] * _EERepl_p0[i] * 1.1920928955078125E-7);
-        _delta_p[i] += _t124;
-        _final_error += _t124;
+        double _t122 = std::abs(_d_p[i] * _EERepl_p0[i] * 1.1920928955078125E-7);
+        _delta_p[i] += _t122;
+        // _error_stream << "p" << " : " << _t122 << "\n";
+        _delta_p_sum += _delta_p[i];
+        _final_error += _t122;
     }
     clad::array<double> _delta_Ap(_d_Ap.size());
+    double _delta_Ap_sum = 0;
     i = 0;
     for (; i < _d_Ap.size(); i++) {
-        double _t125 = std::abs(_d_Ap[i] * Ap[i] * 1.1920928955078125E-7);
-        _delta_Ap[i] += _t125;
-        _final_error += _t125;
+        double _t123 = std::abs(_d_Ap[i] * Ap[i] * 1.1920928955078125E-7);
+        _delta_Ap[i] += _t123;
+        // _error_stream << "Ap" << " : " << _t123 << "\n";
+        _delta_Ap_sum += _delta_Ap[i];
+        _final_error += _t123;
     }
-    _final_error += _delta_diff + _delta_oldrtrans + _delta_beta + _delta_sum + _delta_rtrans + _delta_tolerance + _delta_normr + _delta_alpha + _delta_residual;
+    _final_error += _delta_normr + _delta_tolerance + _delta_sum + _delta_beta + _delta_rtrans + _delta_residual + _delta_oldrtrans + _delta_alpha;
+    _error_stream << "\nFinal error contribution by Ap = " << _delta_Ap_sum << "\n";
+    _error_stream << "\nFinal error contribution by normr = " << _delta_normr << "\n";
+    _error_stream << "\nFinal error contribution by x = " << _delta_x_sum << "\n";
+    _error_stream << "\nFinal error contribution by tolerance = " << _delta_tolerance << "\n";
+    _error_stream << "\nFinal error contribution by sum = " << _delta_sum << "\n";
+    _error_stream << "\nFinal error contribution by beta = " << _delta_beta << "\n";
+    _error_stream << "\nFinal error contribution by rtrans = " << _delta_rtrans << "\n";
+    _error_stream << "\nFinal error contribution by residual = " << _delta_residual << "\n";
+    _error_stream << "\nFinal error contribution by oldrtrans = " << _delta_oldrtrans << "\n";
+    _error_stream << "\nFinal error contribution by alpha = " << _delta_alpha << "\n";
+    _error_stream << "\nFinal error contribution by p = " << _delta_p_sum << "\n";
+    _error_stream << "\nFinal error contribution by r = " << _delta_r_sum << "\n";
+    _error_stream << "\nFinal error contribution by b = " << _delta_b_sum << "\n";
+    _error_stream << "\nFinal error contribution by xexact = " << _delta_xexact_sum << "\n";
 }
