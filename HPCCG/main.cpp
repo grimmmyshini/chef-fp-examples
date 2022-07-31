@@ -194,7 +194,7 @@ void printVals(T* arr, int n) {
 
 void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
   // auto df = clad::gradient(HPCCG_residual);
-  auto df = clad::estimate_error<true>(HPCCG_residual<double>);
+  // auto df = clad::estimate_error<true>(HPCCG_residual<double>);
 
 
   double *x_diff = new double[nrow]();
