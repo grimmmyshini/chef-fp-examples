@@ -68,6 +68,7 @@ using std::endl;
 #include <iomanip>
 
 #include "clad/Differentiator/Differentiator.h"
+#include "../PrintModel/ErrroFunc.h"
 
 #include "generate_matrix.hpp"
 #include "read_HPC_row.hpp"
@@ -193,8 +194,8 @@ void printVals(T* arr, int n) {
 #include "Derivative.h"
 
 void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
-  // auto df = clad::gradient(HPCCG_residual);
-  // auto df = clad::estimate_error<true>(HPCCG_residual<double>);
+  // auto df = clad::gradient(HPCCG_residual<double>);
+  // auto df = clad::estimate_error(HPCCG_residual<double>);
 
 
   double *x_diff = new double[nrow]();
@@ -227,7 +228,7 @@ void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
   // cout << "x exact: ";
   // printVals(xexact, nrow);
 
-  HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error, cout);
+  HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
 
   cout << "\nFinal error in HPCCG =" << _final_error << endl;
 
