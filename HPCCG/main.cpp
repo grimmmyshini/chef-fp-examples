@@ -68,7 +68,7 @@ using std::endl;
 #include <iomanip>
 
 #include "clad/Differentiator/Differentiator.h"
-#include "../PrintModel/ErrroFunc.h"
+#include "../PrintModel/ErrorFunc.h"
 
 #include "generate_matrix.hpp"
 #include "read_HPC_row.hpp"
