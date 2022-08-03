@@ -4,14 +4,14 @@ void ddot_pullback(int n, double *x, double *y, double _d_y0, clad::array_ref<in
     double _EERepl_local_result0;
     bool _cond0;
     unsigned long _t0;
-    int _d_i = 0;
+    
     clad::tape<double> _t1 = {};
     clad::tape<int> _t2 = {};
     clad::tape<double> _t4 = {};
     clad::tape<int> _t5 = {};
     clad::tape<double> _EERepl_local_result1 = {};
     unsigned long _t7;
-    int _d_i = 0;
+    
     clad::tape<double> _t8 = {};
     clad::tape<int> _t9 = {};
     clad::tape<double> _t11 = {};
@@ -110,7 +110,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     double _delta_beta = 0;
     double _EERepl_beta0;
     unsigned long _t0;
-    int _d_i = 0;
+    
     clad::tape<int> _t1 = {};
     clad::array<double> _delta_p(_d_p.size());
     clad::array<double> _EERepl_p0(_d_p.size());
@@ -123,12 +123,11 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<int> _t7 = {};
     clad::tape<double> _EERepl_p1 = {};
     unsigned long _t9;
-    int _d_i = 0;
-    int _EERepl_cur_nnz0 = cur_nnz;
+    
     clad::tape<int> _t10 = {};
     clad::tape<double> _EERepl_sum1 = {};
     clad::tape<unsigned long> _t12 = {};
-    int _d_j = 0;
+    
     clad::tape<double> _t13 = {};
     clad::tape<int> _t14 = {};
     clad::tape<int> _t16 = {};
@@ -140,7 +139,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<int> _t25 = {};
     double _EERepl_beta1;
     unsigned long _t27;
-    int _d_i = 0;
+    
     clad::tape<int> _t28 = {};
     clad::array<double> _delta_r(_d_r.size());
     clad::array<double> _EERepl_r0(_d_r.size());
@@ -163,7 +162,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<bool> _t43 = {};
     clad::tape<double> _EERepl_beta2 = {};
     clad::tape<unsigned long> _t44 = {};
-    int _d_i = 0;
+    
     clad::tape<int> _t45 = {};
     clad::tape<int> _t47 = {};
     clad::tape<double> _t49 = {};
@@ -178,7 +177,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<double> _t58 = {};
     clad::tape<double> _EERepl_beta3 = {};
     clad::tape<unsigned long> _t59 = {};
-    int _d_i = 0;
+    
     clad::tape<int> _t60 = {};
     clad::tape<int> _t62 = {};
     clad::tape<double> _t64 = {};
@@ -188,12 +187,11 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<double> _t68 = {};
     clad::tape<double> _EERepl_normr3 = {};
     clad::tape<unsigned long> _t69 = {};
-    int _d_i = 0;
-    int _EERepl_cur_nnz1 = cur_nnz;
+    
     clad::tape<int> _t70 = {};
     clad::tape<double> _EERepl_sum3 = {};
     clad::tape<unsigned long> _t72 = {};
-    int _d_j = 0;
+    
     clad::tape<double> _t73 = {};
     clad::tape<int> _t74 = {};
     clad::tape<int> _t76 = {};
@@ -211,7 +209,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<double> _t92 = {};
     clad::tape<double> _EERepl_beta5 = {};
     clad::tape<unsigned long> _t93 = {};
-    int _d_i = 0;
+    
     clad::tape<int> _t94 = {};
     clad::array<double> _delta_x(_d_x.size());
     clad::array<double> _EERepl_x0(_d_x.size());
@@ -225,7 +223,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<double> _EERepl_x1 = {};
     clad::tape<double> _EERepl_beta6 = {};
     clad::tape<unsigned long> _t102 = {};
-    int _d_i = 0;
+    
     clad::tape<int> _t103 = {};
     clad::tape<int> _t105 = {};
     clad::tape<double> _t107 = {};
@@ -239,7 +237,7 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     double _delta_diff = 0;
     double _EERepl_diff0;
     unsigned long _t111;
-    int _d_i = 0;
+    
     clad::tape<int> _t112 = {};
     clad::tape<int> _t114 = {};
     clad::tape<double> _t116 = {};
@@ -397,13 +395,14 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
         }
         {
             double _r_d27 = _d_diff;
-            double _r60 = _r_d27 * numerical_diff::forward_central_difference(fabs, clad::pop(_t116), 0, 0, clad::pop(_t116));
+            double tmp_val = clad::pop(_t116);
+            double _r60 = _r_d27 * numerical_diff::forward_central_difference(fabs, tmp_val, 0, 0, tmp_val);
             int _t113 = clad::pop(_t112);
             _d_x[_t113] += _r60;
             int _t115 = clad::pop(_t114);
             _d_xexact[_t115] += -_r60;
             double _r61 = clad::pop(_EERepl_diff1);
-            _delta_diff += _t117;
+            _delta_diff += clad::getErrorVal(_r_d27, _r61, "diff");
             _d_diff -= _r_d27;
         }
     }
@@ -763,5 +762,6 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
         _delta_Ap[i] += _t125;
         _final_error += _t125;
     }
+    std::cout << _delta_sum;
     _final_error += _delta_normr + _delta_tolerance + _delta_sum + _delta_rtrans + _delta_oldrtrans + _delta_residual + _delta_beta + _delta_diff;
 }

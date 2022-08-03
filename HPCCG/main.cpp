@@ -267,8 +267,6 @@ precision executefunction(int nrow, int ncol, double* x, double* b, double* xexa
 
 int main(int argc, char *argv[])
 {
-
-clad::estimate_error(HPCCG_residual<double>);
   double *x, *b, *xexact;
   double *x_diff, *b_diff, *xexact_diff;
   double norm, d;
@@ -309,9 +307,10 @@ clad::estimate_error(HPCCG_residual<double>);
   int ncol = A.local_ncol;
 
   
-  cout << "Actual Error: " << executefunction<double>(nrow, ncol, x, b, xexact);
+  // cout << "Float Result: " << executefunction<float>(nrow, ncol, x, b, xexact) << std::endl;
+  // cout << "Double Result: " << executefunction<double>(nrow, ncol, x, b, xexact);
 
-  // executeGradient(nrow, ncol, x, b, xexact);
+  executeGradient(nrow, ncol, x, b, xexact);
 
   delete[] x;
   delete[] xexact;
