@@ -112,6 +112,7 @@ double HPCCG_residual(double *b, double *x,
   for (int i = 0; i < nrow; i++)
   {
     cur_nnz = A.nnz_in_row[i];
+    Ap[i] = 0;
     for (int j = 0; j < cur_nnz; j++)
       Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
   }
@@ -148,6 +149,7 @@ double HPCCG_residual(double *b, double *x,
     for (int i = 0; i < nrow; i++)
     {
       cur_nnz = A.nnz_in_row[i];
+      Ap[i] = 0;
       for (int j = 0; j < cur_nnz; j++)
         Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
       
@@ -195,7 +197,7 @@ void printVals(T* arr, int n) {
 
 void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
   // auto df = clad::gradient(HPCCG_residual<double>);
-  // auto df = clad::estimate_error(HPCCG_residual<double>);
+  auto df = clad::estimate_error(HPCCG_residual<double>);
 
 
   double *x_diff = new double[nrow]();
@@ -307,9 +309,9 @@ int main(int argc, char *argv[])
   int ncol = A.local_ncol;
 
   
-  // cout << "Actual Error: " << executefunction<double>(nrow, ncol, x, b, xexact);
+  cout << "Actual Error: " << executefunction<double>(nrow, ncol, x, b, xexact);
 
-  executeGradient(nrow, ncol, x, b, xexact);
+  // executeGradient(nrow, ncol, x, b, xexact);
 
   delete[] x;
   delete[] xexact;
