@@ -80,10 +80,6 @@ using std::endl;
 
 HPC_Sparse_Matrix A;
 
-double HPCCG_residual(double *b, double *x,
-                      double *xexact, double *r, double *p,
-                      double *Ap);
-
 template <typename precision>
 double HPCCG_residual(double *b, double *x,
                       double *xexact, precision *r, precision *p,
@@ -94,6 +90,7 @@ double HPCCG_residual(double *b, double *x,
   int max_iter = 100;
   precision tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
   int cur_nnz;
+  precision sum;
 
   ////// HPCCG
   int nrow = A.local_nrow;
@@ -112,9 +109,10 @@ double HPCCG_residual(double *b, double *x,
   for (int i = 0; i < nrow; i++)
   {
     cur_nnz = A.nnz_in_row[i];
-    Ap[i] = 0;
+    sum = 0;
     for (int j = 0; j < cur_nnz; j++)
-      Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
+      sum += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
+    Ap[i] = sum;
   }
 
   beta = -1.0;
@@ -149,9 +147,10 @@ double HPCCG_residual(double *b, double *x,
     for (int i = 0; i < nrow; i++)
     {
       cur_nnz = A.nnz_in_row[i];
-      Ap[i] = 0;
+      sum = 0;
       for (int j = 0; j < cur_nnz; j++)
-        Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
+        sum += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
+      Ap[i] = sum;
       
     }
 
@@ -197,7 +196,7 @@ void printVals(T* arr, int n) {
 
 void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
   // auto df = clad::gradient(HPCCG_residual<double>);
-  auto df = clad::estimate_error(HPCCG_residual<double>);
+  // auto df = clad::estimate_error(HPCCG_residual<double>);
 
 
   double *x_diff = new double[nrow]();
@@ -269,6 +268,7 @@ precision executefunction(int nrow, int ncol, double* x, double* b, double* xexa
 int main(int argc, char *argv[])
 {
 
+clad::estimate_error(HPCCG_residual<double>);
   double *x, *b, *xexact;
   double *x_diff, *b_diff, *xexact_diff;
   double norm, d;
