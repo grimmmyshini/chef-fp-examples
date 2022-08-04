@@ -168,7 +168,7 @@ double HPCCG_residual(double *b, double *x,
   int max_iter = 100;
   precision tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
   int cur_nnz;
-  precision sum;
+  precision sum, temp;
 
   ////// HPCCG
   int nrow = A.local_nrow;
@@ -180,8 +180,10 @@ double HPCCG_residual(double *b, double *x,
 
   precision beta = 0.0;
 
-  for (int i = 0; i < nrow; i++)
-    p[i] = x[i] + beta * x[i];
+  for (int i = 0; i < nrow; i++) {
+    temp = x[i];
+    p[i] = temp + beta * temp;
+  }
 
   // HPC_sparsemv(A, p, Ap);
   for (int i = 0; i < nrow; i++)
@@ -199,8 +201,10 @@ double HPCCG_residual(double *b, double *x,
 
   // ddot(nrow, r, r, &rtrans);
   rtrans = 0.0;
-  for (int i = 0; i < nrow; i++)
-    rtrans += r[i] * r[i];
+  for (int i = 0; i < nrow; i++) {
+    temp = r[i];
+    rtrans += temp * temp;
+  }
   // ddot end
 
   normr = sqrt(rtrans);
@@ -211,22 +215,26 @@ double HPCCG_residual(double *b, double *x,
     {
       //// waxpby(nrow, 1.0, r, 0.0, r, p);
       beta = 0.0;
-      for (int i = 0; i < nrow; i++)
-        p[i] = r[i] + beta * r[i];
+      for (int i = 0; i < nrow; i++) {
+        temp = r[i];
+        p[i] = temp + beta * temp;
+      }
     }
     else
     {
       oldrtrans = rtrans;
       // ddot (nrow, r, r, &rtrans); // 2*nrow ops
       rtrans = 0.0;
-      for (int i = 0; i < nrow; i++)
-        rtrans += r[i] * r[i];
+      for (int i = 0; i < nrow; i++) {
+        temp = r[i];
+        rtrans += temp * temp;
+      }
       // ddot end
 
       beta = rtrans / oldrtrans;
 
       //// waxpby(nrow, 1.0, r, beta, p, p);
-      for (int i = 0; i < nrow; i++)
+      for (int i = 0; i < nrow; i++) 
         p[i] = r[i] + beta * p[i];
     }
     normr = sqrt(rtrans);
