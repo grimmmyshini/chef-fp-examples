@@ -1,89 +1,3 @@
-void ddot_pullback(int n, double *x, double *y, double _d_y0, clad::array_ref<int> _d_n, clad::array_ref<double> _d_x, clad::array_ref<double> _d_y, double &_final_error) {
-    double _d_local_result = 0;
-    double _delta_local_result = 0;
-    double _EERepl_local_result0;
-    bool _cond0;
-    unsigned long _t0;
-    
-    clad::tape<double> _t1 = {};
-    clad::tape<int> _t2 = {};
-    clad::tape<double> _t4 = {};
-    clad::tape<int> _t5 = {};
-    clad::tape<double> _EERepl_local_result1 = {};
-    unsigned long _t7;
-    
-    clad::tape<double> _t8 = {};
-    clad::tape<int> _t9 = {};
-    clad::tape<double> _t11 = {};
-    clad::tape<int> _t12 = {};
-    clad::tape<double> _EERepl_local_result2 = {};
-    double local_result = 0.;
-    _EERepl_local_result0 = local_result;
-    _cond0 = y == x;
-    if (_cond0) {
-        _t0 = 0;
-        for (int i = 0; i < n; i++) {
-            _t0++;
-            local_result += clad::push(_t4, x[clad::push(_t2, i)]) * clad::push(_t1, x[clad::push(_t5, i)]);
-            clad::push(_EERepl_local_result1, local_result);
-        }
-    } else {
-        _t7 = 0;
-        for (int i = 0; i < n; i++) {
-            _t7++;
-            local_result += clad::push(_t11, x[clad::push(_t9, i)]) * clad::push(_t8, y[clad::push(_t12, i)]);
-            clad::push(_EERepl_local_result2, local_result);
-        }
-    }
-    double ddot_return = local_result;
-    goto _label0;
-  _label0:
-    _d_local_result += _d_y0;
-    if (_cond0)
-        for (; _t0; _t0--) {
-            double _r_d0 = _d_local_result;
-            _d_local_result += _r_d0;
-            double _r0 = _r_d0 * clad::pop(_t1);
-            int _t3 = clad::pop(_t2);
-            _d_x[_t3] += _r0;
-            double _r1 = clad::pop(_t4) * _r_d0;
-            int _t6 = clad::pop(_t5);
-            _d_x[_t6] += _r1;
-            double _r2 = clad::pop(_EERepl_local_result1);
-            _delta_local_result += clad::getErrorVal(_r_d0, _r2, "local_result");
-            _d_local_result -= _r_d0;
-        }
-    else
-        for (; _t7; _t7--) {
-            double _r_d1 = _d_local_result;
-            _d_local_result += _r_d1;
-            double _r3 = _r_d1 * clad::pop(_t8);
-            int _t10 = clad::pop(_t9);
-            _d_x[_t10] += _r3;
-            double _r4 = clad::pop(_t11) * _r_d1;
-            int _t13 = clad::pop(_t12);
-            _d_y[_t13] += _r4;
-            double _r5 = clad::pop(_EERepl_local_result2);
-            _delta_local_result += clad::getErrorVal(_r_d1, _r5, "local_result");
-            _d_local_result -= _r_d1;
-        }
-    _delta_local_result += clad::getErrorVal(_d_local_result, _EERepl_local_result0, "local_result");
-    clad::array<double> _delta_x(_d_x.size());
-    int i = 0;
-    for (; i < _d_x.size(); i++) {
-        double _t14 = clad::getErrorVal(_d_x[i], x[i], "x");
-        _delta_x[i] += _t14;
-        _final_error += _t14;
-    }
-    clad::array<double> _delta_y(_d_y.size());
-    i = 0;
-    for (; i < _d_y.size(); i++) {
-        double _t15 = clad::getErrorVal(_d_y[i], y[i], "y");
-        _delta_y[i] += _t15;
-        _final_error += _t15;
-    }
-    _final_error += _delta_local_result;
-}
 void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double *p, double *Ap, clad::array_ref<double> _d_b, clad::array_ref<double> _d_x, clad::array_ref<double> _d_xexact, clad::array_ref<double> _d_r, clad::array_ref<double> _d_p, clad::array_ref<double> _d_Ap, double &_final_error) {
     int _d_niters = 0;
     double _d_normr = 0;
@@ -123,7 +37,6 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<int> _t7 = {};
     clad::tape<double> _EERepl_p1 = {};
     unsigned long _t9;
-    
     clad::tape<int> _t10 = {};
     clad::tape<double> _EERepl_sum1 = {};
     clad::tape<unsigned long> _t12 = {};
@@ -151,84 +64,95 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::tape<double> _t33 = {};
     clad::tape<int> _t34 = {};
     clad::tape<double> _EERepl_r1 = {};
-    int _t36;
-    double *_t37;
-    double *_t38;
     double _EERepl_rtrans1;
-    double _t40;
-    double _EERepl_normr2;
-    unsigned long _t41;
-    int _d_k = 0;
-    clad::tape<bool> _t43 = {};
-    clad::tape<double> _EERepl_beta2 = {};
-    clad::tape<unsigned long> _t44 = {};
+    unsigned long _t36;
     
-    clad::tape<int> _t45 = {};
-    clad::tape<int> _t47 = {};
-    clad::tape<double> _t49 = {};
-    clad::tape<double> _t50 = {};
-    clad::tape<int> _t51 = {};
-    clad::tape<double> _EERepl_p2 = {};
-    clad::tape<int> _t53 = {};
-    clad::tape<double *> _t54 = {};
-    clad::tape<double *> _t55 = {};
+    clad::tape<double> _t37 = {};
+    clad::tape<int> _t38 = {};
+    clad::tape<double> _t40 = {};
+    clad::tape<int> _t41 = {};
     clad::tape<double> _EERepl_rtrans2 = {};
+    double _t43;
+    double _EERepl_normr2;
+    unsigned long _t44;
+    int _d_k = 0;
+    clad::tape<bool> _t46 = {};
+    clad::tape<double> _EERepl_beta2 = {};
+    clad::tape<unsigned long> _t47 = {};
+    
+    clad::tape<int> _t48 = {};
+    clad::tape<int> _t50 = {};
+    clad::tape<double> _t52 = {};
+    clad::tape<double> _t53 = {};
+    clad::tape<int> _t54 = {};
+    clad::tape<double> _EERepl_p2 = {};
+    clad::tape<double> _EERepl_rtrans3 = {};
+    clad::tape<unsigned long> _t56 = {};
+    
     clad::tape<double> _t57 = {};
-    clad::tape<double> _t58 = {};
-    clad::tape<double> _EERepl_beta3 = {};
-    clad::tape<unsigned long> _t59 = {};
-    
-    clad::tape<int> _t60 = {};
-    clad::tape<int> _t62 = {};
+    clad::tape<int> _t58 = {};
+    clad::tape<double> _t60 = {};
+    clad::tape<int> _t61 = {};
+    clad::tape<double> _EERepl_rtrans4 = {};
+    clad::tape<double> _t63 = {};
     clad::tape<double> _t64 = {};
-    clad::tape<double> _t65 = {};
+    clad::tape<double> _EERepl_beta3 = {};
+    clad::tape<unsigned long> _t65 = {};
+    
     clad::tape<int> _t66 = {};
+    clad::tape<int> _t68 = {};
+    clad::tape<double> _t70 = {};
+    clad::tape<double> _t71 = {};
+    clad::tape<int> _t72 = {};
     clad::tape<double> _EERepl_p3 = {};
-    clad::tape<double> _t68 = {};
+    clad::tape<double> _t74 = {};
     clad::tape<double> _EERepl_normr3 = {};
-    clad::tape<unsigned long> _t69 = {};
-    
-    clad::tape<int> _t70 = {};
-    clad::tape<double> _EERepl_sum3 = {};
-    clad::tape<unsigned long> _t72 = {};
-    
-    clad::tape<double> _t73 = {};
-    clad::tape<int> _t74 = {};
+    clad::tape<unsigned long> _t75 = {};
     clad::tape<int> _t76 = {};
-    clad::tape<double> _t78 = {};
-    clad::tape<int> _t79 = {};
-    clad::tape<int> _t81 = {};
-    clad::tape<int> _t83 = {};
-    clad::tape<double> _EERepl_sum4 = {};
+    clad::tape<double> _EERepl_sum3 = {};
+    clad::tape<unsigned long> _t78 = {};
+    
+    clad::tape<double> _t79 = {};
+    clad::tape<int> _t80 = {};
+    clad::tape<int> _t82 = {};
+    clad::tape<double> _t84 = {};
     clad::tape<int> _t85 = {};
     clad::tape<int> _t87 = {};
-    clad::tape<double *> _t88 = {};
-    clad::tape<double *> _t89 = {};
+    clad::tape<int> _t89 = {};
+    clad::tape<double> _EERepl_sum4 = {};
+    clad::tape<int> _t91 = {};
     clad::tape<double> _EERepl_beta4 = {};
-    clad::tape<double> _t91 = {};
-    clad::tape<double> _t92 = {};
-    clad::tape<double> _EERepl_beta5 = {};
     clad::tape<unsigned long> _t93 = {};
     
-    clad::tape<int> _t94 = {};
+    clad::tape<double> _t94 = {};
+    clad::tape<int> _t95 = {};
+    clad::tape<double> _t97 = {};
+    clad::tape<int> _t98 = {};
+    clad::tape<double> _EERepl_beta5 = {};
+    clad::tape<double> _t100 = {};
+    clad::tape<double> _t101 = {};
+    clad::tape<double> _EERepl_beta6 = {};
+    clad::tape<unsigned long> _t102 = {};
+    
+    clad::tape<int> _t103 = {};
     clad::array<double> _delta_x(_d_x.size());
     clad::array<double> _EERepl_x0(_d_x.size());
     for (int i0 = 0; i0 < _d_x.size(); i0++) {
         _EERepl_x0[i0] = x[i0];
     }
-    clad::tape<int> _t96 = {};
-    clad::tape<double> _t98 = {};
-    clad::tape<double> _t99 = {};
-    clad::tape<int> _t100 = {};
-    clad::tape<double> _EERepl_x1 = {};
-    clad::tape<double> _EERepl_beta6 = {};
-    clad::tape<unsigned long> _t102 = {};
-    
-    clad::tape<int> _t103 = {};
     clad::tape<int> _t105 = {};
     clad::tape<double> _t107 = {};
     clad::tape<double> _t108 = {};
     clad::tape<int> _t109 = {};
+    clad::tape<double> _EERepl_x1 = {};
+    clad::tape<double> _EERepl_beta7 = {};
+    clad::tape<unsigned long> _t111 = {};
+    
+    clad::tape<int> _t112 = {};
+    clad::tape<int> _t114 = {};
+    clad::tape<double> _t116 = {};
+    clad::tape<double> _t117 = {};
+    clad::tape<int> _t118 = {};
     clad::tape<double> _EERepl_r2 = {};
     double _d_residual = 0;
     double _delta_residual = 0;
@@ -236,13 +160,13 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     double _d_diff = 0;
     double _delta_diff = 0;
     double _EERepl_diff0;
-    unsigned long _t111;
+    unsigned long _t120;
     
-    clad::tape<int> _t112 = {};
-    clad::tape<int> _t114 = {};
-    clad::tape<double> _t116 = {};
+    clad::tape<int> _t121 = {};
+    clad::tape<int> _t123 = {};
+    clad::tape<double> _t125 = {};
     clad::tape<double> _EERepl_diff1 = {};
-    clad::tape<bool> _t119 = {};
+    clad::tape<bool> _t128 = {};
     int niters = 0;
     double normr = 0.;
     _EERepl_normr0 = normr;
@@ -290,80 +214,91 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
         r[clad::push(_t28, i)] = b[clad::push(_t30, i)] + clad::push(_t33, beta) * clad::push(_t32, Ap[clad::push(_t34, i)]);
         clad::push(_EERepl_r1, r[clad::push(_t28, i)]);
     }
-    _t36 = nrow;
-    _t37 = r;
-    _t38 = r;
-    rtrans = ddot(_t36, r, r);
+    rtrans = 0.;
     _EERepl_rtrans1 = rtrans;
-    _t40 = rtrans;
-    normr = sqrt(_t40);
+    _t36 = 0;
+    for (int i = 0; i < nrow; i++) {
+        _t36++;
+        rtrans += clad::push(_t40, r[clad::push(_t38, i)]) * clad::push(_t37, r[clad::push(_t41, i)]);
+        clad::push(_EERepl_rtrans2, rtrans);
+    }
+    _t43 = rtrans;
+    normr = sqrt(_t43);
     _EERepl_normr2 = normr;
-    _t41 = 0;
+    _t44 = 0;
     for (int k = 1; k < max_iter && normr > tolerance; k++) {
-        _t41++;
-        bool _t42 = k == 1;
+        _t44++;
+        bool _t45 = k == 1;
         {
-            if (_t42) {
+            if (_t45) {
                 beta = 0.;
                 clad::push(_EERepl_beta2, beta);
-                clad::push(_t44, 0UL);
+                clad::push(_t47, 0UL);
                 for (int i = 0; i < nrow; i++) {
-                    clad::back(_t44)++;
-                    p[clad::push(_t45, i)] = r[clad::push(_t47, i)] + clad::push(_t50, beta) * clad::push(_t49, r[clad::push(_t51, i)]);
-                    clad::push(_EERepl_p2, p[clad::push(_t45, i)]);
+                    clad::back(_t47)++;
+                    p[clad::push(_t48, i)] = r[clad::push(_t50, i)] + clad::push(_t53, beta) * clad::push(_t52, r[clad::push(_t54, i)]);
+                    clad::push(_EERepl_p2, p[clad::push(_t48, i)]);
                 }
             } else {
                 oldrtrans = rtrans;
-                clad::push(_t54, r);
-                clad::push(_t55, r);
-                rtrans = ddot(clad::push(_t53, nrow), r, r);
-                clad::push(_EERepl_rtrans2, rtrans);
-                beta = clad::push(_t58, rtrans) / clad::push(_t57, oldrtrans);
-                clad::push(_EERepl_beta3, beta);
-                clad::push(_t59, 0UL);
+                rtrans = 0.;
+                clad::push(_EERepl_rtrans3, rtrans);
+                clad::push(_t56, 0UL);
                 for (int i = 0; i < nrow; i++) {
-                    clad::back(_t59)++;
-                    p[clad::push(_t60, i)] = r[clad::push(_t62, i)] + clad::push(_t65, beta) * clad::push(_t64, p[clad::push(_t66, i)]);
-                    clad::push(_EERepl_p3, p[clad::push(_t60, i)]);
+                    clad::back(_t56)++;
+                    rtrans += clad::push(_t60, r[clad::push(_t58, i)]) * clad::push(_t57, r[clad::push(_t61, i)]);
+                    clad::push(_EERepl_rtrans4, rtrans);
+                }
+                beta = clad::push(_t64, rtrans) / clad::push(_t63, oldrtrans);
+                clad::push(_EERepl_beta3, beta);
+                clad::push(_t65, 0UL);
+                for (int i = 0; i < nrow; i++) {
+                    clad::back(_t65)++;
+                    p[clad::push(_t66, i)] = r[clad::push(_t68, i)] + clad::push(_t71, beta) * clad::push(_t70, p[clad::push(_t72, i)]);
+                    clad::push(_EERepl_p3, p[clad::push(_t66, i)]);
                 }
             }
-            clad::push(_t43, _t42);
+            clad::push(_t46, _t45);
         }
-        normr = sqrt(clad::push(_t68, rtrans));
+        normr = sqrt(clad::push(_t74, rtrans));
         clad::push(_EERepl_normr3, normr);
-        clad::push(_t69, 0UL);
+        clad::push(_t75, 0UL);
         for (int i = 0; i < nrow; i++) {
-            clad::back(_t69)++;
-            cur_nnz = A.nnz_in_row[clad::push(_t70, i)];
+            clad::back(_t75)++;
+            cur_nnz = A.nnz_in_row[clad::push(_t76, i)];
             sum = 0;
             clad::push(_EERepl_sum3, sum);
-            clad::push(_t72, 0UL);
+            clad::push(_t78, 0UL);
             for (int j = 0; j < cur_nnz; j++) {
-                clad::back(_t72)++;
-                sum += clad::push(_t78, A.ptr_to_vals_in_row[clad::push(_t74, i)][clad::push(_t76, j)]) * clad::push(_t73, p[clad::push(_t83, A.ptr_to_inds_in_row[clad::push(_t79, i)][clad::push(_t81, j)])]);
+                clad::back(_t78)++;
+                sum += clad::push(_t84, A.ptr_to_vals_in_row[clad::push(_t80, i)][clad::push(_t82, j)]) * clad::push(_t79, p[clad::push(_t89, A.ptr_to_inds_in_row[clad::push(_t85, i)][clad::push(_t87, j)])]);
                 clad::push(_EERepl_sum4, sum);
             }
-            Ap[clad::push(_t85, i)] = sum;
+            Ap[clad::push(_t91, i)] = sum;
         }
-        clad::push(_t88, p);
-        clad::push(_t89, Ap);
-        beta = ddot(clad::push(_t87, nrow), p, Ap);
+        beta = 0.;
         clad::push(_EERepl_beta4, beta);
-        beta = clad::push(_t92, rtrans) / clad::push(_t91, beta);
-        clad::push(_EERepl_beta5, beta);
         clad::push(_t93, 0UL);
         for (int i = 0; i < nrow; i++) {
             clad::back(_t93)++;
-            x[clad::push(_t94, i)] = x[clad::push(_t96, i)] + clad::push(_t99, beta) * clad::push(_t98, p[clad::push(_t100, i)]);
-            clad::push(_EERepl_x1, x[clad::push(_t94, i)]);
+            beta += clad::push(_t97, p[clad::push(_t95, i)]) * clad::push(_t94, Ap[clad::push(_t98, i)]);
+            clad::push(_EERepl_beta5, beta);
         }
-        beta = -beta;
+        beta = clad::push(_t101, rtrans) / clad::push(_t100, beta);
         clad::push(_EERepl_beta6, beta);
         clad::push(_t102, 0UL);
         for (int i = 0; i < nrow; i++) {
             clad::back(_t102)++;
-            r[clad::push(_t103, i)] = r[clad::push(_t105, i)] + clad::push(_t108, beta) * clad::push(_t107, Ap[clad::push(_t109, i)]);
-            clad::push(_EERepl_r2, r[clad::push(_t103, i)]);
+            x[clad::push(_t103, i)] = x[clad::push(_t105, i)] + clad::push(_t108, beta) * clad::push(_t107, p[clad::push(_t109, i)]);
+            clad::push(_EERepl_x1, x[clad::push(_t103, i)]);
+        }
+        beta = -beta;
+        clad::push(_EERepl_beta7, beta);
+        clad::push(_t111, 0UL);
+        for (int i = 0; i < nrow; i++) {
+            clad::back(_t111)++;
+            r[clad::push(_t112, i)] = r[clad::push(_t114, i)] + clad::push(_t117, beta) * clad::push(_t116, Ap[clad::push(_t118, i)]);
+            clad::push(_EERepl_r2, r[clad::push(_t112, i)]);
         }
         niters = k;
     }
@@ -371,269 +306,288 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     _EERepl_residual0 = residual;
     double diff = 0;
     _EERepl_diff0 = diff;
-    _t111 = 0;
+    _t120 = 0;
     for (int i = 0; i < nrow; i++) {
-        _t111++;
-        diff = fabs(clad::push(_t116, x[clad::push(_t112, i)] - xexact[clad::push(_t114, i)]));
+        _t120++;
+        diff = fabs(clad::push(_t125, x[clad::push(_t121, i)] - xexact[clad::push(_t123, i)]));
         clad::push(_EERepl_diff1, diff);
-        bool _t118 = diff > residual;
+        bool _t127 = diff > residual;
         {
-            if (_t118)
+            if (_t127)
                 residual = diff;
-            clad::push(_t119, _t118);
+            clad::push(_t128, _t127);
         }
     }
     double HPCCG_residual_return = residual;
     goto _label0;
   _label0:
     _d_residual += 1;
-    for (; _t111; _t111--) {
-        if (clad::pop(_t119)) {
-            double _r_d28 = _d_residual;
-            _d_diff += _r_d28;
-            _d_residual -= _r_d28;
+    for (; _t120; _t120--) {
+        if (clad::pop(_t128)) {
+            double _r_d31 = _d_residual;
+            _d_diff += _r_d31;
+            _d_residual -= _r_d31;
         }
         {
-            double _r_d27 = _d_diff;
-            double tmp_val = clad::pop(_t116);
-            double _r60 = _r_d27 * numerical_diff::forward_central_difference(fabs, tmp_val, 0, 0, tmp_val);
-            int _t113 = clad::pop(_t112);
-            _d_x[_t113] += _r60;
-            int _t115 = clad::pop(_t114);
-            _d_xexact[_t115] += -_r60;
-            double _r61 = clad::pop(_EERepl_diff1);
-            _delta_diff += clad::getErrorVal(_r_d27, _r61, "diff");
-            _d_diff -= _r_d27;
+            double _r_d30 = _d_diff;
+            double _r56 = _r_d30 * 1;
+            int _t122 = clad::pop(_t121);
+            _d_x[_t122] += _r56;
+            int _t124 = clad::pop(_t123);
+            _d_xexact[_t124] += -_r56;
+            double _r57 = clad::pop(_EERepl_diff1);
+            _delta_diff += clad::getErrorVal(_r_d30, _r57, "diff");
+            _d_diff -= _r_d30;
         }
     }
     _delta_diff += clad::getErrorVal(_d_diff, _EERepl_diff0, "diff");
     _delta_residual += clad::getErrorVal(_d_residual, _EERepl_residual0, "residual");
-    for (; _t41; _t41--) {
+    for (; _t44; _t44--) {
         {
-            int _r_d26 = _d_niters;
-            _d_k += _r_d26;
-            _d_niters -= _r_d26;
+            int _r_d29 = _d_niters;
+            _d_k += _r_d29;
+            _d_niters -= _r_d29;
+        }
+        {
+            for (; clad::back(_t111); clad::back(_t111)--) {
+                int _t113 = clad::pop(_t112);
+                double _r_d28 = _d_r[_t113];
+                int _t115 = clad::pop(_t114);
+                _d_r[_t115] += _r_d28;
+                double _r52 = _r_d28 * clad::pop(_t116);
+                _d_beta += _r52;
+                double _r53 = clad::pop(_t117) * _r_d28;
+                int _t119 = clad::pop(_t118);
+                _d_Ap[_t119] += _r53;
+                double _r54 = clad::pop(_EERepl_r2);
+                int _r55 = clad::pop(_t112);
+                _delta_r[_r55] += clad::getErrorVal(_r_d28, _r54, "r");
+                _final_error += _delta_r[_r55];
+                _d_r[_t113] -= _r_d28;
+                _d_r[_t113];
+            }
+            clad::pop(_t111);
+        }
+        {
+            double _r_d27 = _d_beta;
+            _d_beta += -_r_d27;
+            double _r51 = clad::pop(_EERepl_beta7);
+            _delta_beta += clad::getErrorVal(_r_d27, _r51, "beta");
+            _d_beta -= _r_d27;
         }
         {
             for (; clad::back(_t102); clad::back(_t102)--) {
                 int _t104 = clad::pop(_t103);
-                double _r_d25 = _d_r[_t104];
+                double _r_d26 = _d_x[_t104];
                 int _t106 = clad::pop(_t105);
-                _d_r[_t106] += _r_d25;
-                double _r56 = _r_d25 * clad::pop(_t107);
-                _d_beta += _r56;
-                double _r57 = clad::pop(_t108) * _r_d25;
+                _d_x[_t106] += _r_d26;
+                double _r47 = _r_d26 * clad::pop(_t107);
+                _d_beta += _r47;
+                double _r48 = clad::pop(_t108) * _r_d26;
                 int _t110 = clad::pop(_t109);
-                _d_Ap[_t110] += _r57;
-                double _r58 = clad::pop(_EERepl_r2);
-                int _r59 = clad::pop(_t103);
-                _delta_r[_r59] += clad::getErrorVal(_r_d25, _r58, "r");
-                _final_error += _delta_r[_r59];
-                _d_r[_t104] -= _r_d25;
-                _d_r[_t104];
+                _d_p[_t110] += _r48;
+                double _r49 = clad::pop(_EERepl_x1);
+                int _r50 = clad::pop(_t103);
+                _delta_x[_r50] += clad::getErrorVal(_r_d26, _r49, "x");
+                _final_error += _delta_x[_r50];
+                _d_x[_t104] -= _r_d26;
+                _d_x[_t104];
             }
             clad::pop(_t102);
         }
         {
-            double _r_d24 = _d_beta;
-            _d_beta += -_r_d24;
-            double _r55 = clad::pop(_EERepl_beta6);
-            _delta_beta += clad::getErrorVal(_r_d24, _r55, "beta");
-            _d_beta -= _r_d24;
+            double _r_d25 = _d_beta;
+            double _r43 = clad::pop(_t100);
+            double _r44 = _r_d25 / _r43;
+            _d_rtrans += _r44;
+            double _r45 = _r_d25 * -clad::pop(_t101) / (_r43 * _r43);
+            _d_beta += _r45;
+            double _r46 = clad::pop(_EERepl_beta6);
+            _delta_beta += clad::getErrorVal(_r_d25, _r46, "beta");
+            _d_beta -= _r_d25;
         }
         {
             for (; clad::back(_t93); clad::back(_t93)--) {
-                int _t95 = clad::pop(_t94);
-                double _r_d23 = _d_x[_t95];
-                int _t97 = clad::pop(_t96);
-                _d_x[_t97] += _r_d23;
-                double _r51 = _r_d23 * clad::pop(_t98);
-                _d_beta += _r51;
-                double _r52 = clad::pop(_t99) * _r_d23;
-                int _t101 = clad::pop(_t100);
-                _d_p[_t101] += _r52;
-                double _r53 = clad::pop(_EERepl_x1);
-                int _r54 = clad::pop(_t94);
-                _delta_x[_r54] += clad::getErrorVal(_r_d23, _r53, "x");
-                _final_error += _delta_x[_r54];
-                _d_x[_t95] -= _r_d23;
-                _d_x[_t95];
+                double _r_d24 = _d_beta;
+                _d_beta += _r_d24;
+                double _r40 = _r_d24 * clad::pop(_t94);
+                int _t96 = clad::pop(_t95);
+                _d_p[_t96] += _r40;
+                double _r41 = clad::pop(_t97) * _r_d24;
+                int _t99 = clad::pop(_t98);
+                _d_Ap[_t99] += _r41;
+                double _r42 = clad::pop(_EERepl_beta5);
+                _delta_beta += clad::getErrorVal(_r_d24, _r42, "beta");
+                _d_beta -= _r_d24;
             }
             clad::pop(_t93);
         }
         {
-            double _r_d22 = _d_beta;
-            double _r47 = clad::pop(_t91);
-            double _r48 = _r_d22 / _r47;
-            _d_rtrans += _r48;
-            double _r49 = _r_d22 * -clad::pop(_t92) / (_r47 * _r47);
-            _d_beta += _r49;
-            double _r50 = clad::pop(_EERepl_beta5);
-            _delta_beta += clad::getErrorVal(_r_d22, _r50, "beta");
-            _d_beta -= _r_d22;
+            double _r_d23 = _d_beta;
+            double _r39 = clad::pop(_EERepl_beta4);
+            _delta_beta += clad::getErrorVal(_r_d23, _r39, "beta");
+            _d_beta -= _r_d23;
         }
         {
-            double _r_d21 = _d_beta;
-            double *_r43 = clad::pop(_t88);
-            double *_r45 = clad::pop(_t89);
-            int _grad6 = 0;
-            double _t90 = 0;
-            ddot_pullback(clad::pop(_t87), _r43, _r45, _r_d21, &_grad6, _d_p, _d_Ap, _t90);
-            int _r41 = _grad6;
-            _d_nrow += _r41;
-            clad::array<double> _r42(_d_p);
-            clad::array<double> _r44(_d_Ap);
-            double _r46 = clad::pop(_EERepl_beta4);
-            _delta_beta += _t90;
-            _d_beta -= _r_d21;
-        }
-        {
-            for (; clad::back(_t69); clad::back(_t69)--) {
+            for (; clad::back(_t75); clad::back(_t75)--) {
                 {
+                    int _t92 = clad::pop(_t91);
+                    int _t88 = clad::pop(_t87);
                     int _t86 = clad::pop(_t85);
-                    int _t82 = clad::pop(_t81);
-                    int _t80 = clad::pop(_t79);
-                    double _r_d20 = _d_Ap[_t86];
-                    _d_sum += _r_d20;
-                    _d_Ap[_t86] -= _r_d20;
-                    _d_Ap[_t86];
+                    double _r_d22 = _d_Ap[_t92];
+                    _d_sum += _r_d22;
+                    _d_Ap[_t92] -= _r_d22;
+                    _d_Ap[_t92];
                 }
                 {
-                    for (; clad::back(_t72); clad::back(_t72)--) {
-                        double _r_d19 = _d_sum;
-                        _d_sum += _r_d19;
-                        double _r38 = _r_d19 * clad::pop(_t73);
-                        int _t75 = clad::pop(_t74);
-                        int _t77 = clad::pop(_t76);
-                        double _r39 = clad::pop(_t78) * _r_d19;
-                        int _t84 = clad::pop(_t83);
-                        _d_p[_t84] += _r39;
-                        double _r40 = clad::pop(_EERepl_sum4);
-                        _delta_sum += clad::getErrorVal(_r_d19, _r40, "sum");
-                        _d_sum -= _r_d19;
+                    for (; clad::back(_t78); clad::back(_t78)--) {
+                        double _r_d21 = _d_sum;
+                        _d_sum += _r_d21;
+                        double _r36 = _r_d21 * clad::pop(_t79);
+                        int _t81 = clad::pop(_t80);
+                        int _t83 = clad::pop(_t82);
+                        double _r37 = clad::pop(_t84) * _r_d21;
+                        int _t90 = clad::pop(_t89);
+                        _d_p[_t90] += _r37;
+                        double _r38 = clad::pop(_EERepl_sum4);
+                        _delta_sum += clad::getErrorVal(_r_d21, _r38, "sum");
+                        _d_sum -= _r_d21;
                     }
-                    clad::pop(_t72);
+                    clad::pop(_t78);
                 }
                 {
-                    double _r_d18 = _d_sum;
-                    double _r37 = clad::pop(_EERepl_sum3);
-                    _delta_sum += clad::getErrorVal(_r_d18, _r37, "sum");
-                    _d_sum -= _r_d18;
+                    double _r_d20 = _d_sum;
+                    double _r35 = clad::pop(_EERepl_sum3);
+                    _delta_sum += clad::getErrorVal(_r_d20, _r35, "sum");
+                    _d_sum -= _r_d20;
                 }
                 {
-                    int _r_d17 = _d_cur_nnz;
-                    int _t71 = clad::pop(_t70);
-                    _d_cur_nnz -= _r_d17;
+                    int _r_d19 = _d_cur_nnz;
+                    int _t77 = clad::pop(_t76);
+                    _d_cur_nnz -= _r_d19;
                 }
             }
-            clad::pop(_t69);
+            clad::pop(_t75);
         }
         {
-            double _r_d16 = _d_normr;
-            double _r35 = _r_d16 * clad::custom_derivatives::sqrt_pushforward(clad::pop(_t68), 1.).pushforward;
-            _d_rtrans += _r35;
-            double _r36 = clad::pop(_EERepl_normr3);
-            _delta_normr += clad::getErrorVal(_r_d16, _r36, "normr");
-            _d_normr -= _r_d16;
+            double _r_d18 = _d_normr;
+            double _r33 = _r_d18 * clad::custom_derivatives::sqrt_pushforward(clad::pop(_t74), 1.).pushforward;
+            _d_rtrans += _r33;
+            double _r34 = clad::pop(_EERepl_normr3);
+            _delta_normr += clad::getErrorVal(_r_d18, _r34, "normr");
+            _d_normr -= _r_d18;
         }
-        if (clad::pop(_t43)) {
+        if (clad::pop(_t46)) {
             {
-                for (; clad::back(_t44); clad::back(_t44)--) {
-                    int _t46 = clad::pop(_t45);
-                    double _r_d11 = _d_p[_t46];
-                    int _t48 = clad::pop(_t47);
-                    _d_r[_t48] += _r_d11;
-                    double _r17 = _r_d11 * clad::pop(_t49);
+                for (; clad::back(_t47); clad::back(_t47)--) {
+                    int _t49 = clad::pop(_t48);
+                    double _r_d12 = _d_p[_t49];
+                    int _t51 = clad::pop(_t50);
+                    _d_r[_t51] += _r_d12;
+                    double _r17 = _r_d12 * clad::pop(_t52);
                     _d_beta += _r17;
-                    double _r18 = clad::pop(_t50) * _r_d11;
-                    int _t52 = clad::pop(_t51);
-                    _d_r[_t52] += _r18;
+                    double _r18 = clad::pop(_t53) * _r_d12;
+                    int _t55 = clad::pop(_t54);
+                    _d_r[_t55] += _r18;
                     double _r19 = clad::pop(_EERepl_p2);
-                    int _r20 = clad::pop(_t45);
-                    _delta_p[_r20] += clad::getErrorVal(_r_d11, _r19, "p");
+                    int _r20 = clad::pop(_t48);
+                    _delta_p[_r20] += clad::getErrorVal(_r_d12, _r19, "p");
                     _final_error += _delta_p[_r20];
-                    _d_p[_t46] -= _r_d11;
-                    _d_p[_t46];
+                    _d_p[_t49] -= _r_d12;
+                    _d_p[_t49];
                 }
-                clad::pop(_t44);
+                clad::pop(_t47);
             }
             {
-                double _r_d10 = _d_beta;
+                double _r_d11 = _d_beta;
                 double _r16 = clad::pop(_EERepl_beta2);
-                _delta_beta += clad::getErrorVal(_r_d10, _r16, "beta");
-                _d_beta -= _r_d10;
+                _delta_beta += clad::getErrorVal(_r_d11, _r16, "beta");
+                _d_beta -= _r_d11;
             }
         } else {
             {
-                for (; clad::back(_t59); clad::back(_t59)--) {
-                    int _t61 = clad::pop(_t60);
-                    double _r_d15 = _d_p[_t61];
-                    int _t63 = clad::pop(_t62);
-                    _d_r[_t63] += _r_d15;
-                    double _r31 = _r_d15 * clad::pop(_t64);
-                    _d_beta += _r31;
-                    double _r32 = clad::pop(_t65) * _r_d15;
+                for (; clad::back(_t65); clad::back(_t65)--) {
                     int _t67 = clad::pop(_t66);
-                    _d_p[_t67] += _r32;
-                    double _r33 = clad::pop(_EERepl_p3);
-                    int _r34 = clad::pop(_t60);
-                    _delta_p[_r34] += clad::getErrorVal(_r_d15, _r33, "p");
-                    _final_error += _delta_p[_r34];
-                    _d_p[_t61] -= _r_d15;
-                    _d_p[_t61];
+                    double _r_d17 = _d_p[_t67];
+                    int _t69 = clad::pop(_t68);
+                    _d_r[_t69] += _r_d17;
+                    double _r29 = _r_d17 * clad::pop(_t70);
+                    _d_beta += _r29;
+                    double _r30 = clad::pop(_t71) * _r_d17;
+                    int _t73 = clad::pop(_t72);
+                    _d_p[_t73] += _r30;
+                    double _r31 = clad::pop(_EERepl_p3);
+                    int _r32 = clad::pop(_t66);
+                    _delta_p[_r32] += clad::getErrorVal(_r_d17, _r31, "p");
+                    _final_error += _delta_p[_r32];
+                    _d_p[_t67] -= _r_d17;
+                    _d_p[_t67];
                 }
-                clad::pop(_t59);
+                clad::pop(_t65);
             }
             {
-                double _r_d14 = _d_beta;
-                double _r27 = clad::pop(_t57);
-                double _r28 = _r_d14 / _r27;
-                _d_rtrans += _r28;
-                double _r29 = _r_d14 * -clad::pop(_t58) / (_r27 * _r27);
-                _d_oldrtrans += _r29;
-                double _r30 = clad::pop(_EERepl_beta3);
-                _delta_beta += clad::getErrorVal(_r_d14, _r30, "beta");
-                _d_beta -= _r_d14;
+                double _r_d16 = _d_beta;
+                double _r25 = clad::pop(_t63);
+                double _r26 = _r_d16 / _r25;
+                _d_rtrans += _r26;
+                double _r27 = _r_d16 * -clad::pop(_t64) / (_r25 * _r25);
+                _d_oldrtrans += _r27;
+                double _r28 = clad::pop(_EERepl_beta3);
+                _delta_beta += clad::getErrorVal(_r_d16, _r28, "beta");
+                _d_beta -= _r_d16;
             }
             {
-                double _r_d13 = _d_rtrans;
-                double *_r23 = clad::pop(_t54);
-                double *_r25 = clad::pop(_t55);
-                int _grad3 = 0;
-                double _t56 = 0;
-                ddot_pullback(clad::pop(_t53), _r23, _r25, _r_d13, &_grad3, _d_r, _d_r, _t56);
-                int _r21 = _grad3;
-                _d_nrow += _r21;
-                clad::array<double> _r22(_d_r);
-                clad::array<double> _r24(_d_r);
-                double _r26 = clad::pop(_EERepl_rtrans2);
-                _delta_rtrans += _t56;
-                _d_rtrans -= _r_d13;
+                for (; clad::back(_t56); clad::back(_t56)--) {
+                    double _r_d15 = _d_rtrans;
+                    _d_rtrans += _r_d15;
+                    double _r22 = _r_d15 * clad::pop(_t57);
+                    int _t59 = clad::pop(_t58);
+                    _d_r[_t59] += _r22;
+                    double _r23 = clad::pop(_t60) * _r_d15;
+                    int _t62 = clad::pop(_t61);
+                    _d_r[_t62] += _r23;
+                    double _r24 = clad::pop(_EERepl_rtrans4);
+                    _delta_rtrans += clad::getErrorVal(_r_d15, _r24, "rtrans");
+                    _d_rtrans -= _r_d15;
+                }
+                clad::pop(_t56);
             }
             {
-                double _r_d12 = _d_oldrtrans;
-                _d_rtrans += _r_d12;
-                _d_oldrtrans -= _r_d12;
+                double _r_d14 = _d_rtrans;
+                double _r21 = clad::pop(_EERepl_rtrans3);
+                _delta_rtrans += clad::getErrorVal(_r_d14, _r21, "rtrans");
+                _d_rtrans -= _r_d14;
+            }
+            {
+                double _r_d13 = _d_oldrtrans;
+                _d_rtrans += _r_d13;
+                _d_oldrtrans -= _r_d13;
             }
         }
     }
     {
-        double _r_d9 = _d_normr;
-        double _r15 = _r_d9 * clad::custom_derivatives::sqrt_pushforward(_t40, 1.).pushforward;
+        double _r_d10 = _d_normr;
+        double _r15 = _r_d10 * clad::custom_derivatives::sqrt_pushforward(_t43, 1.).pushforward;
         _d_rtrans += _r15;
-        _delta_normr += clad::getErrorVal(_r_d9, _EERepl_normr2, "normr");
-        _d_normr -= _r_d9;
+        _delta_normr += clad::getErrorVal(_r_d10, _EERepl_normr2, "normr");
+        _d_normr -= _r_d10;
+    }
+    for (; _t36; _t36--) {
+        double _r_d9 = _d_rtrans;
+        _d_rtrans += _r_d9;
+        double _r12 = _r_d9 * clad::pop(_t37);
+        int _t39 = clad::pop(_t38);
+        _d_r[_t39] += _r12;
+        double _r13 = clad::pop(_t40) * _r_d9;
+        int _t42 = clad::pop(_t41);
+        _d_r[_t42] += _r13;
+        double _r14 = clad::pop(_EERepl_rtrans2);
+        _delta_rtrans += clad::getErrorVal(_r_d9, _r14, "rtrans");
+        _d_rtrans -= _r_d9;
     }
     {
         double _r_d8 = _d_rtrans;
-        int _grad0 = 0;
-        double _t39 = 0;
-        ddot_pullback(_t36, _t37, _t38, _r_d8, &_grad0, _d_r, _d_r, _t39);
-        int _r12 = _grad0;
-        _d_nrow += _r12;
-        clad::array<double> _r13(_d_r);
-        clad::array<double> _r14(_d_r);
-        _delta_rtrans += _t39;
+        _delta_rtrans += clad::getErrorVal(_r_d8, _EERepl_rtrans1, "rtrans");
         _d_rtrans -= _r_d8;
     }
     for (; _t27; _t27--) {
@@ -726,42 +680,50 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     clad::array<double> _delta_b(_d_b.size());
     int i = 0;
     for (; i < _d_b.size(); i++) {
-        double _t120 = clad::getErrorVal(_d_b[i], b[i], "b");
-        _delta_b[i] += _t120;
-        _final_error += _t120;
+        double _t129 = clad::getErrorVal(_d_b[i], b[i], "b");
+        _delta_b[i] += _t129;
+        _final_error += _t129;
     }
     i = 0;
+    double errSum = 0;
     for (; i < _d_x.size(); i++) {
-        double _t121 = clad::getErrorVal(_d_x[i], _EERepl_x0[i], "x");
-        _delta_x[i] += _t121;
-        _final_error += _t121;
+        double _t130 = clad::getErrorVal(_d_x[i], _EERepl_x0[i], "x");
+        _delta_x[i] += _t130;
+        errSum += _delta_x[i];
+        _final_error += _t130;
     }
     clad::array<double> _delta_xexact(_d_xexact.size());
     i = 0;
     for (; i < _d_xexact.size(); i++) {
-        double _t122 = clad::getErrorVal(_d_xexact[i], xexact[i], "xexact");
-        _delta_xexact[i] += _t122;
-        _final_error += _t122;
+        double _t131 = clad::getErrorVal(_d_xexact[i], xexact[i], "xexact");
+        _delta_xexact[i] += _t131;
+        _final_error += _t131;
     }
     i = 0;
+    double errSumr = 0;
     for (; i < _d_r.size(); i++) {
-        double _t123 = clad::getErrorVal(_d_r[i], _EERepl_r0[i], "r");
-        _delta_r[i] += _t123;
-        _final_error += _t123;
+        double _t132 = clad::getErrorVal(_d_r[i], _EERepl_r0[i], "r");
+        _delta_r[i] += _t132;
+        errSumr += _delta_r[i];
+        _final_error += _t132;
     }
     i = 0;
     for (; i < _d_p.size(); i++) {
-        double _t124 = clad::getErrorVal(_d_p[i], _EERepl_p0[i], "p");
-        _delta_p[i] += _t124;
-        _final_error += _t124;
+        double _t133 = clad::getErrorVal(_d_p[i], _EERepl_p0[i], "p");
+        _delta_p[i] += _t133;
+        _final_error += _t133;
     }
     clad::array<double> _delta_Ap(_d_Ap.size());
     i = 0;
     for (; i < _d_Ap.size(); i++) {
-        double _t125 = clad::getErrorVal(_d_Ap[i], Ap[i], "Ap");
-        _delta_Ap[i] += _t125;
-        _final_error += _t125;
+        double _t134 = clad::getErrorVal(_d_Ap[i], Ap[i], "Ap");
+        _delta_Ap[i] += _t134;
+        _final_error += _t134;
     }
-    std::cout << _delta_sum;
-    _final_error += _delta_normr + _delta_tolerance + _delta_sum + _delta_rtrans + _delta_oldrtrans + _delta_residual + _delta_beta + _delta_diff;
+
+    std::cout << "sum : " << _delta_sum << std::endl;
+    std::cout << "x : " << errSum << std::endl;
+    std::cout << "r : " << errSumr << std::endl;
+    
+    _final_error += _delta_normr + _delta_sum + _delta_rtrans + _delta_beta + _delta_diff + _delta_tolerance + _delta_residual + _delta_oldrtrans;
 }

@@ -119,7 +119,12 @@ double HPCCG_residual(double *b, double *x,
   for (int i = 0; i < nrow; i++)
     r[i] = b[i] + beta * Ap[i];
 
-  rtrans = ddot(nrow, r, r);
+  // ddot(nrow, r, r, &rtrans);
+  rtrans = 0.0;
+  for (int i = 0; i < nrow; i++)
+    rtrans += r[i] * r[i];
+  // ddot end
+
   normr = sqrt(rtrans);
 
   for (int k = 1; k < max_iter && normr > tolerance; k++)
@@ -134,7 +139,12 @@ double HPCCG_residual(double *b, double *x,
     else
     {
       oldrtrans = rtrans;
-      rtrans = ddot(nrow, r, r);
+      // ddot (nrow, r, r, &rtrans); // 2*nrow ops
+      rtrans = 0.0;
+      for (int i = 0; i < nrow; i++)
+        rtrans += r[i] * r[i];
+      // ddot end
+
       beta = rtrans / oldrtrans;
 
       //// waxpby(nrow, 1.0, r, beta, p, p);
@@ -156,7 +166,12 @@ double HPCCG_residual(double *b, double *x,
 
     // waxpby(nrow, 1.0, x, alpha, p, x);
     // beta = 0.0;
-    beta = ddot(nrow, p, Ap);
+    // beta = ddot(nrow, p, Ap);
+    // ddot(nrow, p, Ap, &alpha); // 2*nrow ops
+    beta = 0.0;
+    for (int i = 0; i < nrow; i++)
+      beta += p[i] * Ap[i];
+    // ddot end
     beta = rtrans / beta;
 
     for (int i = 0; i < nrow; i++)
