@@ -113,6 +113,11 @@ static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
   delete[] p;
   delete[] Ap;
   delete[] r;
+
+  delete[] x;
+  delete[] xexact;
+  delete[] b;
+  delete A;
 }
 
 static void ErrorEstimateHPCCGClad(benchmark::State &state)
@@ -173,6 +178,8 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
 
   for (auto _ : state)
   {
+    clad::resetErrors();
+
     HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
 
     cout << "\nFinal error in HPCCG =" << _final_error << endl;
@@ -189,20 +196,20 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   delete[] b_diff;
   delete[] x_diff;
   delete[] xexact_diff;
-  delete[] p;
   delete[] p_diff;
-  delete[] Ap;
   delete[] Ap_diff;
-  delete[] r;
   delete[] r_diff;
+  delete[] p;
+  delete[] Ap;
+  delete[] r;
 
   delete[] x;
   delete[] xexact;
   delete[] b;
 }
 
-BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond)->Iterations(10);
+BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond)->Iterations(10);
 
-BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond)->Iterations(1);
 
 BENCHMARK_MAIN();
