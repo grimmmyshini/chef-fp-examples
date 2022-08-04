@@ -1,3 +1,7 @@
+namespace clad {
+
+HPC_Sparse_Matrix A;
+
 void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double *p, double *Ap, clad::array_ref<double> _d_b, clad::array_ref<double> _d_x, clad::array_ref<double> _d_xexact, clad::array_ref<double> _d_r, clad::array_ref<double> _d_p, clad::array_ref<double> _d_Ap, double &_final_error) {
     int _d_niters = 0;
     double _d_normr = 0;
@@ -727,3 +731,6 @@ void HPCCG_residual_grad(double *b, double *x, double *xexact, double *r, double
     
     _final_error += _delta_normr + _delta_sum + _delta_rtrans + _delta_beta + _delta_diff + _delta_tolerance + _delta_residual + _delta_oldrtrans;
 }
+
+}
+

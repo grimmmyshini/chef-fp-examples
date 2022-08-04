@@ -1,3 +1,4 @@
+
 //@HEADER
 // ************************************************************************
 // 
@@ -26,27 +27,25 @@
 // ************************************************************************
 //@HEADER
 
-#ifndef DDOT_H
-#define DDOT_H
-
 #include "adapt.h"
 
 namespace adapt {
 
-int ddot (const int n, const AD_real * const x, const AD_real * const y, 
-	  AD_real * const result)
+int waxpby (const int n, const AD_real alpha, const AD_real * const x, 
+	    const AD_real beta, const AD_real * const y, 
+		     AD_real * const w)
 {  
-  AD_real local_result = 0.0;
-  if (y==x)
-    for (int i=0; i<n; i++) local_result += x[i]*x[i];
-  else
-    for (int i=0; i<n; i++) local_result += x[i]*y[i];
-
-  *result = local_result;
+  if (alpha==1.0) {
+    for (int i=0; i<n; i++) w[i] = x[i] + beta * y[i];
+  }
+  else if(beta==1.0) {
+    for (int i=0; i<n; i++) w[i] = alpha * x[i] + y[i];
+  }
+  else {
+    for (int i=0; i<n; i++) w[i] = alpha * x[i] + beta * y[i];
+  }
 
   return(0);
 }
 
 } // adapt
-
-#endif

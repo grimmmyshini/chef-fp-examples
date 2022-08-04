@@ -1,84 +1,162 @@
 
 //@HEADER
 // ************************************************************************
-//
+// 
 //               HPCCG: Simple Conjugate Gradient Benchmark Code
 //                 Copyright (2006) Sandia Corporation
-//
+// 
 // Under terms of Contract DE-AC04-94AL85000, there is a non-exclusive
 // license for use of this work by or on behalf of the U.S. Government.
-//
+// 
 // This library is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as
 // published by the Free Software Foundation; either version 2.1 of the
 // License, or (at your option) any later version.
-//
+//  
 // This library is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-//
+//  
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 // USA
-// Questions? Contact Michael A. Heroux (maherou@sandia.gov)
-//
+// Questions? Contact Michael A. Heroux (maherou@sandia.gov) 
+// 
 // ************************************************************************
 //@HEADER
 
-// Changelog
-//
-// Version 0.3
-// - Added timing of setup time for sparse MV
-// - Corrected percentages reported for sparse MV with overhead
-//
-/////////////////////////////////////////////////////////////////////////
+#ifndef HPCCG_H
+#define HPCCG_H
+#include "HPC_sparsemv.hpp"
+#include "ddot.hpp"
+#include "waxpby.hpp"
+#include "HPC_Sparse_Matrix.hpp"
+#include "HPCCG.hpp"
 
-// Main routine of a program that reads a sparse matrix, right side
-// vector, solution vector and initial guess from a file  in HPC
-// format.  This program then calls the HPCCG conjugate gradient
-// solver to solve the problem, and then prints results.
+#include "Derivative.hpp"
 
-// Calling sequence:
-
-// test_HPCCG linear_system_file
-
-// Routines called:
-
-// read_HPC_row - Reads in linear system
-
-// mytimer - Timing routine (compile with -DWALL to get wall clock
-//           times
-
-// HPCCG - CG Solver
-
-// compute_residual - Compares HPCCG solution to known solution.
+#include "adapt.h"
+#include "adapt-impl.cpp"
 
 #include <iostream>
 using std::cerr;
 using std::cout;
 using std::endl;
-#include <cstdio>
-#include <cstdlib>
-#include <cctype>
-#include <cassert>
-#include <string>
 #include <cmath>
-#include <iomanip>
 
-#include "clad/Differentiator/Differentiator.h"
-#include "../PrintModel/ErrorFunc.h"
+// this function will compute the Conjugate Gradient...
+// A <=> Matrix
+// b <=> constant
+// xnot <=> initial guess
+// max_iter <=> how many times we iterate
+// tolerance <=> specifies how "good"of a value we would like
+// x <=> used for return value
 
-#include "generate_matrix.hpp"
-#include "read_HPC_row.hpp"
-#include "HPC_Sparse_Matrix.hpp"
-#include "dump_matlab_matrix.hpp"
-#include "ddot.hpp"
+// A is known
+// x is unknown vector
+// b is known vector
+// xnot = 0
+// niters is the number of iterations
 
-#undef DEBUG
+namespace adapt {
 
-HPC_Sparse_Matrix A;
+int HPCCG(HPC_Sparse_Matrix *A,
+          const AD_real *const b, AD_real *const x,
+          const int max_iter, const double tolerance, int &niters,
+          AD_real &normr, AD_real *r, AD_real *p, AD_real *Ap)
+
+{
+  int nrow = A->local_nrow;
+  int ncol = A->local_ncol;
+
+  normr = 0.0;
+  AD_real rtrans = 0.0;
+  AD_real oldrtrans = 0.0;
+
+  int rank = 0; // Serial case (not using MPI)
+
+  int print_freq = max_iter / 10;
+  if (print_freq > 50)
+    print_freq = 50;
+  if (print_freq < 1)
+    print_freq = 1;
+
+  // p is of length ncols, copy x to p for sparse MV operation
+  waxpby(nrow, 1.0, x, 0.0, x, p);
+
+  HPC_sparsemv(A, p, Ap);
+  
+  waxpby(nrow, 1.0, b, -1.0, Ap, r);
+  
+  ddot(nrow, r, r, &rtrans);
+  
+  normr = sqrt(AD_value(rtrans));
+  AD_INTERMEDIATE(normr, "normr");
+
+  if (rank == 0)
+    cout << "Initial Residual = " << AD_value(normr) << endl;
+
+  for (int k = 1; k < max_iter && normr > tolerance; k++)
+  {
+    if (k == 1)
+    {
+      waxpby(nrow, 1.0, r, 0.0, r, p);
+    }
+    else
+    {
+      oldrtrans = rtrans;
+	  
+      ddot(nrow, r, r, &rtrans);
+	  
+      AD_real beta = rtrans / oldrtrans;
+      AD_INTERMEDIATE(beta, "beta");
+	  
+      waxpby(nrow, 1.0, r, beta, p, p);
+	  
+      // for(int ii=0; ii < nrow; ii++) {AD_INTERMEDIATE(p[ii], "p"+std::to_string(k));};
+    }
+    normr = sqrt(rtrans);
+    AD_INTERMEDIATE(normr, "normr");
+    if (rank == 0 && (k % print_freq == 0 || k + 1 == max_iter))
+      cout << "Iteration = " << k << "   Residual = " << AD_value(normr) << endl;
+
+    HPC_sparsemv(A, p, Ap);
+
+    for (int ii = 0; ii < nrow; ii++)
+    {
+      AD_INTERMEDIATE(Ap[ii], "Ap");
+    };
+    AD_real alpha = 0.0;
+	
+    ddot(nrow, p, Ap, &alpha);
+	
+    AD_INTERMEDIATE(alpha, "alpha");
+    alpha = rtrans / alpha;
+    AD_INTERMEDIATE(alpha, "alpha");
+	
+    waxpby(nrow, 1.0, x, alpha, p, x); // 2*nrow ops
+    for (int ii = 0; ii < nrow; ii++)
+    {
+      AD_INTERMEDIATE(x[ii], "x");
+    };
+    waxpby(nrow, 1.0, r, -alpha, Ap, r);
+	
+    for (int ii = 0; ii < nrow; ii++)
+    {
+      AD_INTERMEDIATE(r[ii], "r");
+    };
+    niters = k;
+  }
+
+  return (0);
+}
+
+} // namespace adapt
+
+
+namespace clad {
 
 template <typename precision>
 double HPCCG_residual(double *b, double *x,
@@ -207,8 +285,6 @@ void printVals(T* arr, int n) {
   cout << endl;
 }
 
-#include "Derivative.h"
-
 void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
   // auto df = clad::gradient(HPCCG_residual<double>);
   // auto df = clad::estimate_error(HPCCG_residual<double>);
@@ -278,58 +354,8 @@ precision executefunction(int nrow, int ncol, double* x, double* b, double* xexa
   delete[] r;
 
   return residual;
-} 
-
-int main(int argc, char *argv[])
-{
-  double *x, *b, *xexact;
-  double *x_diff, *b_diff, *xexact_diff;
-  double norm, d;
-  int ierr = 0;
-  int i, j;
-  int ione = 1;
-  double times[7];
-  double t6 = 0.0;
-  int nx, ny, nz;
-
-  if (argc != 2 && argc != 4)
-  {
-    cerr << "Usage:" << endl
-         << "Mode 1: " << argv[0] << " nx ny nz" << endl
-         << "     where nx, ny and nz are the local sub-block dimensions, or" << endl
-         << "Mode 2: " << argv[0] << " HPC_data_file " << endl
-         << "     where HPC_data_file is a globally accessible file containing matrix data." << endl;
-    exit(1);
-  }
-
-  if (argc == 4)
-  {
-    nx = atoi(argv[1]);
-    ny = atoi(argv[2]);
-    nz = atoi(argv[3]);
-    generate_matrix(nx, ny, nz, A, &x, &b, &xexact);
-  }
-  else
-  {
-    read_HPC_row(argv[1], A, &x, &b, &xexact);
-  }
-
-  bool dump_matrix = false;
-  if (dump_matrix)
-    dump_matlab_matrix(A);
-
-  int nrow = A.local_nrow;
-  int ncol = A.local_ncol;
-
-  
-  // cout << "Float Result: " << executefunction<float>(nrow, ncol, x, b, xexact) << std::endl;
-  // cout << "Double Result: " << executefunction<double>(nrow, ncol, x, b, xexact);
-
-  executeGradient(nrow, ncol, x, b, xexact);
-
-  delete[] x;
-  delete[] xexact;
-  delete[] b;
-
-  return 0;
 }
+
+} // clad
+
+#endif

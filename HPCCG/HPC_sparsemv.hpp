@@ -1,3 +1,4 @@
+
 //@HEADER
 // ************************************************************************
 // 
@@ -26,24 +27,46 @@
 // ************************************************************************
 //@HEADER
 
-#ifndef DDOT_H
-#define DDOT_H
+#ifndef HPC_SPARSEMV_H
+#define HPC_SPARSEMV_H
 
+#include <iostream>
+using std::cout;
+using std::cerr;
+using std::endl;
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
+#include <cassert>
+#include <string>
+#include <cmath>
+
+#include "HPC_Sparse_Matrix.hpp"
 #include "adapt.h"
 
 namespace adapt {
 
-int ddot (const int n, const AD_real * const x, const AD_real * const y, 
-	  AD_real * const result)
-{  
-  AD_real local_result = 0.0;
-  if (y==x)
-    for (int i=0; i<n; i++) local_result += x[i]*x[i];
-  else
-    for (int i=0; i<n; i++) local_result += x[i]*y[i];
+int HPC_sparsemv( HPC_Sparse_Matrix *A, 
+		 const AD_real * const x, AD_real * const y)
+{
 
-  *result = local_result;
+  const int nrow = (const int) A->local_nrow;
 
+  for (int i=0; i< nrow; i++)
+    {
+      AD_real sum = 0.0;
+      const double * const cur_vals = 
+     (const double * const) A->ptr_to_vals_in_row[i];
+
+      const int    * const cur_inds = 
+     (const int    * const) A->ptr_to_inds_in_row[i];
+
+      const int cur_nnz = (const int) A->nnz_in_row[i];
+
+      for (int j=0; j< cur_nnz; j++)
+          sum += cur_vals[j]*x[cur_inds[j]];
+      y[i] = sum;
+    }
   return(0);
 }
 

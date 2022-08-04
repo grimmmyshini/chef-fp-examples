@@ -1,3 +1,4 @@
+
 //@HEADER
 // ************************************************************************
 // 
@@ -26,27 +27,30 @@
 // ************************************************************************
 //@HEADER
 
-#ifndef DDOT_H
-#define DDOT_H
+#ifndef COMPUTE_RESIDUAL_H
+#define COMPUTE_RESIDUAL_H
 
 #include "adapt.h"
+#include <cmath>  // needed for fabs
+using std::fabs;
 
 namespace adapt {
 
-int ddot (const int n, const AD_real * const x, const AD_real * const y, 
-	  AD_real * const result)
-{  
-  AD_real local_result = 0.0;
-  if (y==x)
-    for (int i=0; i<n; i++) local_result += x[i]*x[i];
-  else
-    for (int i=0; i<n; i++) local_result += x[i]*y[i];
-
-  *result = local_result;
+int compute_residual(const int n, const AD_real * const v1, 
+		     const double * const v2, AD_real * const residual)
+{
+  AD_real local_residual = 0.0;
+  
+  for (int i=0; i<n; i++) {
+    AD_real diff = fabs(v1[i] - v2[i]);
+    if (diff > local_residual) local_residual = diff;
+  }
+  
+  *residual = local_residual;
 
   return(0);
 }
 
-} // adapt
+}
 
 #endif
