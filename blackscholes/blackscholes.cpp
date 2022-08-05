@@ -38,8 +38,40 @@ typedef struct OptionData_
 // Cumulative Normal Distribution Function
 // See Hull, Section 11.8, P.243-244
 
-fptype CNDF(fptype InputX)
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+fptype BlkSchlsEqEuroNoDiv(fptype sptprice,
+                           fptype strike, fptype rate, fptype volatility,
+                           fptype time, int otype, float timet)
 {
+    fptype OptionPrice;
+
+    // local private working variables for the calculation
+    fptype xStockPrice;
+    fptype xStrikePrice;
+    fptype xRiskFreeRate;
+    fptype xVolatility;
+    fptype xTime;
+    fptype xSqrtTime;
+
+    fptype logValues;
+    fptype xLogTerm;
+    fptype xD1;
+    fptype xD2;
+    fptype xPowerTerm;
+    fptype xDen;
+    fptype d1;
+    fptype d2;
+    fptype FutureValueX;
+    fptype NofXd1;
+    fptype NofXd2;
+    fptype NegNofXd1;
+    fptype NegNofXd2;
+
+    fptype InputX;
+
     int sign;
 
     fptype OutputX;
@@ -52,6 +84,35 @@ fptype CNDF(fptype InputX)
     fptype xLocal, xLocal_1;
     fptype xLocal_2, xLocal_3;
     fptype inv_sqrt_2xPI = 0.39894228040143270286;
+
+    xStockPrice = sptprice;
+    xStrikePrice = strike;
+    xRiskFreeRate = rate;
+    xVolatility = volatility;
+
+    xTime = time;
+    xSqrtTime = sqrt(xTime);
+
+    logValues = log(sptprice / strike);
+
+    xLogTerm = logValues;
+
+    xPowerTerm = xVolatility * xVolatility;
+    xPowerTerm = xPowerTerm * 0.5;
+
+    xD1 = xRiskFreeRate + xPowerTerm;
+    xD1 = xD1 * xTime;
+    xD1 = xD1 + xLogTerm;
+
+    xDen = xVolatility * xSqrtTime;
+    xD1 = xD1 / xDen;
+    xD2 = xD1 - xDen;
+
+    d1 = xD1;
+    d2 = xD2;
+
+    // ---------------------------- NofXd1 = CNDF(d1) --------------------------
+    InputX = d1;
 
     // Check for negative value of InputX
     if (InputX < 0.0)
@@ -97,69 +158,58 @@ fptype CNDF(fptype InputX)
         OutputX = 1.0 - OutputX;
     }
 
-    return OutputX;
-}
+    NofXd1 = OutputX;
+    // -------------------------- NofXd1 = CNDF(d1) END ------------------------
 
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-fptype BlkSchlsEqEuroNoDiv(fptype sptprice,
-                           fptype strike, fptype rate, fptype volatility,
-                           fptype time, int otype, float timet)
-{
-    fptype OptionPrice;
+    // ---------------------------- NofXd2 = CNDF(d2) --------------------------
+    InputX = d2;
 
-    // local private working variables for the calculation
-    fptype xStockPrice;
-    fptype xStrikePrice;
-    fptype xRiskFreeRate;
-    fptype xVolatility;
-    fptype xTime;
-    fptype xSqrtTime;
+    // Check for negative value of InputX
+    if (InputX < 0.0)
+    {
+        InputX = -InputX;
+        sign = 1;
+    }
+    else
+        sign = 0;
 
-    fptype logValues;
-    fptype xLogTerm;
-    fptype xD1;
-    fptype xD2;
-    fptype xPowerTerm;
-    fptype xDen;
-    fptype d1;
-    fptype d2;
-    fptype FutureValueX;
-    fptype NofXd1;
-    fptype NofXd2;
-    fptype NegNofXd1;
-    fptype NegNofXd2;
+    xInput = InputX;
 
-    xStockPrice = sptprice;
-    xStrikePrice = strike;
-    xRiskFreeRate = rate;
-    xVolatility = volatility;
+    // Compute NPrimeX term common to both four & six decimal accuracy calcs
+    expValues = exp(-0.5f * InputX * InputX);
+    xNPrimeofX = expValues;
+    xNPrimeofX = xNPrimeofX * inv_sqrt_2xPI;
 
-    xTime = time;
-    xSqrtTime = sqrt(xTime);
+    xK2 = 0.2316419 * xInput;
+    xK2 = 1.0 + xK2;
+    xK2 = 1.0 / xK2;
+    xK2_2 = xK2 * xK2;
+    xK2_3 = xK2_2 * xK2;
+    xK2_4 = xK2_3 * xK2;
+    xK2_5 = xK2_4 * xK2;
 
-    logValues = log(sptprice / strike);
+    xLocal_1 = xK2 * 0.319381530;
+    xLocal_2 = xK2_2 * (-0.356563782);
+    xLocal_3 = xK2_3 * 1.781477937;
+    xLocal_2 = xLocal_2 + xLocal_3;
+    xLocal_3 = xK2_4 * (-1.821255978);
+    xLocal_2 = xLocal_2 + xLocal_3;
+    xLocal_3 = xK2_5 * 1.330274429;
+    xLocal_2 = xLocal_2 + xLocal_3;
 
-    xLogTerm = logValues;
+    xLocal_1 = xLocal_2 + xLocal_1;
+    xLocal = xLocal_1 * xNPrimeofX;
+    xLocal = 1.0 - xLocal;
 
-    xPowerTerm = xVolatility * xVolatility;
-    xPowerTerm = xPowerTerm * 0.5;
+    OutputX = xLocal;
 
-    xD1 = xRiskFreeRate + xPowerTerm;
-    xD1 = xD1 * xTime;
-    xD1 = xD1 + xLogTerm;
+    if (sign)
+    {
+        OutputX = 1.0 - OutputX;
+    }
 
-    xDen = xVolatility * xSqrtTime;
-    xD1 = xD1 / xDen;
-    xD2 = xD1 - xDen;
-
-    d1 = xD1;
-    d2 = xD2;
-
-    NofXd1 = CNDF(d1);
-    NofXd2 = CNDF(d2);
+    NofXd2 = OutputX;
+    // -------------------------- NofXd2 = CNDF(d2) END ------------------------
 
     FutureValueX = strike * (exp(-(rate) * (time)));
     if (otype == 0)
