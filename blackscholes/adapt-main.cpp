@@ -11,6 +11,7 @@
 #include <cstring>
 
 #include "blackscholes.hpp"
+#include "blackscholes-adapt.hpp"
 
 #include "adapt.h"
 
@@ -115,16 +116,18 @@ int main(int argc, char **argv)
     printf("Num of Runs: %d\n", NUM_RUNS);
 
     const int LINESIZE = 64;
+    const int PAD_FPTYPE = LINESIZE * sizeof(fptype);
+    const int PAD_INT = LINESIZE * sizeof(int);
 
     buffer = new AD_real[5 * numOptions + LINESIZE];
-    sptprice = (AD_real *)(((unsigned long long)buffer + PAD) & ~(LINESIZE - 1));
+    sptprice = (AD_real *)(((unsigned long long)buffer + PAD_FPTYPE) & ~(LINESIZE - 1));
     strike = sptprice + numOptions;
     rate = strike + numOptions;
     volatility = rate + numOptions;
     otime = volatility + numOptions;
 
     buffer2 = new int[numOptions + LINESIZE];
-    otype = (int *)(((unsigned long long)buffer2 + PAD) & ~(LINESIZE - 1));
+    otype = (int *)(((unsigned long long)buffer2 + PAD_INT) & ~(LINESIZE - 1));
 
     for (i = 0; i < numOptions; i++)
     {
