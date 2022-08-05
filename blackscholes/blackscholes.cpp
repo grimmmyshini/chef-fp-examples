@@ -31,19 +31,6 @@ typedef struct OptionData_
     fptype DGrefval; // DerivaGem Reference Value
 } OptionData;
 
-OptionData *data;
-fptype *prices;
-int numOptions;
-
-int *otype;
-fptype *sptprice;
-fptype *strike;
-fptype *rate;
-fptype *volatility;
-fptype *otime;
-int numError = 0;
-int nThreads;
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,41 +181,6 @@ fptype BlkSchlsEqEuroNoDiv(fptype sptprice,
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 
-int bs_thread()
-{
-    int k, j;
-    fptype price;
-    fptype priceDelta;
-    int start = 0 * (numOptions / nThreads);
-    int end = start + (numOptions / nThreads);
-
-    for (j = 0; j < NUM_RUNS; j++)
-    {
-        for (k = start; k < end; k++)
-        {
-            /* Calling main function to calculate option value based on
-             * Black & Scholes's equation.
-             */
-            price = BlkSchlsEqEuroNoDiv(sptprice[k], strike[k],
-                                        rate[k], volatility[k], otime[k],
-                                        otype[k], 0);
-            prices[k] = price;
-
-#ifdef ERR_CHK
-            priceDelta = data[k].DGrefval - price;
-            if (fabs(priceDelta) >= 1e-4)
-            {
-                printf("Error on %d. Computed=%.5f, Ref=%.5f, Delta=%.5f\n",
-                       k, price, data[k].DGrefval, priceDelta);
-                numError++;
-            }
-#endif
-        }
-    }
-
-    return 0;
-}
-
 int main(int argc, char **argv)
 {
     FILE *file;
@@ -237,6 +189,19 @@ int main(int argc, char **argv)
     fptype *buffer;
     int *buffer2;
     int rv;
+
+    OptionData *data;
+    fptype *prices;
+    int numOptions;
+
+    int *otype;
+    fptype *sptprice;
+    fptype *strike;
+    fptype *rate;
+    fptype *volatility;
+    fptype *otime;
+    int numError = 0;
+    int nThreads;
 
     printf("PARSEC Benchmark Suite\n");
     fflush(NULL);
@@ -335,7 +300,37 @@ int main(int argc, char **argv)
     printf("Size of data: %d\n", numOptions * (sizeof(OptionData) + sizeof(int)));
 
     // serial version
-    bs_thread();
+    // ---------------------------- bs_thread() ------------------------------
+    int k, j;
+    fptype price;
+    fptype priceDelta;
+    int start = 0 * (numOptions / nThreads);
+    int end = start + (numOptions / nThreads);
+
+    for (j = 0; j < NUM_RUNS; j++)
+    {
+        for (k = start; k < end; k++)
+        {
+            /* Calling main function to calculate option value based on
+             * Black & Scholes's equation.
+             */
+            price = BlkSchlsEqEuroNoDiv(sptprice[k], strike[k],
+                                        rate[k], volatility[k], otime[k],
+                                        otype[k], 0);
+            prices[k] = price;
+
+#ifdef ERR_CHK
+            priceDelta = data[k].DGrefval - price;
+            if (fabs(priceDelta) >= 1e-4)
+            {
+                printf("Error on %d. Computed=%.5f, Ref=%.5f, Delta=%.5f\n",
+                       k, price, data[k].DGrefval, priceDelta);
+                numError++;
+            }
+#endif
+        }
+    }
+    // -------------------------- bs_thread END -----------------------------
 
     // Write prices to output file
     file = fopen(outputFile, "w");
