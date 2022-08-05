@@ -80,11 +80,11 @@ int main(int argc, char **argv)
     }
 
     // alloc spaces for the option data
-    data = (OptionData *)malloc(numOptions * sizeof(OptionData));
-    prices = (fptype *)malloc(numOptions * sizeof(fptype));
+    data = new OptionData[numOptions];
+    prices = new fptype[numOptions];
     for (loopnum = 0; loopnum < numOptions; ++loopnum)
     {
-        rv = fscanf(file, "%f %f %f %f %f %f %c %f %f",
+        rv = fscanf(file, "%lf %lf %lf %lf %lf %lf %c %lf %lf",
                     &data[loopnum].s,
                     &data[loopnum].strike,
                     &data[loopnum].r,
@@ -112,17 +112,18 @@ int main(int argc, char **argv)
     printf("Num of Options: %d\n", numOptions);
     printf("Num of Runs: %d\n", NUM_RUNS);
 
-#define PAD 256
-#define LINESIZE 64
 
-    buffer = (fptype *)malloc(5 * numOptions * sizeof(fptype) + PAD);
+    const int LINESIZE = 64;
+    const int PAD = LINESIZE * sizeof(fptype);
+
+    buffer = new fptype[5 * numOptions + LINESIZE];
     sptprice = (fptype *)(((unsigned long long)buffer + PAD) & ~(LINESIZE - 1));
     strike = sptprice + numOptions;
     rate = strike + numOptions;
     volatility = rate + numOptions;
     otime = volatility + numOptions;
 
-    buffer2 = (int *)malloc(numOptions * sizeof(fptype) + PAD);
+    buffer2 = new int[numOptions + LINESIZE];
     otype = (int *)(((unsigned long long)buffer2 + PAD) & ~(LINESIZE - 1));
 
     for (i = 0; i < numOptions; i++)
@@ -154,7 +155,7 @@ int main(int argc, char **argv)
              */
             price = BlkSchlsEqEuroNoDiv(sptprice[k], strike[k],
                                         rate[k], volatility[k], otime[k],
-                                        otype[k], 0);
+                                        otype[k]);
             prices[k] = price;
 
 #ifdef ERR_CHK
@@ -201,8 +202,10 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    free(data);
-    free(prices);
+    delete[] buffer2;
+    delete[] buffer;
+    delete[] data;
+    delete[] prices;
 
     return 0;
 }

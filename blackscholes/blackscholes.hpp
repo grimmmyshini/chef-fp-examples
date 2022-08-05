@@ -1,6 +1,7 @@
 #include <cmath>
 
-#define fptype float
+typedef double fptype;
+#define INPUT_LINE_FORMAT "%lf %lf %lf %lf %lf %lf %c %lf %lf"
 
 #define NUM_RUNS 100
 
