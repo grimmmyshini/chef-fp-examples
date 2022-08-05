@@ -54,19 +54,20 @@
 
 
 // /* kmeans_clustering.c */
-// __inline
-// float euclid_dist_2(float *pt1,
-//                     float *pt2,
-//                     int    numdims)
-// {
-//     int i;
-//     float ans=0.0;
+template <typename T, typename P>
+__inline
+T euclid_dist_2(P *pt1,
+                    P *pt2,
+                    int    numdims)
+{
+    int i;
+    T ans=0.0;
 
-//     for (i=0; i<numdims; i++)
-//         ans += (pt1[i]-pt2[i]) * (pt1[i]-pt2[i]);
+    for (i=0; i<numdims; i++)
+        ans += (pt1[i]-pt2[i]) * (pt1[i]-pt2[i]);
 
-//     return(ans);
-// }
+    return(ans);
+}
 
 // int find_nearest_point(float  *pt,          /* [nfeatures] */
 //                        int     nfeatures,

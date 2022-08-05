@@ -78,6 +78,8 @@
 
 #include "kmeans.h"
 
+#include "clad/Differentiator/Differentiator.h"
+
 extern double wtime(void);
 extern ssize_t read(int, void *, size_t);
 extern int close(int);
@@ -98,46 +100,46 @@ void usage(char *argv0)
 /*---< main() >-------------------------------------------------------------*/
 int main(int argc, char **argv)
 {
-    int opt;
-    extern char *optarg;
-    extern int optind;
-    int nclusters = 5;
-    char *filename = 0;
-    float *buf;
-    float **attributes;
-    float **cluster_centres = NULL;
+  auto df = clad::estimate_error(euclid_dist_2<float, float>);
 
-    int numAttributes;
-    int numObjects;
-    char line[1024];
-    int isBinaryFile = 0;
-    int nloops;
-    float threshold = 0.001;
-    double timing;
+  int opt;
+  extern char *optarg;
+  extern int optind;
+  int nclusters = 5;
+  char *filename = 0;
+  float *buf;
+  float **attributes;
+  float **cluster_centres = NULL;
 
-    while ((opt = getopt(argc, argv, "i:k:t:b")) != EOF)
-    {
-        switch (opt)
-        {
-        case 'i':
-            filename = optarg;
-            break;
-        case 'b':
-            isBinaryFile = 1;
-            break;
-        case 't':
-            threshold = atof(optarg);
-            break;
-        case 'k':
-            nclusters = atoi(optarg);
-            break;
-        case '?':
-            usage(argv[0]);
-            break;
-        default:
-            usage(argv[0]);
-            break;
-        }
+  int numAttributes;
+  int numObjects;
+  char line[1024];
+  int isBinaryFile = 0;
+  int nloops;
+  float threshold = 0.001;
+  double timing;
+
+  while ((opt = getopt(argc, argv, "i:k:t:b")) != EOF) {
+    switch (opt) {
+    case 'i':
+      filename = optarg;
+      break;
+    case 'b':
+      isBinaryFile = 1;
+      break;
+    case 't':
+      threshold = atof(optarg);
+      break;
+    case 'k':
+      nclusters = atoi(optarg);
+      break;
+    case '?':
+      usage(argv[0]);
+      break;
+    default:
+      usage(argv[0]);
+      break;
+    }
     }
 
     if (filename == 0)
@@ -303,13 +305,23 @@ int main(int argc, char **argv)
                 {
                     float dist = 0.0;
 
-                    // dist = euclid_dist_2(attributes[i], clusters[k], numAttributes); /* no need square root */
-                    int i;
-                    for (int coord = 0; coord < numAttributes; coord++)
-                        dist += (attributes[i][coord] - clusters[k][coord]) *
-                                (attributes[i][coord] - clusters[k][coord]);
-                    // euclid_dist_2 end
+                    dist = euclid_dist_2<float, float>(attributes[i], clusters[k], numAttributes); /* no need square root */
 
+                    // Error Estimation Begin
+                    clad::array<float> d_clusters(numAttributes);
+                    clad::array<float> d_attributes(numAttributes);
+                    int d_numAttributes = 0;
+                    double final_error = 0;
+
+                    df.execute(
+                        attributes[i], clusters[k], numAttributes,
+                        clad::array_ref<float>(d_attributes, numAttributes),
+                        clad::array_ref<float>(d_clusters, numAttributes),
+                        &d_numAttributes, final_error);
+
+                    printf("Final error: %f of object %d and cluster %d\n", final_error, i, k);
+                    printf("Actual error: %f\n", std::fabs(euclid_dist_2<double, float>(attributes[i], clusters[k], numAttributes) - dist));
+                    // Error Estimation End
                     if (dist < min_dist)
                     {
                         min_dist = dist;
