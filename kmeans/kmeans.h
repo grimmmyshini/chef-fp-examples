@@ -56,9 +56,7 @@
 // /* kmeans_clustering.c */
 template <typename T, typename P>
 __inline
-T euclid_dist_2(P *pt1,
-                    P *pt2,
-                    int    numdims)
+T euclid_dist_2(P *pt1, P *pt2, int numdims)
 {
     int i;
     T ans=0.0;

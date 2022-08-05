@@ -79,6 +79,9 @@
 #include "kmeans.h"
 
 #include "clad/Differentiator/Differentiator.h"
+#include "../PrintModel/ErrorFunc.h"
+
+#include "Derivative.h"
 
 extern double wtime(void);
 extern ssize_t read(int, void *, size_t);
@@ -100,7 +103,7 @@ void usage(char *argv0)
 /*---< main() >-------------------------------------------------------------*/
 int main(int argc, char **argv)
 {
-  auto df = clad::estimate_error(euclid_dist_2<float, float>);
+//   auto df = clad::estimate_error(euclid_dist_2<float, float>);
 
   int opt;
   extern char *optarg;
@@ -242,6 +245,8 @@ int main(int argc, char **argv)
 
     //-------- Allocate memory before this line -------------//
 
+    clad::resetErrors();
+
     for (int loop = 0; loop < nloops; loop++)
     {
 
@@ -313,7 +318,7 @@ int main(int argc, char **argv)
                     int d_numAttributes = 0;
                     double final_error = 0;
 
-                    df.execute(
+                    euclid_dist_2_grad(
                         attributes[i], clusters[k], numAttributes,
                         clad::array_ref<float>(d_attributes, numAttributes),
                         clad::array_ref<float>(d_clusters, numAttributes),
@@ -362,6 +367,8 @@ int main(int argc, char **argv)
         // kmeans_clustering end
         // cluster end
     }
+
+    clad::printErrorReport();
 
     printf("number of Clusters %d\n", nclusters);
     printf("number of Attributes %d\n\n", numAttributes);
