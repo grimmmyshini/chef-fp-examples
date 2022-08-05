@@ -1,3 +1,6 @@
 err_file.txt
 adapt_recommend.json
 part_err_file.txt
+*.o*
+*.so
+perf.data*
