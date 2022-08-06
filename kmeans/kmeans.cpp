@@ -83,66 +83,51 @@
 
 #include "Derivative.h"
 
-extern double wtime(void);
-extern ssize_t read(int, void *, size_t);
-extern int close(int);
-
-/*---< usage() >------------------------------------------------------------*/
-void usage(char *argv0)
-{
-    const char *help =
-        "Usage: \%s [switches] -i filename\n"
-        "       -i filename     :  file containing data to be clustered\n"
-        "       -b                 :input file is in binary format\n"
-        "       -k                 : number of clusters (default is 8) \n"
-        "       -t threshold    : threshold value\n";
-    fprintf(stderr, help, argv0);
-    exit(-1);
-}
-
 /*---< main() >-------------------------------------------------------------*/
 int main(int argc, char **argv)
 {
-//   auto df = clad::estimate_error(euclid_dist_2<float, float>);
+    auto df = clad::estimate_error(euclid_dist_2<double, double>);
 
-  int opt;
-  extern char *optarg;
-  extern int optind;
-  int nclusters = 5;
-  char *filename = 0;
-  float *buf;
-  float **attributes;
-  float **cluster_centres = NULL;
+    int opt;
+    extern char *optarg;
+    extern int optind;
+    int nclusters = 5;
+    char *filename = 0;
+    float *buf;
+    double **attributes;
+    double **cluster_centres = NULL;
 
-  int numAttributes;
-  int numObjects;
-  char line[1024];
-  int isBinaryFile = 0;
-  int nloops;
-  float threshold = 0.001;
-  double timing;
+    int numAttributes;
+    int numObjects;
+    char line[1024];
+    int isBinaryFile = 0;
+    int nloops;
+    float threshold = 0.001;
+    double timing;
 
-  while ((opt = getopt(argc, argv, "i:k:t:b")) != EOF) {
-    switch (opt) {
-    case 'i':
-      filename = optarg;
-      break;
-    case 'b':
-      isBinaryFile = 1;
-      break;
-    case 't':
-      threshold = atof(optarg);
-      break;
-    case 'k':
-      nclusters = atoi(optarg);
-      break;
-    case '?':
-      usage(argv[0]);
-      break;
-    default:
-      usage(argv[0]);
-      break;
-    }
+    while ((opt = getopt(argc, argv, "i:k:t:b")) != EOF)
+    {
+        switch (opt)
+        {
+        case 'i':
+            filename = optarg;
+            break;
+        case 'b':
+            isBinaryFile = 1;
+            break;
+        case 't':
+            threshold = atof(optarg);
+            break;
+        case 'k':
+            nclusters = atoi(optarg);
+            break;
+        case '?':
+            usage(argv[0]);
+            break;
+        default:
+            usage(argv[0]);
+            break;
+        }
     }
 
     if (filename == 0)
@@ -154,7 +139,7 @@ int main(int argc, char **argv)
 
     if (isBinaryFile)
     {
-        FILE* infile;
+        FILE *infile;
         if ((infile = fopen(filename, "r")) == NULL)
         {
             fprintf(stderr, "Error: no such file (%s)\n", filename);
@@ -165,10 +150,6 @@ int main(int argc, char **argv)
 
         /* allocate space for attributes[] and read attributes of all objects */
         buf = (float *)malloc(numObjects * numAttributes * sizeof(float));
-        attributes = (float **)malloc(numObjects * sizeof(float *));
-        attributes[0] = (float *)malloc(numObjects * numAttributes * sizeof(float));
-        for (int i = 1; i < numObjects; i++)
-            attributes[i] = attributes[i - 1] + numAttributes;
 
         fread(buf, sizeof(float), numObjects * numAttributes, infile);
 
@@ -199,11 +180,6 @@ int main(int argc, char **argv)
 
         /* allocate space for attributes[] and read attributes of all objects */
         buf = (float *)malloc(numObjects * numAttributes * sizeof(float));
-        attributes = (float **)malloc(numObjects * sizeof(float *));
-        attributes[0] = (float *)malloc(numObjects * numAttributes * sizeof(float));
-
-        for (int i = 1; i < numObjects; i++)
-            attributes[i] = attributes[i - 1] + numAttributes;
 
         rewind(infile);
 
@@ -225,18 +201,25 @@ int main(int argc, char **argv)
     nloops = 1;
     printf("I/O completed\n");
 
-    memcpy(attributes[0], buf, numObjects * numAttributes * sizeof(float));
+    attributes = (double **)malloc(numObjects * sizeof(double *));
+    attributes[0] = (double *)malloc(numObjects * numAttributes * sizeof(double));
+
+    for (int i = 1; i < numObjects; i++)
+        attributes[i] = attributes[i - 1] + numAttributes;
+
+    // memcpy(attributes[0], buf, numObjects * numAttributes * sizeof(float));
+    for (int i = 0; i < numObjects * numAttributes; i++)
+        attributes[0][i] = buf[i];
 
     int *membership = (int *)malloc(numObjects * sizeof(int));
-    ;
 
-    float **clusters; /* out: [nclusters][numAttributes] */
-    clusters = (float **)malloc(nclusters * sizeof(float *));
-    clusters[0] = (float *)malloc(nclusters * numAttributes * sizeof(float));
+    double **clusters; /* out: [nclusters][numAttributes] */
+    clusters = (double **)malloc(nclusters * sizeof(double *));
+    clusters[0] = (double *)malloc(nclusters * numAttributes * sizeof(double));
 
-    float **new_centers; /* [nclusters][numAttributes] */
-    new_centers = (float **)malloc(nclusters * sizeof(float *));
-    new_centers[0] = (float *)malloc(nclusters * numAttributes * sizeof(float));
+    double **new_centers; /* [nclusters][numAttributes] */
+    new_centers = (double **)malloc(nclusters * sizeof(double *));
+    new_centers[0] = (double *)malloc(nclusters * numAttributes * sizeof(double));
 
     int *new_centers_len; /* [nclusters]: no. of points in each cluster */
     new_centers_len = (int *)malloc(nclusters * sizeof(int));
@@ -303,29 +286,27 @@ int main(int argc, char **argv)
                 /* find the index of nestest cluster centers */
 
                 // index = find_nearest_point(attributes[i], numAttributes, clusters, nclusters);
-                float min_dist = FLT_MAX;
+                double min_dist = FLT_MAX;
 
                 /* find the cluster center id with min distance to pt */
                 for (int k = 0; k < nclusters; k++)
                 {
-                    float dist = 0.0;
+                    double dist = 0.0;
 
-                    dist = euclid_dist_2<float, float>(attributes[i], clusters[k], numAttributes); /* no need square root */
+                    dist = euclid_dist_2<double, double>(attributes[i], clusters[k], numAttributes); /* no need square root */
 
                     // Error Estimation Begin
-                    clad::array<float> d_clusters(numAttributes);
-                    clad::array<float> d_attributes(numAttributes);
+                    clad::array<double> d_clusters(numAttributes);
+                    clad::array<double> d_attributes(numAttributes);
                     int d_numAttributes = 0;
                     double final_error = 0;
 
                     euclid_dist_2_grad(
                         attributes[i], clusters[k], numAttributes,
-                        clad::array_ref<float>(d_attributes, numAttributes),
-                        clad::array_ref<float>(d_clusters, numAttributes),
-                        &d_numAttributes, final_error);
+                        d_attributes, d_clusters, &d_numAttributes, final_error);
 
                     printf("Final error: %f of object %d and cluster %d\n", final_error, i, k);
-                    printf("Actual error: %f\n", std::fabs(euclid_dist_2<double, float>(attributes[i], clusters[k], numAttributes) - dist));
+                    printf("Actual error: %f\n", std::fabs(euclid_dist_2<float, double>(attributes[i], clusters[k], numAttributes) - dist));
                     // Error Estimation End
                     if (dist < min_dist)
                     {

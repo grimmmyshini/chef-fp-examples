@@ -151,7 +151,8 @@ struct option
 /* Many other libraries have conflicting prototypes for getopt, with
    differences in the consts, in stdlib.h.  To avoid compilation
    errors, only prototype getopt for the GNU C library.  */
-extern int getopt (int ___argc, char *const *___argv, const char *__shortopts);
+extern int getopt (int ___argc, char *const *___argv, const char *__shortopts)
+        __THROW __nonnull ((2, 3));
 # else /* not __GNU_LIBRARY__ */
 extern int getopt ();
 # endif /* __GNU_LIBRARY__ */
