@@ -86,7 +86,7 @@
 /*---< main() >-------------------------------------------------------------*/
 int main(int argc, char **argv)
 {
-    auto df = clad::estimate_error(euclid_dist_2<double, double>);
+    // auto df = clad::estimate_error(euclid_dist_2<double, double>);
 
     int opt;
     extern char *optarg;
