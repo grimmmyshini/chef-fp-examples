@@ -342,6 +342,7 @@ int main(int argc, char **argv)
     }
 
     AD_report();
+    AD_end();
 
     printf("number of Clusters %d\n", nclusters);
     printf("number of Attributes %d\n\n", numAttributes);
