@@ -18,7 +18,7 @@
 
 #include "adapt.h"
 
-#define INPUT_FILE_NAME "data/100"
+#define INPUT_FILE_NAME "data/3000.txt"
 #define IS_BINARY_FILE 0
 
 struct cout_redirect
