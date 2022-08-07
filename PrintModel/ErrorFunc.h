@@ -52,7 +52,7 @@ namespace clad
     {
         auto error_map = MaxError::getInstance().get_error_map();
 
-        std::cout << "Clad error report: " << std::endl;
+        std::cout << std::endl << "================================== Clad Error Report ==================================" << std::endl;
         for (const auto &error : error_map)
         {
             double total = error.second.first;
@@ -65,6 +65,7 @@ namespace clad
                 std::cout << error.first << ":\ttotal = " << total << "\tcount = out of bounds"
                           << "\tavg = undeterminable" << std::endl;
         }
+        std::cout << "=======================================================================================" << std::endl;
     }
 
     void resetErrors()
