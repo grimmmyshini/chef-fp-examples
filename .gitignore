@@ -4,3 +4,4 @@ part_err_file.txt
 *.o*
 *.so
 perf.data*
+result*.txt
