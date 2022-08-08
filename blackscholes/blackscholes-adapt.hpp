@@ -78,12 +78,16 @@ namespace adapt
         AD_INTERMEDIATE(xLogTerm, "xLogTerm");
 
         xPowerTerm = xVolatility * xVolatility;
+        AD_INTERMEDIATE(xPowerTerm, "xPowerTerm");
         xPowerTerm = xPowerTerm * 0.5;
         AD_INTERMEDIATE(xPowerTerm, "xPowerTerm");
 
         xD1 = xRiskFreeRate + xPowerTerm;
+        AD_INTERMEDIATE(xD1, "xD1");
         xD1 = xD1 * xTime;
+        AD_INTERMEDIATE(xD1, "xD1");
         xD1 = xD1 + xLogTerm;
+        AD_INTERMEDIATE(xD1, "xD1");
 
         xDen = xVolatility * xSqrtTime;
         AD_INTERMEDIATE(xDen, "xDen");
@@ -94,17 +98,18 @@ namespace adapt
 
         // ---------------------------- NofXd1 = CNDF(d1) --------------------------
         InputX = xD1;
+        AD_INTERMEDIATE(InputX, "InputX");
 
         // Check for negative value of InputX
         if (InputX < 0.0)
         {
             InputX = -InputX;
+            AD_INTERMEDIATE(InputX, "InputX");
             sign = 1;
         }
         else
             sign = 0;
 
-        AD_INTERMEDIATE(InputX, "InputX");
 
         xInput = InputX;
         AD_INTERMEDIATE(xInput, "xInput");
@@ -113,11 +118,14 @@ namespace adapt
         expValues = exp(-0.5f * InputX * InputX);
         AD_INTERMEDIATE(expValues, "expValues");
         xNPrimeofX = expValues;
+        AD_INTERMEDIATE(xNPrimeofX, "xNPrimeofX");
         xNPrimeofX = xNPrimeofX * inv_sqrt_2xPI;
         AD_INTERMEDIATE(xNPrimeofX, "xNPrimeofX");
 
         xK2 = 0.2316419 * xInput;
+        AD_INTERMEDIATE(xK2, "xK2");
         xK2 = 1.0 + xK2;
+        AD_INTERMEDIATE(xK2, "xK2");
         xK2 = 1.0 / xK2;
         AD_INTERMEDIATE(xK2, "xK2");
         xK2_2 = xK2 * xK2;
@@ -130,13 +138,17 @@ namespace adapt
         AD_INTERMEDIATE(xK2_5, "xK2_5");
 
         xLocal_1 = xK2 * 0.319381530;
+        AD_INTERMEDIATE(xLocal_1, "xLocal_1");
         xLocal_2 = xK2_2 * (-0.356563782);
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_3 * 1.781477937;
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_4 * (-1.821255978);
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_5 * 1.330274429;
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
@@ -145,16 +157,18 @@ namespace adapt
         xLocal_1 = xLocal_2 + xLocal_1;
         AD_INTERMEDIATE(xLocal_1, "xLocal_1");
         xLocal = xLocal_1 * xNPrimeofX;
+        AD_INTERMEDIATE(xLocal, "xLocal");
         xLocal = 1.0 - xLocal;
         AD_INTERMEDIATE(xLocal, "xLocal");
 
         OutputX = xLocal;
+        AD_INTERMEDIATE(OutputX, "OutputX");
 
         if (sign)
         {
             OutputX = 1.0 - OutputX;
+            AD_INTERMEDIATE(OutputX, "OutputX");
         }
-        AD_INTERMEDIATE(OutputX, "OutputX");
 
         NofXd1 = OutputX;
         AD_INTERMEDIATE(NofXd1, "NofXd1");
@@ -162,11 +176,13 @@ namespace adapt
 
         // ---------------------------- NofXd2 = CNDF(d2) --------------------------
         InputX = xD2;
+        AD_INTERMEDIATE(InputX, "InputX");
 
         // Check for negative value of InputX
         if (InputX < 0.0)
         {
             InputX = -InputX;
+            AD_INTERMEDIATE(InputX, "InputX");
             sign = 1;
         }
         else
@@ -181,11 +197,14 @@ namespace adapt
         expValues = exp(-0.5f * InputX * InputX);
         AD_INTERMEDIATE(expValues, "expValues");
         xNPrimeofX = expValues;
+        AD_INTERMEDIATE(xNPrimeofX, "xNPrimeofX");
         xNPrimeofX = xNPrimeofX * inv_sqrt_2xPI;
         AD_INTERMEDIATE(xNPrimeofX, "xNPrimeofX");
 
         xK2 = 0.2316419 * xInput;
+        AD_INTERMEDIATE(xK2, "xK2");
         xK2 = 1.0 + xK2;
+        AD_INTERMEDIATE(xK2, "xK2");
         xK2 = 1.0 / xK2;
         AD_INTERMEDIATE(xK2, "xK2");
         xK2_2 = xK2 * xK2;
@@ -198,13 +217,17 @@ namespace adapt
         AD_INTERMEDIATE(xK2_5, "xK2_5");
 
         xLocal_1 = xK2 * 0.319381530;
+        AD_INTERMEDIATE(xLocal_1, "xLocal_1");
         xLocal_2 = xK2_2 * (-0.356563782);
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_3 * 1.781477937;
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_4 * (-1.821255978);
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_5 * 1.330274429;
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
@@ -213,16 +236,18 @@ namespace adapt
         xLocal_1 = xLocal_2 + xLocal_1;
         AD_INTERMEDIATE(xLocal_1, "xLocal_1");
         xLocal = xLocal_1 * xNPrimeofX;
+        AD_INTERMEDIATE(xLocal, "xLocal");
         xLocal = 1.0 - xLocal;
         AD_INTERMEDIATE(xLocal, "xLocal");
 
         OutputX = xLocal;
+        AD_INTERMEDIATE(OutputX, "OutputX");
 
         if (sign)
         {
             OutputX = 1.0 - OutputX;
+            AD_INTERMEDIATE(OutputX, "OutputX");
         }
-        AD_INTERMEDIATE(OutputX, "OutputX");
 
         NofXd2 = OutputX;
         AD_INTERMEDIATE(NofXd2, "NofXd2");
