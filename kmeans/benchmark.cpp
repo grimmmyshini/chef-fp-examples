@@ -525,6 +525,7 @@ for (auto _ : state)
         // kmeans_clustering end
         // cluster end
     }
+    benchmark::DoNotOptimize(cluster_centres);
 
     clad::printErrorReport();
 }
@@ -540,7 +541,7 @@ for (auto _ : state)
     free(buf);
 }
 
-BENCHMARK(ErrorEstimateKMeansAdapt)->Unit(benchmark::kSecond)->Iterations(10);
-BENCHMARK(ErrorEstimateKMeansClad)->Unit(benchmark::kSecond)->Iterations(10);
+BENCHMARK(ErrorEstimateKMeansClad)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateKMeansAdapt)->Unit(benchmark::kSecond)->Iterations(1);
 
 BENCHMARK_MAIN();

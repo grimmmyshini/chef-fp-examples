@@ -59,14 +59,14 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
     clad::resetErrors();
 
     clad::do_fun_grad(0, 0, &ds1, &dt1, fin_error);
-    
+
+    benchmark::DoNotOptimize(fin_error);
     clad::printErrorReport();
   }
 }
 
-BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kSecond)->Iterations(10);
-
-BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kSecond)->Iterations(10);
+BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kSecond)->Iterations(1);
 
 // Define our main
 BENCHMARK_MAIN();

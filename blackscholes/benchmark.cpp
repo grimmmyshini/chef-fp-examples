@@ -345,6 +345,8 @@ static void ErrorEstimateBlkSolClad(benchmark::State &state)
             }
         }
 
+        benchmark::DoNotOptimize(prices);
+
         clad::printErrorReport();
     }
 
@@ -356,7 +358,7 @@ static void ErrorEstimateBlkSolClad(benchmark::State &state)
     delete[] prices;
 }
 
-BENCHMARK(ErrorEstimateBlkSolAdapt)->Unit(benchmark::kSecond)->Iterations(10);
-BENCHMARK(ErrorEstimateBlkSolClad)->Unit(benchmark::kSecond)->Iterations(10);
+BENCHMARK(ErrorEstimateBlkSolClad)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateBlkSolAdapt)->Unit(benchmark::kSecond)->Iterations(1);
 
 BENCHMARK_MAIN();
