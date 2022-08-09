@@ -19,15 +19,12 @@ using std::endl;
 #include "read_HPC_row.hpp"
 #include "HPC_sparsemv.hpp"
 #include "compute_residual.hpp"
-#include "HPCCG-adapt.hpp"
 #include "HPCCG-clad.hpp"
 #include "HPC_Sparse_Matrix.hpp"
 #include "dump_matlab_matrix.hpp"
 #include "ddot.hpp"
 
 #undef DEBUG
-
-#include "adapt.h"
 
 #define nx 20
 #define ny 30
@@ -49,78 +46,6 @@ private:
   std::stringstream buffer;
   std::streambuf *old;
 };
-
-static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
-{
-  HPC_Sparse_Matrix *A;
-  AD_real *x, *b;
-  double *xexact;
-  double norm, d;
-  int ierr = 0;
-  int i, j;
-  int ione = 1;
-  double t6 = 0.0;
-
-  int size = 1; // Serial case (not using MPI)
-  int rank = 0;
-
-  adapt::generate_matrix(nx, ny, nz, &A, &x, &b, &xexact);
-
-  bool dump_matrix = false;
-  if (dump_matrix && size <= 4)
-    adapt::dump_matlab_matrix(A, rank);
-
-  int niters = 0;
-  AD_real normr = 0.0;
-  int max_iter = 100;
-  double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
-
-  int nrow = A->local_nrow, ncol = A->local_ncol;
-
-  AD_real *r = new AD_real[nrow];
-  AD_real *p = new AD_real[ncol]; // In parallel case, A is rectangular
-  AD_real *Ap = new AD_real[nrow];
-
-  cout_suppressor suppressor;
-
-  for (auto _ : state)
-  {
-    AD_begin();
-    //  AD_enable_absolute_value_error();
-    AD_enable_source_aggregation();
-    for (int i = 0; i < A->total_nrow; i++)
-    {
-      AD_INDEPENDENT(x[i], "x");
-      AD_INDEPENDENT(b[i], "b");
-    }
-
-    adapt::HPCCG(A, b, x, max_iter, tolerance, niters, normr, r, p, Ap);
-
-    // Compute difference between known exact solution and computed solution
-    // All processors are needed here.
-
-    AD_real residual = 0;
-    adapt::compute_residual(A->local_nrow, x, xexact, &residual);
-
-    if (rank == 0)
-      cout << std::setprecision(5) << "Difference between computed and exact (residual)  = "
-           << AD_value(residual) << ".\n"
-           << endl;
-
-    AD_DEPENDENT(residual, "residual", 0.0);
-    AD_report();
-    AD_end();
-  }
-
-  delete[] p;
-  delete[] Ap;
-  delete[] r;
-
-  delete[] x;
-  delete[] xexact;
-  delete[] b;
-  delete A;
-}
 
 static void ErrorEstimateHPCCGClad(benchmark::State &state)
 {
@@ -168,13 +93,6 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
 
   double _final_error = 0;
 
-  // cout << "b: ";
-  // printVals(b, nrow);
-  // cout << "x: ";
-  // printVals(x, nrow);
-  // cout << "x exact: ";
-  // printVals(xexact, nrow);
-
   cout_supressor suppressor;
 
   for (auto _ : state)
@@ -187,12 +105,6 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
 
     clad::printErrorReport();
   }
-
-  // cout << "Gradients are: " << endl;
-  // cout << "b: ";
-  // printVals(d_b.ptr(), nrow);
-  // cout << "x: ";
-  // printVals(d_x.ptr(), nrow);
 
   delete[] b_diff;
   delete[] x_diff;
@@ -209,8 +121,7 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   delete[] b;
 }
 
-BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond)->Iterations(1);
-BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond)->Iterations(10);
 
 
 BENCHMARK_MAIN();
