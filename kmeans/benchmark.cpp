@@ -21,20 +21,21 @@
 #define INPUT_FILE_NAME "data/3000.txt"
 #define IS_BINARY_FILE 0
 
-struct cout_redirect
+struct cout_supressor
 {
-    cout_redirect(std::streambuf *new_buffer)
-        : old(std::cout.rdbuf(new_buffer))
-    {
-    }
+  cout_supressor()
+      : buffer(), old(std::cout.rdbuf(buffer.rdbuf()))
+  {
+  }
 
-    ~cout_redirect()
-    {
-        std::cout.rdbuf(old);
-    }
+  ~cout_supressor()
+  {
+    std::cout.rdbuf(old);
+  }
 
 private:
-    std::streambuf *old;
+  std::stringstream buffer;
+  std::streambuf *old;
 };
 
 static void ErrorEstimateKMeansAdapt(benchmark::State &state)
@@ -150,129 +151,129 @@ static void ErrorEstimateKMeansAdapt(benchmark::State &state)
 
     //-------- Allocate memory before this line -------------//
 
-    std::stringstream suppress;
-    cout_redirect output(suppress.rdbuf());
+    cout_supressor suppressor;
 
     for (auto _ : state)
     {
-    AD_begin();
+        AD_begin();
 
-    for (int loop = 0; loop < nloops; loop++)
-    {
-
-        // cluster(numObjects,
-        //         numAttributes,
-        //         attributes,           /* [numObjects][numAttributes] */
-        //         nclusters,
-        //         threshold,
-        //         &cluster_centres
-        //        );
-
-        srand(7);
-
-        // tmp_cluster_centres = kmeans_clustering(attributes,
-        //                                         numAttributes,
-        //                                         numObjects,
-        //                                         nclusters,
-        //                                         threshold,
-        //                                         membership);
-        int n = 0, index;
-        float delta;
-
-        /* allocate space for returning variable clusters[] */
-        for (int i = 1; i < nclusters; i++)
-            clusters[i] = clusters[i - 1] + numAttributes;
-
-        /* randomly pick cluster centers */
-        for (int i = 0; i < nclusters; i++)
+        for (int loop = 0; loop < nloops; loop++)
         {
-            // n = (int)rand() % numObjects;
-            for (int j = 0; j < numAttributes; j++)
-                clusters[i][j] = attributes[n][j];
-            n++;
-        }
 
-        for (int i = 0; i < numObjects; i++)
-            membership[i] = -1;
+            // cluster(numObjects,
+            //         numAttributes,
+            //         attributes,           /* [numObjects][numAttributes] */
+            //         nclusters,
+            //         threshold,
+            //         &cluster_centres
+            //        );
 
-        /* need to initialize new_centers_len and new_centers[0] to all 0 */
-        *new_centers_len = 0;
+            srand(7);
 
-        for (int i = 0; i < nclusters * numAttributes; i++)
-            new_centers[0][i] = 0.0;
+            // tmp_cluster_centres = kmeans_clustering(attributes,
+            //                                         numAttributes,
+            //                                         numObjects,
+            //                                         nclusters,
+            //                                         threshold,
+            //                                         membership);
+            int n = 0, index;
+            float delta;
 
-        for (int i = 1; i < nclusters; i++)
-            new_centers[i] = new_centers[i - 1] + numAttributes;
+            /* allocate space for returning variable clusters[] */
+            for (int i = 1; i < nclusters; i++)
+                clusters[i] = clusters[i - 1] + numAttributes;
 
-        do
-        {
-            delta = 0.0;
-
-            for (int i = 0; i < numObjects; i++)
-            {
-                /* find the index of nestest cluster centers */
-
-                // index = find_nearest_point(attributes[i], numAttributes, clusters, nclusters);
-                AD_real min_dist = FLT_MAX;
-
-                /* find the cluster center id with min distance to pt */
-                for (int k = 0; k < nclusters; k++)
-                {
-                    AD_real dist = 0.0;
-
-                    for (int l = 0; l < numAttributes; l++) {
-                        AD_INDEPENDENT(attributes[i][l], "attributes");
-                        AD_INDEPENDENT(clusters[k][l], "clusters");
-                    }
-
-                    dist = adapt::euclid_dist_2(attributes[i], clusters[k], numAttributes); /* no need square root */
-
-                    AD_DEPENDENT(dist, "dist", 0.0);
-
-                    // Error Estimation End
-                    if (dist < min_dist)
-                    {
-                        min_dist = dist;
-                        index = k;
-                    }
-                }
-
-                /* if membership changes, increase delta by 1 */
-                if (membership[i] != index)
-                    delta += 1.0;
-
-                /* assign the membership to object i */
-                membership[i] = index;
-
-                /* update new cluster centers : sum of objects located within */
-                new_centers_len[index]++;
-                for (int j = 0; j < numAttributes; j++)
-                    new_centers[index][j] += attributes[i][j];
-            }
-
-            /* replace old cluster centers with new_centers */
+            /* randomly pick cluster centers */
             for (int i = 0; i < nclusters; i++)
             {
+                // n = (int)rand() % numObjects;
                 for (int j = 0; j < numAttributes; j++)
-                {
-                    if (new_centers_len[i] > 0)
-                        clusters[i][j] = new_centers[i][j] / new_centers_len[i];
-                    new_centers[i][j] = 0.0; /* set back to 0 */
-                }
-                new_centers_len[i] = 0; /* set back to 0 */
+                    clusters[i][j] = attributes[n][j];
+                n++;
             }
 
-            // delta /= numObjects;
-        } while (delta > threshold);
+            for (int i = 0; i < numObjects; i++)
+                membership[i] = -1;
 
-        cluster_centres = clusters;
+            /* need to initialize new_centers_len and new_centers[0] to all 0 */
+            *new_centers_len = 0;
 
-        // kmeans_clustering end
-        // cluster end
-    }
+            for (int i = 0; i < nclusters * numAttributes; i++)
+                new_centers[0][i] = 0.0;
 
-    AD_report();
-    AD_end();
+            for (int i = 1; i < nclusters; i++)
+                new_centers[i] = new_centers[i - 1] + numAttributes;
+
+            do
+            {
+                delta = 0.0;
+
+                for (int i = 0; i < numObjects; i++)
+                {
+                    /* find the index of nestest cluster centers */
+
+                    // index = find_nearest_point(attributes[i], numAttributes, clusters, nclusters);
+                    AD_real min_dist = FLT_MAX;
+
+                    /* find the cluster center id with min distance to pt */
+                    for (int k = 0; k < nclusters; k++)
+                    {
+                        AD_real dist = 0.0;
+
+                        for (int l = 0; l < numAttributes; l++)
+                        {
+                            AD_INDEPENDENT(attributes[i][l], "attributes");
+                            AD_INDEPENDENT(clusters[k][l], "clusters");
+                        }
+
+                        dist = adapt::euclid_dist_2(attributes[i], clusters[k], numAttributes); /* no need square root */
+
+                        AD_DEPENDENT(dist, "dist", 0.0);
+
+                        // Error Estimation End
+                        if (dist < min_dist)
+                        {
+                            min_dist = dist;
+                            index = k;
+                        }
+                    }
+
+                    /* if membership changes, increase delta by 1 */
+                    if (membership[i] != index)
+                        delta += 1.0;
+
+                    /* assign the membership to object i */
+                    membership[i] = index;
+
+                    /* update new cluster centers : sum of objects located within */
+                    new_centers_len[index]++;
+                    for (int j = 0; j < numAttributes; j++)
+                        new_centers[index][j] += attributes[i][j];
+                }
+
+                /* replace old cluster centers with new_centers */
+                for (int i = 0; i < nclusters; i++)
+                {
+                    for (int j = 0; j < numAttributes; j++)
+                    {
+                        if (new_centers_len[i] > 0)
+                            clusters[i][j] = new_centers[i][j] / new_centers_len[i];
+                        new_centers[i][j] = 0.0; /* set back to 0 */
+                    }
+                    new_centers_len[i] = 0; /* set back to 0 */
+                }
+
+                // delta /= numObjects;
+            } while (delta > threshold);
+
+            cluster_centres = clusters;
+
+            // kmeans_clustering end
+            // cluster end
+        }
+
+        AD_report();
+        AD_end();
     }
 
     //------------------ Deallocate memory after this line -------------//
@@ -289,7 +290,7 @@ static void ErrorEstimateKMeansAdapt(benchmark::State &state)
 static void ErrorEstimateKMeansClad(benchmark::State &state)
 {
     // auto df = clad::estimate_error(euclid_dist_2<double, double>);
-int opt;
+    int opt;
     extern char *optarg;
     extern int optind;
     int nclusters = 5;
@@ -399,136 +400,135 @@ int opt;
     cluster_centres = NULL;
 
     //-------- Allocate memory before this line -------------//
-    std::stringstream suppress;
-    cout_redirect output(suppress.rdbuf());
+    cout_supressor suppressor;
 
-for (auto _ : state)
+    for (auto _ : state)
     {
-    AD_begin();
-    clad::resetErrors();
+        AD_begin();
+        clad::resetErrors();
 
-    for (int loop = 0; loop < nloops; loop++)
-    {
-
-        // cluster(numObjects,
-        //         numAttributes,
-        //         attributes,           /* [numObjects][numAttributes] */
-        //         nclusters,
-        //         threshold,
-        //         &cluster_centres
-        //        );
-
-        srand(7);
-
-        // tmp_cluster_centres = kmeans_clustering(attributes,
-        //                                         numAttributes,
-        //                                         numObjects,
-        //                                         nclusters,
-        //                                         threshold,
-        //                                         membership);
-        int n = 0, index;
-        float delta;
-
-        /* allocate space for returning variable clusters[] */
-        for (int i = 1; i < nclusters; i++)
-            clusters[i] = clusters[i - 1] + numAttributes;
-
-        /* randomly pick cluster centers */
-        for (int i = 0; i < nclusters; i++)
+        for (int loop = 0; loop < nloops; loop++)
         {
-            // n = (int)rand() % numObjects;
-            for (int j = 0; j < numAttributes; j++)
-                clusters[i][j] = attributes[n][j];
-            n++;
-        }
 
-        for (int i = 0; i < numObjects; i++)
-            membership[i] = -1;
+            // cluster(numObjects,
+            //         numAttributes,
+            //         attributes,           /* [numObjects][numAttributes] */
+            //         nclusters,
+            //         threshold,
+            //         &cluster_centres
+            //        );
 
-        /* need to initialize new_centers_len and new_centers[0] to all 0 */
-        *new_centers_len = 0;
+            srand(7);
 
-        for (int i = 0; i < nclusters * numAttributes; i++)
-            new_centers[0][i] = 0.0;
+            // tmp_cluster_centres = kmeans_clustering(attributes,
+            //                                         numAttributes,
+            //                                         numObjects,
+            //                                         nclusters,
+            //                                         threshold,
+            //                                         membership);
+            int n = 0, index;
+            float delta;
 
-        for (int i = 1; i < nclusters; i++)
-            new_centers[i] = new_centers[i - 1] + numAttributes;
+            /* allocate space for returning variable clusters[] */
+            for (int i = 1; i < nclusters; i++)
+                clusters[i] = clusters[i - 1] + numAttributes;
 
-        do
-        {
-            delta = 0.0;
-
-            for (int i = 0; i < numObjects; i++)
-            {
-                /* find the index of nestest cluster centers */
-
-                // index = find_nearest_point(attributes[i], numAttributes, clusters, nclusters);
-                double min_dist = FLT_MAX;
-
-                /* find the cluster center id with min distance to pt */
-                for (int k = 0; k < nclusters; k++)
-                {
-                    double dist = 0.0;
-
-                    dist = euclid_dist_2<double, double>(attributes[i], clusters[k], numAttributes); /* no need square root */
-
-                    // Error Estimation Begin
-                    clad::array<double> d_clusters(numAttributes);
-                    clad::array<double> d_attributes(numAttributes);
-                    int d_numAttributes = 0;
-                    double final_error = 0;
-
-                    euclid_dist_2_grad(
-                        attributes[i], clusters[k], numAttributes,
-                        d_attributes, d_clusters, &d_numAttributes, final_error);
-
-                    // printf("Final error: %f of object %d and cluster %d\n", final_error, i, k);
-                    // printf("Actual error: %f\n", std::fabs(euclid_dist_2<float, double>(attributes[i], clusters[k], numAttributes) - dist));
-                    // Error Estimation End
-                    if (dist < min_dist)
-                    {
-                        min_dist = dist;
-                        index = k;
-                    }
-                }
-
-                /* if membership changes, increase delta by 1 */
-                if (membership[i] != index)
-                    delta += 1.0;
-
-                /* assign the membership to object i */
-                membership[i] = index;
-
-                /* update new cluster centers : sum of objects located within */
-                new_centers_len[index]++;
-                for (int j = 0; j < numAttributes; j++)
-                    new_centers[index][j] += attributes[i][j];
-            }
-
-            /* replace old cluster centers with new_centers */
+            /* randomly pick cluster centers */
             for (int i = 0; i < nclusters; i++)
             {
+                // n = (int)rand() % numObjects;
                 for (int j = 0; j < numAttributes; j++)
-                {
-                    if (new_centers_len[i] > 0)
-                        clusters[i][j] = new_centers[i][j] / new_centers_len[i];
-                    new_centers[i][j] = 0.0; /* set back to 0 */
-                }
-                new_centers_len[i] = 0; /* set back to 0 */
+                    clusters[i][j] = attributes[n][j];
+                n++;
             }
 
-            // delta /= numObjects;
-        } while (delta > threshold);
+            for (int i = 0; i < numObjects; i++)
+                membership[i] = -1;
 
-        cluster_centres = clusters;
+            /* need to initialize new_centers_len and new_centers[0] to all 0 */
+            *new_centers_len = 0;
 
-        // kmeans_clustering end
-        // cluster end
+            for (int i = 0; i < nclusters * numAttributes; i++)
+                new_centers[0][i] = 0.0;
+
+            for (int i = 1; i < nclusters; i++)
+                new_centers[i] = new_centers[i - 1] + numAttributes;
+
+            do
+            {
+                delta = 0.0;
+
+                for (int i = 0; i < numObjects; i++)
+                {
+                    /* find the index of nestest cluster centers */
+
+                    // index = find_nearest_point(attributes[i], numAttributes, clusters, nclusters);
+                    double min_dist = FLT_MAX;
+
+                    /* find the cluster center id with min distance to pt */
+                    for (int k = 0; k < nclusters; k++)
+                    {
+                        double dist = 0.0;
+
+                        dist = euclid_dist_2<double, double>(attributes[i], clusters[k], numAttributes); /* no need square root */
+
+                        // Error Estimation Begin
+                        clad::array<double> d_clusters(numAttributes);
+                        clad::array<double> d_attributes(numAttributes);
+                        int d_numAttributes = 0;
+                        double final_error = 0;
+
+                        euclid_dist_2_grad(
+                            attributes[i], clusters[k], numAttributes,
+                            d_attributes, d_clusters, &d_numAttributes, final_error);
+
+                        // printf("Final error: %f of object %d and cluster %d\n", final_error, i, k);
+                        // printf("Actual error: %f\n", std::fabs(euclid_dist_2<float, double>(attributes[i], clusters[k], numAttributes) - dist));
+                        // Error Estimation End
+                        if (dist < min_dist)
+                        {
+                            min_dist = dist;
+                            index = k;
+                        }
+                    }
+
+                    /* if membership changes, increase delta by 1 */
+                    if (membership[i] != index)
+                        delta += 1.0;
+
+                    /* assign the membership to object i */
+                    membership[i] = index;
+
+                    /* update new cluster centers : sum of objects located within */
+                    new_centers_len[index]++;
+                    for (int j = 0; j < numAttributes; j++)
+                        new_centers[index][j] += attributes[i][j];
+                }
+
+                /* replace old cluster centers with new_centers */
+                for (int i = 0; i < nclusters; i++)
+                {
+                    for (int j = 0; j < numAttributes; j++)
+                    {
+                        if (new_centers_len[i] > 0)
+                            clusters[i][j] = new_centers[i][j] / new_centers_len[i];
+                        new_centers[i][j] = 0.0; /* set back to 0 */
+                    }
+                    new_centers_len[i] = 0; /* set back to 0 */
+                }
+
+                // delta /= numObjects;
+            } while (delta > threshold);
+
+            cluster_centres = clusters;
+
+            // kmeans_clustering end
+            // cluster end
+        }
+        benchmark::DoNotOptimize(cluster_centres);
+
+        clad::printErrorReport();
     }
-    benchmark::DoNotOptimize(cluster_centres);
-
-    clad::printErrorReport();
-}
 
     //------------------ Deallocate memory after this line -------------//
     free(new_centers[0]);

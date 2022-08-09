@@ -15,20 +15,21 @@
 
 #define INPUT_FILE_NAME "data/input.txt"
 
-struct cout_redirect
+struct cout_supressor
 {
-    cout_redirect(std::streambuf *new_buffer)
-        : old(std::cout.rdbuf(new_buffer))
-    {
-    }
+  cout_supressor()
+      : buffer(), old(std::cout.rdbuf(buffer.rdbuf()))
+  {
+  }
 
-    ~cout_redirect()
-    {
-        std::cout.rdbuf(old);
-    }
+  ~cout_supressor()
+  {
+    std::cout.rdbuf(old);
+  }
 
 private:
-    std::streambuf *old;
+  std::stringstream buffer;
+  std::streambuf *old;
 };
 
 static void ErrorEstimateBlkSolAdapt(benchmark::State &state)
@@ -145,8 +146,7 @@ static void ErrorEstimateBlkSolAdapt(benchmark::State &state)
     int start = 0 * (numOptions / nThreads);
     int end = start + (numOptions / nThreads);
 
-    std::stringstream suppress;
-    cout_redirect output(suppress.rdbuf());
+    cout_supressor suppressor;
 
     for (auto _ : state)
     {
@@ -304,8 +304,7 @@ static void ErrorEstimateBlkSolClad(benchmark::State &state)
     int start = 0 * (numOptions / nThreads);
     int end = start + (numOptions / nThreads);
 
-    std::stringstream suppress;
-    cout_redirect output(suppress.rdbuf());
+    cout_supressor suppressor;
 
     for (auto _ : state)
     {

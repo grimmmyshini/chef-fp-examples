@@ -11,22 +11,26 @@
 
 #include "Derivative.hpp"
 
-struct cout_redirect {
-    cout_redirect( std::streambuf * new_buffer ) 
-        : old( std::cout.rdbuf( new_buffer ) )
-    { }
+struct cout_supressor
+{
+  cout_supressor()
+      : buffer(), old(std::cout.rdbuf(buffer.rdbuf()))
+  {
+  }
 
-    ~cout_redirect( ) {
-        std::cout.rdbuf( old );
-    }
+  ~cout_supressor()
+  {
+    std::cout.rdbuf(old);
+  }
 
 private:
-    std::streambuf * old;
+  std::stringstream buffer;
+  std::streambuf *old;
 };
 
 static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
-    std::stringstream buffer;
-    cout_redirect output(buffer.rdbuf());
+    cout_supressor suppressor;
+
     using namespace adapt;
 
     for (auto _ : state) {
@@ -49,8 +53,7 @@ static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
 static void ErrorEstimateArcLenClad(benchmark::State& state) {
 //   auto df = clad::estimate_error(clad::do_fun);
   
-  std::stringstream buffer;
-  cout_redirect output(buffer.rdbuf());
+  cout_supressor suppressor;
 
   for (auto _ : state) {
     double ds1 = 0, dt1 = 0;
