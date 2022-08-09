@@ -2,6 +2,7 @@
 
 // FIXME: If we move this before benchmark.h we have tons of errors due to a bug
 #include "clad/Differentiator/Differentiator.h"
+#include "../PrintModel/ErrorFunc.h"
 
 #include <cmath>
 
