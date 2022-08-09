@@ -21,14 +21,14 @@
 #define INPUT_FILE_NAME "data/3000.txt"
 #define IS_BINARY_FILE 0
 
-struct cout_supressor
+struct cout_suppressor
 {
-  cout_supressor()
+  cout_suppressor()
       : buffer(), old(std::cout.rdbuf(buffer.rdbuf()))
   {
   }
 
-  ~cout_supressor()
+  ~cout_suppressor()
   {
     std::cout.rdbuf(old);
   }
@@ -151,7 +151,7 @@ static void ErrorEstimateKMeansAdapt(benchmark::State &state)
 
     //-------- Allocate memory before this line -------------//
 
-    cout_supressor suppressor;
+    cout_suppressor suppressor;
 
     for (auto _ : state)
     {
@@ -400,7 +400,7 @@ static void ErrorEstimateKMeansClad(benchmark::State &state)
     cluster_centres = NULL;
 
     //-------- Allocate memory before this line -------------//
-    cout_supressor suppressor;
+    cout_suppressor suppressor;
 
     for (auto _ : state)
     {

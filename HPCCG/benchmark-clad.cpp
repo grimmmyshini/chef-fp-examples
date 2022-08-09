@@ -30,14 +30,14 @@ using std::endl;
 #define ny 30
 #define nz 160
 
-struct cout_supressor
+struct cout_suppressor
 {
-  cout_supressor()
+  cout_suppressor()
       : buffer(), old(std::cout.rdbuf(buffer.rdbuf()))
   {
   }
 
-  ~cout_supressor()
+  ~cout_suppressor()
   {
     std::cout.rdbuf(old);
   }
@@ -93,7 +93,7 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
 
   double _final_error = 0;
 
-  cout_supressor suppressor;
+  cout_suppressor suppressor;
 
   for (auto _ : state)
   {

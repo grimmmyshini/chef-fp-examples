@@ -10,14 +10,14 @@
 
 #define INPUT_FILE_NAME "data/input.txt"
 
-struct cout_supressor
+struct cout_suppressor
 {
-  cout_supressor()
+  cout_suppressor()
       : buffer(), old(std::cout.rdbuf(buffer.rdbuf()))
   {
   }
 
-  ~cout_supressor()
+  ~cout_suppressor()
   {
     std::cout.rdbuf(old);
   }
@@ -141,7 +141,7 @@ static void ErrorEstimateBlkSolAdapt(benchmark::State &state)
     int start = 0 * (numOptions / nThreads);
     int end = start + (numOptions / nThreads);
 
-    cout_supressor suppressor;
+    cout_suppressor suppressor;
 
     for (auto _ : state)
     {

@@ -30,14 +30,14 @@ using std::endl;
 #define ny 30
 #define nz 160
 
-struct cout_supressor
+struct cout_suppressor
 {
-  cout_supressor()
+  cout_suppressor()
       : buffer(), old(std::cout.rdbuf(buffer.rdbuf()))
   {
   }
 
-  ~cout_supressor()
+  ~cout_suppressor()
   {
     std::cout.rdbuf(old);
   }
@@ -78,7 +78,7 @@ static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
   AD_real *p = new AD_real[ncol]; // In parallel case, A is rectangular
   AD_real *Ap = new AD_real[nrow];
 
-  cout_supressor suppressor;
+  cout_suppressor suppressor;
 
   for (auto _ : state)
   {

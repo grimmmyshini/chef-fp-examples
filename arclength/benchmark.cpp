@@ -11,14 +11,14 @@
 
 #include "Derivative.hpp"
 
-struct cout_supressor
+struct cout_suppressor
 {
-  cout_supressor()
+  cout_suppressor()
       : buffer(), old(std::cout.rdbuf(buffer.rdbuf()))
   {
   }
 
-  ~cout_supressor()
+  ~cout_suppressor()
   {
     std::cout.rdbuf(old);
   }
@@ -29,7 +29,7 @@ private:
 };
 
 static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
-    cout_supressor suppressor;
+    cout_suppressor suppressor;
 
     using namespace adapt;
 
@@ -53,7 +53,7 @@ static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
 static void ErrorEstimateArcLenClad(benchmark::State& state) {
 //   auto df = clad::estimate_error(clad::do_fun);
   
-  cout_supressor suppressor;
+  cout_suppressor suppressor;
 
   for (auto _ : state) {
     double ds1 = 0, dt1 = 0;
