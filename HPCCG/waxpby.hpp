@@ -27,6 +27,9 @@
 // ************************************************************************
 //@HEADER
 
+#ifndef WAXPBY_HPP
+#define WAXPBY_HPP
+
 #include "adapt.h"
 
 namespace adapt {
@@ -49,3 +52,5 @@ int waxpby (const int n, const AD_real alpha, const AD_real * const x,
 }
 
 } // adapt
+
+#endif
