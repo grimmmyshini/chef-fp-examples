@@ -56,11 +56,11 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   int ione = 1;
   double t6 = 0.0;
 
-  clad::generate_matrix(nx, ny, nz, clad::A, &x, &b, &xexact);
+  generate_matrix(nx, ny, nz, clad::A, &x, &b, &xexact);
 
   bool dump_matrix = false;
   if (dump_matrix)
-    clad::dump_matlab_matrix(clad::A);
+    dump_matlab_matrix(clad::A);
 
   int nrow = clad::A.local_nrow;
   int ncol = clad::A.local_ncol;

@@ -26,14 +26,12 @@ namespace adapt
     sin_x_pi = sin(x_pi);
     AD_INTERMEDIATE(sin_x_pi, "sin_x_pi");
     AD_real fa = sin_x_pi;
-    AD_INTERMEDIATE(fa, "fa");
 
     x_pi = b * pi;
     AD_INTERMEDIATE(x_pi, "x_pi");
     sin_x_pi = sin(x_pi);
     AD_INTERMEDIATE(sin_x_pi, "sin_x_pi");
     AD_real fb = sin_x_pi;
-    AD_INTERMEDIATE(fb, "fb");
 
     AD_real s1 = fa + fb;
     AD_INTERMEDIATE(s1, "s1");

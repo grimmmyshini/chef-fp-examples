@@ -62,9 +62,6 @@ int dump_matlab_matrix( HPC_Sparse_Matrix *A, int rank) {
 
 } // adapt
 
-namespace clad {
-
-
 int dump_matlab_matrix(HPC_Sparse_Matrix &A)
 {
    int nrow = A.local_nrow;
@@ -85,8 +82,5 @@ int dump_matlab_matrix(HPC_Sparse_Matrix &A)
   fclose(handle);
   return (0);
 }
-
-} // clad
-
 
 #endif

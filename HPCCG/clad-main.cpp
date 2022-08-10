@@ -76,7 +76,7 @@ using std::endl;
 #include "dump_matlab_matrix.hpp"
 #include "ddot.hpp"
 
-#include "HPCCG.hpp"
+#include "HPCCG-clad.hpp"
 
 #undef DEBUG
 
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     nx = atoi(argv[1]);
     ny = atoi(argv[2]);
     nz = atoi(argv[3]);
-    clad::generate_matrix(nx, ny, nz, clad::A, &x, &b, &xexact);
+    generate_matrix(nx, ny, nz, clad::A, &x, &b, &xexact);
   }
   else
   {
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 
   bool dump_matrix = false;
   if (dump_matrix)
-    clad::dump_matlab_matrix(clad::A);
+    dump_matlab_matrix(clad::A);
 
   int nrow = clad::A.local_nrow;
   int ncol = clad::A.local_ncol;

@@ -71,7 +71,7 @@ using std::endl;
 #include "read_HPC_row.hpp"
 #include "HPC_sparsemv.hpp"
 #include "compute_residual.hpp"
-#include "HPCCG.hpp"
+#include "HPCCG-adapt.hpp"
 #include "HPC_Sparse_Matrix.hpp"
 #include "dump_matlab_matrix.hpp"
 

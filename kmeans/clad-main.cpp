@@ -305,8 +305,8 @@ int main(int argc, char **argv)
                         attributes[i], clusters[k], numAttributes,
                         d_attributes, d_clusters, &d_numAttributes, final_error);
 
-                    printf("Final error: %f of object %d and cluster %d\n", final_error, i, k);
-                    printf("Actual error: %f\n", std::fabs(euclid_dist_2<float, double>(attributes[i], clusters[k], numAttributes) - dist));
+                    // printf("Final error: %f of object %d and cluster %d\n", final_error, i, k);
+                    // printf("Actual error: %f\n", std::fabs(euclid_dist_2<float, double>(attributes[i], clusters[k], numAttributes) - dist));
                     // Error Estimation End
                     if (dist < min_dist)
                     {

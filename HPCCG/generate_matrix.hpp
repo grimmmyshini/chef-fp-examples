@@ -249,8 +249,6 @@ void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix **A, AD_real **x,
 
 } // adapt
 
-namespace clad {
-
 void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix& A, double** x,
                      double** b, double** xexact)
 
@@ -364,7 +362,5 @@ void generate_matrix(int nx, int ny, int nz, HPC_Sparse_Matrix& A, double** x,
 
   return;
 }
-
-} // clad
 
 #endif
