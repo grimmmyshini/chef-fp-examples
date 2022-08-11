@@ -39,7 +39,7 @@ private:
   std::streambuf *old;
 };
 
-static void Kmeans(benchmark::State &state)
+static void KMeans(benchmark::State &state)
 {
     // auto df = clad::estimate_error(euclid_dist_2<double, double>);
     int opt;
@@ -278,7 +278,7 @@ static void Kmeans(benchmark::State &state)
     free(buf);
 }
 
-static void KmeansWithClad(benchmark::State &state)
+static void KMeansWithClad(benchmark::State &state)
 {
     // auto df = clad::estimate_error(euclid_dist_2<double, double>);
     int opt;
@@ -531,8 +531,8 @@ static void KmeansWithClad(benchmark::State &state)
     free(buf);
 }
 
-BENCHMARK(Kmeans)->Unit(benchmark::kSecond);
-BENCHMARK(KmeansWithClad)->Unit(benchmark::kSecond);
+BENCHMARK(KMeans)->Unit(benchmark::kSecond);
+BENCHMARK(KMeansWithClad)->Unit(benchmark::kSecond);
 
 // Define our main
 BENCHMARK_MAIN();

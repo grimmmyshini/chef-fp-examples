@@ -45,7 +45,7 @@ namespace lower_prec
     }
 }
 
-static void SimpsonLowerPrec(benchmark::State &state)
+static void SimpLowerPrec(benchmark::State &state)
 {
     float a = 0, b = 1;
 
@@ -57,7 +57,7 @@ static void SimpsonLowerPrec(benchmark::State &state)
     }
 }
 
-static void SimpsonHighPrec(benchmark::State &state)
+static void SimpHighPrec(benchmark::State &state)
 {
     double a = 0, b = 1;
 
@@ -70,7 +70,7 @@ static void SimpsonHighPrec(benchmark::State &state)
     }
 }
 
-BENCHMARK(SimpsonLowerPrec)->Unit(benchmark::kSecond);
-BENCHMARK(SimpsonHighPrec)->Unit(benchmark::kSecond);
+BENCHMARK(SimpLowerPrec)->Unit(benchmark::kSecond);
+BENCHMARK(SimpHighPrec)->Unit(benchmark::kSecond);
 
 BENCHMARK_MAIN();
