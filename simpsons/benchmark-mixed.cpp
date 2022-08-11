@@ -11,7 +11,7 @@ namespace lower_prec
 {
     double simpsons(float a, float b)
     {
-        int n = 10000000;
+        int n = ITERATIONS;
         double pi = M_PI;
         float h = (b - a) / (2.0 * n);
         double x = a;
