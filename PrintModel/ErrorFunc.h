@@ -7,7 +7,6 @@
 
 namespace clad
 {
-
     class ErrorStorage
     {
     private:
@@ -77,7 +76,7 @@ namespace clad
                 long long count = error.second.count;
                 double max_error = error.second.max_error;
                 double avg_error;
-                bool to_replace;
+                bool to_lower_precision;
                 max_var_name_size = max_var_name_size < var_name.size() ? var_name.size() : max_var_name_size;
 
                 if (count > 0)
@@ -85,52 +84,61 @@ namespace clad
                 else
                     avg_error = std::numeric_limits<double>::quiet_NaN();
 
-                to_replace = (total_error < threshold);
+                to_lower_precision = (total_error < threshold);
 
-                reports.push_back({var_name, total_error, count, max_error, avg_error, to_replace});
+                reports.push_back({var_name, total_error, count,
+                                   max_error, avg_error, to_lower_precision});
             }
         }
 
         void print()
         {
             std::sort(reports.begin(), reports.end(), compareByTotalError);
-            std::sort(reports.begin(), reports.end(), compareByToReplace);
+            std::sort(reports.begin(), reports.end(), compareByToLowerPrecision);
 
             max_var_name_size = max_var_name_size > 8 ? max_var_name_size : 8;
 
             std::string margin("  ");
 
-            long long length = 7 + max_var_name_size + 11 + 11 + 11 + 11 + margin.size() * 5;
+            const int len_prec = 9;
+            const int len_varn = max_var_name_size;
+            const int len_merr = 11;
+            const int len_coun = 11;
+            const int len_terr = 11;
+            const int len_aerr = 11;
+
+            long long length = len_prec + len_varn + len_merr + len_coun +
+                               len_terr + len_aerr + margin.size() * 5;
 
             print_banner(" CLAD ERROR REPORT ", length, '=');
 
-            print_with_padding("Replace", 7);
+            print_with_padding("Precision", len_prec);
             std::cout << margin;
-            print_with_padding("Var Name", max_var_name_size);
+            print_with_padding("Var Name", len_varn);
             std::cout << margin;
-            print_with_padding("Max Error", 11);
+            print_with_padding("Max Error", len_merr);
             std::cout << margin;
-            print_with_padding("Count", 11);
+            print_with_padding("Count", len_coun);
             std::cout << margin;
-            print_with_padding("Total Error", 11);
+            print_with_padding("Total Error", len_terr);
             std::cout << margin;
-            print_with_padding("Avg. Error", 11);
+            print_with_padding("Avg. Error", len_aerr);
             std::cout << std::endl;
             print_banner("", length, '-');
 
             for (auto &report : reports)
             {
-                print_with_padding(report.to_replace ? "YES" : "NO", 7);
+                print_with_padding(report.to_lower_precision ? "lower" : "HIGHER", len_prec);
                 std::cout << margin;
-                print_with_padding(report.var_name, max_var_name_size);
+                print_with_padding(report.var_name, len_varn);
                 std::cout << margin;
-                print_with_padding(report.max_error, 11);
+                print_with_padding(report.max_error, len_merr);
                 std::cout << margin;
-                print_with_padding(report.count, 11);
+                print_with_padding(report.count, len_coun);
                 std::cout << margin;
-                print_with_padding(report.total_error, 11);
+                print_with_padding(report.total_error, len_terr);
                 std::cout << margin;
-                print_with_padding(report.avg_error, 11);
+                print_with_padding(report.avg_error, len_aerr);
                 std::cout << std::endl;
             }
 
@@ -147,7 +155,7 @@ namespace clad
             long long count;
             double max_error;
             double avg_error;
-            bool to_replace;
+            bool to_lower_precision;
         };
 
         std::vector<Report> reports;
@@ -158,9 +166,9 @@ namespace clad
             return a.total_error < b.total_error;
         }
 
-        static bool compareByToReplace(const Report &a, const Report &b)
+        static bool compareByToLowerPrecision(const Report &a, const Report &b)
         {
-            return a.to_replace > b.to_replace;
+            return a.to_lower_precision > b.to_lower_precision;
         }
 
         static void print_with_padding(std::string str, long long length)
@@ -173,7 +181,7 @@ namespace clad
 
         static void print_with_padding(double num, long long length)
         {
-            std::cout.precision(length - 6);
+            std::cout.to_lower_precision(length - 6);
             std::cout << std::scientific << num;
         }
 
