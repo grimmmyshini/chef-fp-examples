@@ -181,7 +181,7 @@ namespace clad
 
         static void print_with_padding(double num, long long length)
         {
-            std::cout.to_lower_precision(length - 6);
+            std::cout.precision(length - 6);
             std::cout << std::scientific << num;
         }
 
