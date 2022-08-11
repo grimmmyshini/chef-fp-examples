@@ -66,7 +66,7 @@ namespace clad
         double _t18;
         double _t19;
         double _EERepl_s14;
-        int n = 10000000;
+        int n = ITERATIONS;
         double pi = 3.1415926535897931;
         _EERepl_pi0 = pi;
         _t1 = (b - a);

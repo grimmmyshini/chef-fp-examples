@@ -7,7 +7,7 @@
 #include "clad/Differentiator/Differentiator.h"
 #include "../PrintModel/ErrorFunc.h"
 
-#include "Derivatives.hpp"
+#include "Derivative.hpp"
 
 int main() {
   // clad::estimate_error(simpsons<double>);

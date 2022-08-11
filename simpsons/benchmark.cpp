@@ -8,7 +8,7 @@
 #include "clad/Differentiator/Differentiator.h"
 #include "../PrintModel/ErrorFunc.h"
 
-#include "Derivatives.hpp"
+#include "Derivative.hpp"
 
 #include "adapt.h"
 
@@ -60,9 +60,10 @@ static void ErrorEstimateSimpClad(benchmark::State &state)
         double a = 0, b = 1, d_a = 0, d_b = 0, final_error = 0;
 
         double result_dbl = simpsons(a, b);
+        benchmark::DoNotOptimize(result_dbl);
 
+        clad::resetErrors();
         clad::simpsons_grad(a, b, &d_a, &d_b, final_error);
-
         clad::printErrorReport();
     }
 }

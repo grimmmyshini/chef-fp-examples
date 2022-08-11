@@ -2,11 +2,12 @@
 #define SIMPSONS_HPP
 
 #include <cmath>
+#define ITERATIONS 100000000
 
-// defines the simpsons rule for integral estimation.
+// defines the simpsons rule for integral estimation of sin( x * pi ) in [a,b]
 template <typename prec>
 prec simpsons(prec a, prec b) {
-  int n = 10000000;
+  int n = ITERATIONS;
   prec pi = M_PI;
   prec h = (b - a) / (2.0 * n);
   prec x = a;
