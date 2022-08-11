@@ -20,6 +20,7 @@
 
 #define INPUT_FILE_NAME "data/3000.txt"
 #define IS_BINARY_FILE 0
+#define NLOOPS 1
 
 struct cout_suppressor
 {
@@ -361,7 +362,7 @@ static void ErrorEstimateKMeansAdapt(benchmark::State &state)
         fclose(infile);
     }
 
-    nloops = 1;
+    nloops = NLOOPS;
 
     attributes = (AD_real **)malloc(numObjects * sizeof(AD_real *));
     attributes[0] = (AD_real *)malloc(numObjects * numAttributes * sizeof(AD_real));
@@ -611,7 +612,7 @@ static void ErrorEstimateKMeansClad(benchmark::State &state)
         fclose(infile);
     }
 
-    nloops = 1;
+    nloops = NLOOPS;
 
     attributes = (double **)malloc(numObjects * sizeof(double *));
     attributes[0] = (double *)malloc(numObjects * numAttributes * sizeof(double));
