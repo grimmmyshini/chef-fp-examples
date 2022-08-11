@@ -119,7 +119,7 @@ static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
 }
 
 
-BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond)->Iterations(10);
+BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond);
 
 
 BENCHMARK_MAIN();

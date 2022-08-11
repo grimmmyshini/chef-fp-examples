@@ -3,6 +3,9 @@
 
 #include "benchmark/benchmark.h"
 
+
+#define ITERATIONS 10000000
+
 #include "simpsons.hpp"
 #include "simpsons-adapt.hpp"
 #include "clad/Differentiator/Differentiator.h"
@@ -68,7 +71,7 @@ static void ErrorEstimateSimpClad(benchmark::State &state)
     }
 }
 
-BENCHMARK(ErrorEstimateSimpClad)->Unit(benchmark::kSecond)->Iterations(1);
-BENCHMARK(ErrorEstimateSimpAdapt)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateSimpClad)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateSimpAdapt)->Unit(benchmark::kSecond);
 
 BENCHMARK_MAIN();

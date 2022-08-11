@@ -1,6 +1,8 @@
 #include <iomanip>  // necessary for setprecision
 #include <iostream> // necessary for 'cout'
 
+#define ITERATIONS 10000000
+
 #include "simpsons.hpp"
 
 // Clad header

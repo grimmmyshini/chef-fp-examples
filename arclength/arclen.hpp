@@ -8,8 +8,6 @@
 #define ANS 5.795776322412856L
 #define EPS 1e-10
 
-#define ITERATIONS 50000000
-
 double do_fun(double s1, double t1)
 {
     int i, k;

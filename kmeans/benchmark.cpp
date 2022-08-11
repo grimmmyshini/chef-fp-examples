@@ -540,7 +540,7 @@ static void ErrorEstimateKMeansClad(benchmark::State &state)
     free(buf);
 }
 
-BENCHMARK(ErrorEstimateKMeansClad)->Unit(benchmark::kSecond)->Iterations(1);
-BENCHMARK(ErrorEstimateKMeansAdapt)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateKMeansClad)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateKMeansAdapt)->Unit(benchmark::kSecond);
 
 BENCHMARK_MAIN();

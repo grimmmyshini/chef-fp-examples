@@ -2,6 +2,8 @@
 
 #include "benchmark/benchmark.h"
 
+#define ITERATIONS 100000000
+
 #include "simpsons.hpp"
 
 #include "clad/Differentiator/Differentiator.h"

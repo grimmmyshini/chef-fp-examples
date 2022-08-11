@@ -1,5 +1,7 @@
 #include "benchmark/benchmark.h"
 
+#define ITERATIONS 50000000
+
 #include "arclen.hpp"
 
 namespace lower_prec

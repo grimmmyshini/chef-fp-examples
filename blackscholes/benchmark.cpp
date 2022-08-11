@@ -357,7 +357,7 @@ static void ErrorEstimateBlkSolClad(benchmark::State &state)
     delete[] prices;
 }
 
-BENCHMARK(ErrorEstimateBlkSolClad)->Unit(benchmark::kSecond)->Iterations(1);
-BENCHMARK(ErrorEstimateBlkSolAdapt)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateBlkSolClad)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateBlkSolAdapt)->Unit(benchmark::kSecond);
 
 BENCHMARK_MAIN();

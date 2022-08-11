@@ -1,3 +1,5 @@
+#define ITERATIONS 1000000
+
 #include "arclen.hpp"
 #include "arclen-adapt.hpp"
 

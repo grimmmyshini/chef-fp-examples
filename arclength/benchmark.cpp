@@ -1,5 +1,7 @@
 #include "benchmark/benchmark.h"
 
+#define ITERATIONS 1000000
+
 #include "arclen.hpp"
 #include "arclen-adapt.hpp"
 
@@ -70,8 +72,8 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
   }
 }
 
-BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kSecond)->Iterations(1);
-BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kSecond);
 
 // Define our main
 BENCHMARK_MAIN();

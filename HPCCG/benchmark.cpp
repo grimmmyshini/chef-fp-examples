@@ -209,8 +209,8 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   delete[] b;
 }
 
-BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond)->Iterations(1);
-BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond);
 
 
 BENCHMARK_MAIN();

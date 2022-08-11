@@ -588,7 +588,7 @@ static void HPCCGHighPrec(benchmark::State &state)
              << endl;
 }
 
-BENCHMARK(HPCCGLowerPrec)->Unit(benchmark::kSecond)->Iterations(1);
-BENCHMARK(HPCCGHighPrec)->Unit(benchmark::kSecond)->Iterations(1);
+BENCHMARK(HPCCGLowerPrec)->Unit(benchmark::kSecond);
+BENCHMARK(HPCCGHighPrec)->Unit(benchmark::kSecond);
 
 BENCHMARK_MAIN();

@@ -1,3 +1,5 @@
+#define ITERATIONS 50000000
+
 #include "arclen.hpp"
 
 #include "clad/Differentiator/Differentiator.h"

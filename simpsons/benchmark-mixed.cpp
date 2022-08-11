@@ -3,6 +3,8 @@
 
 #include "benchmark/benchmark.h"
 
+#define ITERATIONS 100000000
+
 #include "simpsons.hpp"
 
 namespace lower_prec
