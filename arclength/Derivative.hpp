@@ -40,14 +40,14 @@ namespace clad
         clad::tape<double> _t14 = {};
         clad::tape<double> _EERepl_s11 = {};
         int i, k;
-        double t2, h = 3.14159265358979319992L / 1000000, x, d2, t3;
+        double t2, h = 3.14159265358979319992L / ITERATIONS, x, d2, t3;
         _EERepl_t24 = t2;
         _EERepl_t23 = t2;
         _EERepl_t22 = t2;
         _EERepl_t21 = t2;
         _EERepl_t20 = t2;
         _t0 = 0;
-        for (i = 1; i <= 1000000; i += 1)
+        for (i = 1; i <= ITERATIONS; i += 1)
         {
             _t0++;
             x = clad::push(_t2, i) * clad::push(_t1, h);
@@ -172,7 +172,7 @@ namespace clad
                 }
             }
         }
-        long double _r0 = _d_h / 1000000;
+        long double _r0 = _d_h / ITERATIONS;
         _delta_s1 += clad::getErrorVal(*_d_s1, _EERepl_s10, "s1");
         double _delta_t1 = 0;
         _delta_t1 += clad::getErrorVal(*_d_t1, t1, "t1");
