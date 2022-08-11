@@ -81,7 +81,7 @@
 #include "clad/Differentiator/Differentiator.h"
 #include "../PrintModel/ErrorFunc.h"
 
-#include "Derivative.h"
+#include "Derivative.hpp"
 
 /*---< main() >-------------------------------------------------------------*/
 int main(int argc, char **argv)
