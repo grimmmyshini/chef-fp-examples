@@ -166,7 +166,7 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   double *Ap_diff = new double[nrow]();
   clad::array_ref<double> d_Ap(Ap_diff, nrow);
 
-  double _final_error = 0;
+  double _final_error = 0, residual;
 
   // cout << "b: ";
   // printVals(b, nrow);
@@ -181,7 +181,10 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   {
     clad::resetErrors();
 
+    residual = clad::HPCCG_residual(b, x, xexact, r, p, Ap);
+
     HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
+    benchmark::DoNotOptimize(residual);
 
     cout << "\nFinal error in HPCCG =" << _final_error << endl;
 

@@ -1,14 +1,22 @@
 #!/bin/bash
 
-rm /tmp/b.txt
+rm /tmp/b.txt /tmp/m.txt /tmp/o.txt
 
 bench_gen() {
     benchall -O3 ${1}.cpp -o ${1}.out -L$ws_dir/benchmark/build/src
 }
 
-alias gen_adc=bench_gen benchmark
-alias gen_mix=bench_gen benchmark-mixed
-alias gen_ovr=bench_gen benchmark-overhead
+gen_adc () {
+    bench_gen benchmark
+}
+
+gen_mix () {
+    bench_gen benchmark-mixed
+}
+
+gen_ovr () {
+    bench_gen benchmark-overhead
+}
 
 bench_run() {
     $1 --benchmark_filter=$2 | tail -n +4 >> $3
@@ -41,7 +49,7 @@ run_adc ErrorEstimateArcLenAdapt
 run_mix ArcLenLowerPrec
 run_mix ArcLenHighPrec
 run_ovr ArcLen
-rub_ovr ArcLenWithClad
+run_ovr ArcLenWithClad
 cd ..
 
 cd blackscholes
@@ -50,7 +58,7 @@ gen_ovr
 run_adc ErrorEstimateBlkSolClad
 run_adc ErrorEstimateBlkSolAdapt
 run_ovr BlkSol
-rub_ovr BlkSolWithClad
+run_ovr BlkSolWithClad
 cd ..
 
 cd HPCCG
@@ -62,9 +70,8 @@ run_adc ErrorEstimateHPCCGAdapt
 run_mix HPCCGLowerPrec
 run_mix HPCCGHighPrec
 run_ovr HPCCG
-rub_ovr HPCCGWithClad
+run_ovr HPCCGWithClad
 cd ..
-echo "" >> results.txt
 
 cd kmeans
 gen_adc
@@ -72,7 +79,7 @@ gen_ovr
 run_adc ErrorEstimateKMeansClad
 run_adc ErrorEstimateKMeansAdapt
 run_ovr KMeans
-rub_ovr KMeansWithClad
+run_ovr KMeansWithClad
 cd ..
 
 cd simpsons
@@ -84,10 +91,17 @@ run_adc ErrorEstimateSimpAdapt
 run_mix SimpLowerPrec
 run_mix SimpHighPrec
 run_ovr Simp
-rub_ovr SimpWithClad
+run_ovr SimpWithClad
 cd ..
 
+echo "------------------------------- Adapt VS Clad -------------------------------" >> results.txt
 cat /tmp/b.txt >> results.txt
+echo "" >> results.txt
+echo "------------------------------ Mixed Precision ------------------------------" >> results.txt
+cat /tmp/m.txt >> results.txt
+echo "" >> results.txt
+echo "--------------------------------- Overhead ----------------------------------" >> results.txt
+cat /tmp/o.txt >> results.txt
 
 echo "" >> results.txt
 echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> results.txt
