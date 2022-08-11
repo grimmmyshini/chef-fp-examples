@@ -13,7 +13,7 @@
 
 #include "adapt.h"
 
-#define INPUT_FILE_NAME "data/input.txt"
+#define INPUT_FILE_NAME "data/adaptvsclad.txt"
 
 struct cout_suppressor
 {
