@@ -50,6 +50,45 @@ private:
   std::streambuf *old;
 };
 
+static void ErrorEstimateHPCCG(benchmark::State &state)
+{
+  double *x, *b, *xexact;
+  double norm, d;
+  int ierr = 0;
+  int i, j;
+  int ione = 1;
+  double times[7];
+  double t6 = 0.0;
+  
+  generate_matrix(nx, ny, nz, clad::A, &x, &b, &xexact);
+
+  bool dump_matrix = false;
+  if (dump_matrix)
+    dump_matlab_matrix(clad::A);
+
+  int nrow = clad::A.local_nrow;
+  int ncol = clad::A.local_ncol;
+
+  double *r = new double[nrow]();
+  double *p = new double[ncol]();
+  double *Ap = new double[nrow]();
+
+  double residual;
+
+  for (auto _ : state)
+  {
+    residual = clad::HPCCG_residual(b, x, xexact, r, p, Ap);
+  }
+
+  delete[] p;
+  delete[] Ap;
+  delete[] r;
+
+  delete[] x;
+  delete[] xexact;
+  delete[] b;
+}
+
 static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
 {
   HPC_Sparse_Matrix *A;
@@ -212,6 +251,7 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   delete[] b;
 }
 
+BENCHMARK(ErrorEstimateHPCCG)->Unit(benchmark::kSecond);
 BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond);
 BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond);
 

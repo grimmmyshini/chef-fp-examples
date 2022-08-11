@@ -43,55 +43,45 @@ echo "" >> results.txt
 cd arclength
 gen_adc
 gen_mix
-gen_ovr
+run_adc ErrorEstimateArcLen
 run_adc ErrorEstimateArcLenClad
 run_adc ErrorEstimateArcLenAdapt
 run_mix ArcLenLowerPrec
 run_mix ArcLenHighPrec
-run_ovr ArcLen
-run_ovr ArcLenWithClad
 cd ..
 
 cd blackscholes
 gen_adc
-gen_ovr
+run_adc ErrorEstimateBlkSol
 run_adc ErrorEstimateBlkSolClad
 run_adc ErrorEstimateBlkSolAdapt
-run_ovr BlkSol
-run_ovr BlkSolWithClad
 cd ..
 
 cd HPCCG
 gen_adc
 gen_mix
-gen_ovr
+run_adc ErrorEstimateHPCCG
 run_adc ErrorEstimateHPCCGClad
 run_adc ErrorEstimateHPCCGAdapt
 run_mix HPCCGLowerPrec
 run_mix HPCCGHighPrec
-run_ovr HPCCG
-run_ovr HPCCGWithClad
 cd ..
 
 cd kmeans
 gen_adc
-gen_ovr
+run_adc ErrorEstimateKMeans
 run_adc ErrorEstimateKMeansClad
 run_adc ErrorEstimateKMeansAdapt
-run_ovr KMeans
-run_ovr KMeansWithClad
 cd ..
 
 cd simpsons
 gen_adc
 gen_mix
-gen_ovr
+run_adc ErrorEstimateSimp
 run_adc ErrorEstimateSimpClad
 run_adc ErrorEstimateSimpAdapt
 run_mix SimpLowerPrec
 run_mix SimpHighPrec
-run_ovr Simp
-run_ovr SimpWithClad
 cd ..
 
 echo "------------------------------- Adapt VS Clad -------------------------------" >> results.txt
@@ -100,8 +90,6 @@ echo "" >> results.txt
 echo "------------------------------ Mixed Precision ------------------------------" >> results.txt
 cat /tmp/m.txt >> results.txt
 echo "" >> results.txt
-echo "--------------------------------- Overhead ----------------------------------" >> results.txt
-cat /tmp/o.txt >> results.txt
 
 echo "" >> results.txt
 echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> results.txt

@@ -29,6 +29,16 @@ private:
   std::streambuf *old;
 };
 
+static void ErrorEstimateArcLen(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+        double result = do_fun(0, 0);
+
+        benchmark::DoNotOptimize(result);
+    }
+}
+
 static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
     cout_suppressor suppressor;
 
@@ -72,6 +82,7 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
   }
 }
 
+BENCHMARK(ErrorEstimateArcLen)->Unit(benchmark::kSecond);
 BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kSecond);
 BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kSecond);
 

@@ -32,6 +32,17 @@ private:
     std::streambuf *old;
 };
 
+static void ErrorEstimateSimp(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+        double a = 0, b = 1, d_a = 0, d_b = 0, final_error = 0;
+
+        double result_dbl = simpsons(a, b);
+        benchmark::DoNotOptimize(result_dbl);
+    }
+}
+
 static void ErrorEstimateSimpAdapt(benchmark::State &state)
 {
     cout_suppressor suppress;
@@ -71,6 +82,7 @@ static void ErrorEstimateSimpClad(benchmark::State &state)
     }
 }
 
+BENCHMARK(ErrorEstimateSimp)->Unit(benchmark::kSecond);
 BENCHMARK(ErrorEstimateSimpClad)->Unit(benchmark::kSecond);
 BENCHMARK(ErrorEstimateSimpAdapt)->Unit(benchmark::kSecond);
 
