@@ -39,7 +39,7 @@ static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
         AD_INTERMEDIATE(s1, "s1");
         AD_INTERMEDIATE(d1, "d1");
 
-        result = do_fun();
+        do_fun();
 
         AD_DEPENDENT(s1, "s1", EPS);
         AD_report();
