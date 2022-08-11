@@ -1,22 +1,22 @@
 #include <cmath>
 
-typedef double fptype;
+typedef double fptype0;
 #define INPUT_LINE_FORMAT "%lf %lf %lf %lf %lf %lf %c %lf %lf"
 
 #define NUM_RUNS 100
 
 typedef struct OptionData_
 {
-    fptype s;        // spot price
-    fptype strike;   // strike price
-    fptype r;        // risk-free interest rate
-    fptype divq;     // dividend rate
-    fptype v;        // volatility
-    fptype t;        // time to maturity or option expiration in years
+    fptype0 s;        // spot price
+    fptype0 strike;   // strike price
+    fptype0 r;        // risk-free interest rate
+    fptype0 divq;     // dividend rate
+    fptype0 v;        // volatility
+    fptype0 t;        // time to maturity or option expiration in years
                      //     (1yr = 1.0, 6mos = 0.5, 3mos = 0.25, ..., etc)
     char OptionType; // Option type.  "P"=PUT, "C"=CALL
-    fptype divs;     // dividend vals (not used in this test)
-    fptype DGrefval; // DerivaGem Reference Value
+    fptype0 divs;     // dividend vals (not used in this test)
+    fptype0 DGrefval; // DerivaGem Reference Value
 } OptionData;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +30,7 @@ typedef struct OptionData_
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
+template <typename fptype>
 fptype BlkSchlsEqEuroNoDiv(fptype sptprice,
                            fptype strike, fptype rate, fptype volatility,
                            fptype time, int otype)

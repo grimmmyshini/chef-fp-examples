@@ -49,9 +49,12 @@ namespace adapt
     {
         int i;
         AD_real ans = 0.0;
+        AD_real arg;
 
         for (i = 0; i < numdims; i++) {
-            ans += (pt1[i] - pt2[i]) * (pt1[i] - pt2[i]);
+          arg = (pt1[i] - pt2[i]);
+          AD_INDEPENDENT(arg, "arg");
+          ans += arg * arg;
         }
 
         return ans;

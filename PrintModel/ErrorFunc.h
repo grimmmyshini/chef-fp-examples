@@ -1,7 +1,10 @@
 #include <iostream>
 #include <limits>
 #include <unordered_map>
+#include <algorithm>
+#include <vector>
 #include <utility>
+#include <fstream>
 
 namespace clad
 {
@@ -48,6 +51,11 @@ namespace clad
         std::unordered_map<const char *, std::pair<double, long long>> error_map;
     };
 
+    bool sortbysec(const std::pair<int,int> &a, const std::pair<int,int> &b)
+    {
+        return (a.second < b.second);
+    }
+
     void printErrorReport()
     {
         auto error_map = MaxError::getInstance().get_error_map();
@@ -59,11 +67,26 @@ namespace clad
             long long count = error.second.second;
 
             if (count > 0)
-                std::cout << error.first << ":\ttotal = " << total << "\tcount = " << count << "\tavg = " << total / count << std::endl;
+                std::cout << error.first << ": total = " << total << " count = " << count << " avg = " << total / count << std::endl;
             else
 
                 std::cout << error.first << ":\ttotal = " << total << "\tcount = out of bounds"
                           << "\tavg = undeterminable" << std::endl;
+        }
+    }
+
+
+    std::vector<std::pair<int, double>> IterErrors(1, {0, 0});
+    int occ = 0;
+
+    void printIterVec(){
+      std::ofstream fil("IterErrors");
+      std::cout << "Error by iter: ";
+      // std::sort(IterErrors.begin(), IterErrors.end(), sortbysec);
+      int iter = 0;
+      for (auto &it : IterErrors) {
+        if (it.second > 10E-10)  
+          fil << it.first << " : " << it.second << std::endl;
         }
     }
 
@@ -74,7 +97,16 @@ namespace clad
 
     __attribute__((always_inline)) double getErrorVal(double dx, double x, const char* name)
     {
-        double error = std::abs(dx * x * std::numeric_limits<float>::epsilon());
+        double error = std::abs(dx * (x - (float)x));
+        if (strcmp(name, "ans") || strcmp(name, "arg")){
+          occ++;
+          if (occ > 2) {
+            IterErrors.push_back({IterErrors.size()-1, error});
+            occ = 0;
+          } else
+            IterErrors[IterErrors.size() - 1].second += error;
+        }
+          
         MaxError::getInstance().set_error(name, error);
         return error;
     }

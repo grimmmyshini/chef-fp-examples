@@ -30,20 +30,20 @@ int main(int argc, char **argv)
     FILE *file;
     int i;
     int loopnum;
-    fptype *buffer;
+    fptype0 *buffer;
     int *buffer2;
     int rv;
 
     OptionData *data;
-    fptype *prices;
+    fptype0 *prices;
     int numOptions;
 
     int *otype;
-    fptype *sptprice;
-    fptype *strike;
-    fptype *rate;
-    fptype *volatility;
-    fptype *otime;
+    fptype0 *sptprice;
+    fptype0 *strike;
+    fptype0 *rate;
+    fptype0 *volatility;
+    fptype0 *otime;
     int numError = 0;
     int nThreads;
 
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 
     // alloc spaces for the option data
     data = new OptionData[numOptions];
-    prices = new fptype[numOptions];
+    prices = new fptype0[numOptions];
     for (loopnum = 0; loopnum < numOptions; ++loopnum)
     {
         rv = fscanf(file, INPUT_LINE_FORMAT,
@@ -120,11 +120,11 @@ int main(int argc, char **argv)
 
     
     const int LINESIZE = 64;
-    const int PAD_FPTYPE = LINESIZE * sizeof(fptype);
+    const int PAD_FPTYPE = LINESIZE * sizeof(fptype0);
     const int PAD_INT = LINESIZE * sizeof(int);
 
-    buffer = new fptype[5 * numOptions + LINESIZE];
-    sptprice = (fptype *)(((unsigned long long)buffer + PAD_FPTYPE) & ~(LINESIZE - 1));
+    buffer = new fptype0[5 * numOptions + LINESIZE];
+    sptprice = (fptype0 *)(((unsigned long long)buffer + PAD_FPTYPE) & ~(LINESIZE - 1));
     strike = sptprice + numOptions;
     rate = strike + numOptions;
     volatility = rate + numOptions;
@@ -148,8 +148,8 @@ int main(int argc, char **argv)
     // serial version
     // ---------------------------- bs_thread() ------------------------------
     int k, j;
-    fptype price;
-    fptype priceDelta;
+    fptype0 price;
+    fptype0 priceDelta;
     int start = 0 * (numOptions / nThreads);
     int end = start + (numOptions / nThreads);
 
@@ -162,11 +162,17 @@ int main(int argc, char **argv)
             /* Calling main function to calculate option value based on
              * Black & Scholes's equation.
              */
-            price = BlkSchlsEqEuroNoDiv(sptprice[k], strike[k],
+            float price_flt = BlkSchlsEqEuroNoDiv<float>(sptprice[k], strike[k],
                                         rate[k], volatility[k], otime[k],
                                         otype[k]);
 
-            float _d_sptprice = 0, _d_strike = 0, _d_rate = 0, _d_volatility = 0, _d_time = 0;
+            price = BlkSchlsEqEuroNoDiv<double>(sptprice[k], strike[k],
+                                        rate[k], volatility[k], otime[k],
+                                        otype[k]);
+
+            std::cout << "Actual diff = " << price - price_flt << std::endl;
+
+            double _d_sptprice = 0, _d_strike = 0, _d_rate = 0, _d_volatility = 0, _d_time = 0;
             int _d_otype = 0;
             double final_error = 0;
 
@@ -174,6 +180,8 @@ int main(int argc, char **argv)
                                            otime[k], otype[k], &_d_sptprice, &_d_strike,
                                            &_d_rate, &_d_volatility, &_d_time, &_d_otype,
                                            final_error);
+
+            std::cout << "Estimated diff = " << final_error << std::endl;
 
             prices[k] = price;
 
@@ -189,7 +197,7 @@ int main(int argc, char **argv)
         }
     }
 
-    clad::printErrorReport();
+    // clad::printErrorReport();
 
     // -------------------------- bs_thread END -----------------------------
 

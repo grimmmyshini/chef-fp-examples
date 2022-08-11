@@ -86,7 +86,7 @@
 /*---< main() >-------------------------------------------------------------*/
 int main(int argc, char **argv)
 {
-    // auto df = clad::estimate_error(euclid_dist_2<double, double>);
+    // auto df = clad::estimate_error(euclid_dist_2<double>);
 
     int opt;
     extern char *optarg;
@@ -280,6 +280,7 @@ int main(int argc, char **argv)
         do
         {
             delta = 0.0;
+            clad::resetErrors();
 
             for (int i = 0; i < numObjects; i++)
             {
@@ -293,7 +294,7 @@ int main(int argc, char **argv)
                 {
                     double dist = 0.0;
 
-                    dist = euclid_dist_2<double, double>(attributes[i], clusters[k], numAttributes); /* no need square root */
+                    dist = euclid_dist_2<double>(attributes[i], clusters[k], numAttributes); /* no need square root */
 
                     // Error Estimation Begin
                     clad::array<double> d_clusters(numAttributes);
@@ -306,13 +307,15 @@ int main(int argc, char **argv)
                         d_attributes, d_clusters, &d_numAttributes, final_error);
 
                     printf("Final error: %f of object %d and cluster %d\n", final_error, i, k);
-                    printf("Actual error: %f\n", std::fabs(euclid_dist_2<float, double>(attributes[i], clusters[k], numAttributes) - dist));
+                    printf("Actual error: %f\n", std::fabs(euclid_dist_2<float>(attributes[i], clusters[k], numAttributes) - dist));
                     // Error Estimation End
                     if (dist < min_dist)
                     {
                         min_dist = dist;
                         index = k;
                     }
+
+                    clad::printErrorReport();
                 }
 
                 /* if membership changes, increase delta by 1 */
@@ -349,10 +352,10 @@ int main(int argc, char **argv)
         // cluster end
     }
 
-    clad::printErrorReport();
-
     printf("number of Clusters %d\n", nclusters);
     printf("number of Attributes %d\n\n", numAttributes);
+                    clad::printIterVec();
+
     /*printf("Cluster Centers Output\n");
     printf("The first number is cluster number and the following data is arribute value\n");
     printf("=============================================================================\n\n");

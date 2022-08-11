@@ -78,12 +78,16 @@ namespace adapt
         AD_INTERMEDIATE(xLogTerm, "xLogTerm");
 
         xPowerTerm = xVolatility * xVolatility;
+        AD_INTERMEDIATE(xPowerTerm, "xPowerTerm");
         xPowerTerm = xPowerTerm * 0.5;
         AD_INTERMEDIATE(xPowerTerm, "xPowerTerm");
 
         xD1 = xRiskFreeRate + xPowerTerm;
+        AD_INTERMEDIATE(xD1, "xD1");
         xD1 = xD1 * xTime;
+        AD_INTERMEDIATE(xD1, "xD1");
         xD1 = xD1 + xLogTerm;
+        AD_INTERMEDIATE(xD1, "xD1");
 
         xDen = xVolatility * xSqrtTime;
         AD_INTERMEDIATE(xDen, "xDen");
@@ -130,7 +134,9 @@ namespace adapt
         AD_INTERMEDIATE(xK2_5, "xK2_5");
 
         xLocal_1 = xK2 * 0.319381530;
+        AD_INTERMEDIATE(xLocal_1, "xLocal_2");
         xLocal_2 = xK2_2 * (-0.356563782);
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_3 * 1.781477937;
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
@@ -145,6 +151,7 @@ namespace adapt
         xLocal_1 = xLocal_2 + xLocal_1;
         AD_INTERMEDIATE(xLocal_1, "xLocal_1");
         xLocal = xLocal_1 * xNPrimeofX;
+        AD_INTERMEDIATE(xLocal, "xLocal");
         xLocal = 1.0 - xLocal;
         AD_INTERMEDIATE(xLocal, "xLocal");
 
@@ -198,13 +205,17 @@ namespace adapt
         AD_INTERMEDIATE(xK2_5, "xK2_5");
 
         xLocal_1 = xK2 * 0.319381530;
+        AD_INTERMEDIATE(xLocal_1, "xLocal_1");
         xLocal_2 = xK2_2 * (-0.356563782);
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_3 * 1.781477937;
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_4 * (-1.821255978);
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
+        AD_INTERMEDIATE(xLocal_2, "xLocal_2");
         xLocal_3 = xK2_5 * 1.330274429;
         AD_INTERMEDIATE(xLocal_3, "xLocal_3");
         xLocal_2 = xLocal_2 + xLocal_3;
@@ -213,6 +224,7 @@ namespace adapt
         xLocal_1 = xLocal_2 + xLocal_1;
         AD_INTERMEDIATE(xLocal_1, "xLocal_1");
         xLocal = xLocal_1 * xNPrimeofX;
+        AD_INTERMEDIATE(xLocal, "xLocal");
         xLocal = 1.0 - xLocal;
         AD_INTERMEDIATE(xLocal, "xLocal");
 
