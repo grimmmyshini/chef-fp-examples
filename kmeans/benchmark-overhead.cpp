@@ -18,7 +18,7 @@
 
 #include "Derivative.hpp"
 
-#define INPUT_FILE_NAME "data/30000.txt"
+#define INPUT_FILE_NAME "data/100000.txt"
 #define IS_BINARY_FILE 0
 #define NLOOPS 2
 

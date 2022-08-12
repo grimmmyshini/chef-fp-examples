@@ -1,6 +1,6 @@
 #include "benchmark/benchmark.h"
 
-#define ITERATIONS 1000000
+int ITERATIONS = 0;
 
 #include "arclen.hpp"
 #include "arclen-adapt.hpp"
@@ -31,6 +31,7 @@ private:
 
 static void ErrorEstimateArcLen(benchmark::State &state)
 {
+    ITERATIONS = state.range(0);
     for (auto _ : state)
     {
         double result = do_fun(0, 0);
@@ -43,6 +44,7 @@ static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
     cout_suppressor suppressor;
 
     using namespace adapt;
+    ITERATIONS = state.range(0);
 
     for (auto _ : state) {
         AD_begin();
@@ -67,6 +69,7 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
   cout_suppressor suppressor;
   double result;
   double ds1, dt1, fin_error;
+  ITERATIONS = state.range(0);
 
   for (auto _ : state) {
     ds1 = 0, dt1 = 0;
@@ -82,9 +85,11 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
   }
 }
 
-BENCHMARK(ErrorEstimateArcLen)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateArcLen)->Unit(benchmark::kSecond)->RangeMultiplier(10)->Range(10000, 100000000);
+
+BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kSecond)->RangeMultiplier(10)->Range(10000, 100000000);
+
+BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kSecond)->RangeMultiplier(10)->Range(10000, 10000000);
 
 // Define our main
 BENCHMARK_MAIN();

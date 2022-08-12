@@ -13,7 +13,7 @@
 
 #include "adapt.h"
 
-#define INPUT_FILE_NAME "data/adaptvsclad.txt"
+const char * input_files[] = {"data/100.txt", "data/1000.txt", "data/10000.txt", "data/100000.txt", "data/1000000.txt"};
 
 struct cout_suppressor
 {
@@ -57,7 +57,7 @@ static void ErrorEstimateBlkSol(benchmark::State &state)
     int nThreads;
 
     nThreads = 1;
-    const char *inputFile = INPUT_FILE_NAME;
+    const char *inputFile = input_files[state.range(0)];
     const char *outputFile = "prices.output";
 
     // Read input data from file
@@ -213,7 +213,7 @@ static void ErrorEstimateBlkSolAdapt(benchmark::State &state)
     int nThreads;
 
     nThreads = 1;
-    const char *inputFile = INPUT_FILE_NAME;
+    const char *inputFile = input_files[state.range(0)];
     const char *outputFile = "prices.output";
 
     // Read input data from file
@@ -370,7 +370,7 @@ static void ErrorEstimateBlkSolClad(benchmark::State &state)
     int nThreads;
 
     nThreads = 1;
-    const char *inputFile = INPUT_FILE_NAME;
+    const char *inputFile = input_files[state.range(0)];
     const char *outputFile = "prices.output";
 
     // Read input data from file
@@ -515,8 +515,8 @@ static void ErrorEstimateBlkSolClad(benchmark::State &state)
     delete[] prices;
 }
 
-BENCHMARK(ErrorEstimateBlkSol)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateBlkSolClad)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateBlkSolAdapt)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateBlkSol)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(ErrorEstimateBlkSolClad)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(ErrorEstimateBlkSolAdapt)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2);
 
 BENCHMARK_MAIN();

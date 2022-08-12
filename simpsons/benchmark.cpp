@@ -3,8 +3,7 @@
 
 #include "benchmark/benchmark.h"
 
-
-#define ITERATIONS 10000000
+int ITERATIONS;
 
 #include "simpsons.hpp"
 #include "simpsons-adapt.hpp"
@@ -14,6 +13,7 @@
 #include "Derivative.hpp"
 
 #include "adapt.h"
+
 
 struct cout_suppressor
 {
@@ -34,6 +34,7 @@ private:
 
 static void ErrorEstimateSimp(benchmark::State &state)
 {
+    ITERATIONS = state.range(0);
     for (auto _ : state)
     {
         double a = 0, b = 1, d_a = 0, d_b = 0, final_error = 0;
@@ -45,6 +46,7 @@ static void ErrorEstimateSimp(benchmark::State &state)
 
 static void ErrorEstimateSimpAdapt(benchmark::State &state)
 {
+    ITERATIONS = state.range(0);
     cout_suppressor suppress;
 
     for (auto _ : state)
@@ -66,6 +68,7 @@ static void ErrorEstimateSimpAdapt(benchmark::State &state)
 
 static void ErrorEstimateSimpClad(benchmark::State &state)
 {
+    ITERATIONS = state.range(0);
     // clad::estimate_error(simpsons<double>);
     cout_suppressor suppress;
     
@@ -82,8 +85,8 @@ static void ErrorEstimateSimpClad(benchmark::State &state)
     }
 }
 
-BENCHMARK(ErrorEstimateSimp)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateSimpClad)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateSimpAdapt)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateSimp)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ErrorEstimateSimpClad)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ErrorEstimateSimpAdapt)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 10000000);
 
 BENCHMARK_MAIN();

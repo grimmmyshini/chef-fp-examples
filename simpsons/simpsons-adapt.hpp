@@ -11,7 +11,7 @@ namespace adapt
   // defines the simpsons rule for integral estimation.
   AD_real simpsons(AD_real a, AD_real b)
   {
-    int n = 10000000;
+    int n = ITERATIONS;
 
     AD_real pi = M_PI;
 

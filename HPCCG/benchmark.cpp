@@ -29,9 +29,6 @@ using std::endl;
 
 #include "adapt.h"
 
-#define nx 20
-#define ny 30
-#define nz 160
 
 struct cout_suppressor
 {
@@ -59,6 +56,10 @@ static void ErrorEstimateHPCCG(benchmark::State &state)
   int ione = 1;
   double times[7];
   double t6 = 0.0;
+
+  int nx = state.range(0);
+  int ny = state.range(1);
+  int nz = state.range(2);
   
   generate_matrix(nx, ny, nz, clad::A, &x, &b, &xexact);
 
@@ -102,6 +103,10 @@ static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
 
   int size = 1; // Serial case (not using MPI)
   int rank = 0;
+
+  int nx = state.range(0);
+  int ny = state.range(1);
+  int nz = state.range(2);
 
   adapt::generate_matrix(nx, ny, nz, &A, &x, &b, &xexact);
 
@@ -169,6 +174,10 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   int i, j;
   int ione = 1;
   double t6 = 0.0;
+
+  int nx = state.range(0);
+  int ny = state.range(1);
+  int nz = state.range(2);
 
   generate_matrix(nx, ny, nz, clad::A, &x, &b, &xexact);
 
@@ -251,9 +260,9 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   delete[] b;
 }
 
-BENCHMARK(ErrorEstimateHPCCG)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateHPCCG)->Unit(benchmark::kMillisecond)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kMillisecond)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kMillisecond)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160});
 
 
 BENCHMARK_MAIN();

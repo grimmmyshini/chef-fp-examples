@@ -18,9 +18,10 @@
 
 #include "adapt.h"
 
-#define INPUT_FILE_NAME "data/3000.txt"
 #define IS_BINARY_FILE 0
 #define NLOOPS 1
+
+const char * input_files[] = {"data/100.txt", "data/1000.txt", "data/10000.txt", "data/100000.txt", "data/1000000.txt"};
 
 struct cout_suppressor
 {
@@ -46,7 +47,7 @@ static void ErrorEstimateKMeans(benchmark::State &state)
     extern char *optarg;
     extern int optind;
     int nclusters = 5;
-    const char *filename = INPUT_FILE_NAME;
+    const char *filename = input_files[state.range(0)];
     float *buf;
     double **attributes;
     double **cluster_centres = NULL;
@@ -284,7 +285,7 @@ static void ErrorEstimateKMeansAdapt(benchmark::State &state)
     extern char *optarg;
     extern int optind;
     int nclusters = 5;
-    const char *filename = INPUT_FILE_NAME;
+    const char *filename = input_files[state.range(0)];
     float *buf;
     AD_real **attributes;
     AD_real **cluster_centres = NULL;
@@ -534,7 +535,7 @@ static void ErrorEstimateKMeansClad(benchmark::State &state)
     extern char *optarg;
     extern int optind;
     int nclusters = 5;
-    const char *filename = INPUT_FILE_NAME;
+    const char *filename = input_files[state.range(0)];
     float *buf;
     double **attributes;
     double **cluster_centres = NULL;
@@ -780,8 +781,8 @@ static void ErrorEstimateKMeansClad(benchmark::State &state)
     free(buf);
 }
 
-BENCHMARK(ErrorEstimateKMeans)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateKMeansClad)->Unit(benchmark::kSecond);
-BENCHMARK(ErrorEstimateKMeansAdapt)->Unit(benchmark::kSecond);
+BENCHMARK(ErrorEstimateKMeans)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(ErrorEstimateKMeansClad)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(ErrorEstimateKMeansAdapt)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3);
 
 BENCHMARK_MAIN();
