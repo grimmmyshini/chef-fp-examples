@@ -201,6 +201,6 @@ setup() {
     clang -I$ws_dir/clad/inst/include -I$ws_dir/clang/tools/clang/include -I$ws_dir/llvm-project/clang/include -I$ws_dir/clang/include -I$ws_dir/llvm-project/llvm/include -fPIC -shared -fno-rtti -Wl,-undefined -Wl,suppress PrintModel.cpp -o libPrintModel.so
 }
 
-setup()
+setup
 cd clad-fp-error-est-examples
 ./runner.sh
