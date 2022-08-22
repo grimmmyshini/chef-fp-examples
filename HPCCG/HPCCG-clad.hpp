@@ -59,53 +59,74 @@ using std::endl;
 
 namespace clad {
 
-template <typename precision>
-double HPCCG_residual(double *b, double *x,
-                      double *xexact, precision *r, precision *p,
-                      precision *Ap)
+double HPCCG(double *b, double *x, int max_iter, double tolerance,
+                      int &niters, double &normr, double *r, double *p,
+                      double *Ap, double *xexact)
 {
-  int niters = 0;
-  precision normr = 0.0;
-  int max_iter = 100;
-  precision tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
-  int cur_nnz;
-  precision sum, temp;
-
-  ////// HPCCG
+  // ierr = HPCCG(A, b, x, max_iter, tolerance, niters, normr);
   int nrow = A.local_nrow;
   int ncol = A.local_ncol;
 
   normr = 0.0;
-  precision rtrans = 0.0;
-  precision oldrtrans = 0.0;
+  double rtrans = 0.0;
+  double oldrtrans = 0.0;
+  double alp, bta;
 
-  precision beta = 0.0;
+  int rank = 0; // Serial case (not using MPI)
 
-  for (int i = 0; i < nrow; i++) {
-    temp = x[i];
-    p[i] = temp + beta * temp;
+  // // p is of length ncols, copy x to p for sparse MV operation
+  // waxpby(nrow, 1.0, x, 0.0, x, p);
+  alp = 1.0;
+  bta = 0.0;
+  if (alp == 1.0)
+  {
+    for (int i = 0; i < nrow; i++)
+      p[i] = x[i] + bta * x[i];
   }
+  else if (bta == 1.0)
+  {
+    for (int i = 0; i < nrow; i++)
+      p[i] = alp * x[i] + x[i];
+  }
+  else
+  {
+    for (int i = 0; i < nrow; i++)
+      p[i] = alp * x[i] + bta * x[i];
+  }
+  // waxpy end
 
   // HPC_sparsemv(A, p, Ap);
   for (int i = 0; i < nrow; i++)
   {
-    cur_nnz = A.nnz_in_row[i];
-    sum = 0;
-    for (int j = 0; j < cur_nnz; j++)
-      sum += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
-    Ap[i] = sum;
+    for (int j = 0; j < A.nnz_in_row[i]; j++)
+      Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
   }
+  // HPC_sparsemv end
 
-  beta = -1.0;
-  for (int i = 0; i < nrow; i++)
-    r[i] = b[i] + beta * Ap[i];
+  // waxpby(nrow, 1.0, b, -1.0, Ap, r);
+  alp = 1.0;
+  bta = -1.0;
+  if (alp == 1.0)
+  {
+    for (int i = 0; i < nrow; i++)
+      r[i] = b[i] + bta * Ap[i];
+  }
+  else if (bta == 1.0)
+  {
+    for (int i = 0; i < nrow; i++)
+      r[i] = alp * b[i] + Ap[i];
+  }
+  else
+  {
+    for (int i = 0; i < nrow; i++)
+      r[i] = alp * b[i] + bta * Ap[i];
+  }
+  // waxpby end
 
   // ddot(nrow, r, r, &rtrans);
   rtrans = 0.0;
-  for (int i = 0; i < nrow; i++) {
-    temp = r[i];
-    rtrans += temp * temp;
-  }
+    for (int i = 0; i < nrow; i++)
+      rtrans += r[i] * r[i];
   // ddot end
 
   normr = sqrt(rtrans);
@@ -114,60 +135,122 @@ double HPCCG_residual(double *b, double *x,
   {
     if (k == 1)
     {
-      //// waxpby(nrow, 1.0, r, 0.0, r, p);
-      beta = 0.0;
-      for (int i = 0; i < nrow; i++) {
-        temp = r[i];
-        p[i] = temp + beta * temp;
+      // waxpby(nrow, 1.0, r, 0.0, r, p);
+      alp = 1.0;
+      bta = 0.0;
+      if (alp == 1.0)
+      {
+        for (int i = 0; i < nrow; i++)
+          p[i] = r[i] + bta * r[i];
       }
+      else if (bta == 1.0)
+      {
+        for (int i = 0; i < nrow; i++)
+          p[i] = alp * r[i] + r[i];
+      }
+      else
+      {
+        for (int i = 0; i < nrow; i++)
+          p[i] = alp * r[i] + bta * r[i];
+      }
+      // waxpby end
     }
     else
     {
       oldrtrans = rtrans;
+
       // ddot (nrow, r, r, &rtrans); // 2*nrow ops
       rtrans = 0.0;
-      for (int i = 0; i < nrow; i++) {
-        temp = r[i];
-        rtrans += temp * temp;
-      }
+        for (int i = 0; i < nrow; i++)
+          rtrans += r[i] * r[i];
       // ddot end
 
-      beta = rtrans / oldrtrans;
+      double beta = rtrans / oldrtrans;
 
-      //// waxpby(nrow, 1.0, r, beta, p, p);
-      for (int i = 0; i < nrow; i++) 
-        p[i] = r[i] + beta * p[i];
+      // waxpby(nrow, 1.0, r, beta, p, p); // 2*nrow ops
+      alp = 1.0;
+      bta = beta;
+      if (alp == 1.0)
+      {
+        for (int i = 0; i < nrow; i++)
+          p[i] = r[i] + bta * p[i];
+      }
+      else if (bta == 1.0)
+      {
+        for (int i = 0; i < nrow; i++)
+          p[i] = alp * r[i] + p[i];
+      }
+      else
+      {
+        for (int i = 0; i < nrow; i++)
+          p[i] = alp * r[i] + bta * p[i];
+      }
+      // waxpby end
     }
+
     normr = sqrt(rtrans);
 
-    //// HPC_sparsemv(A, p, Ap);
+    // HPC_sparsemv(A, p, Ap); // 2*nnz ops
     for (int i = 0; i < nrow; i++)
     {
-      cur_nnz = A.nnz_in_row[i];
-      sum = 0;
-      for (int j = 0; j < cur_nnz; j++)
-        sum += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
-      Ap[i] = sum;
-      
+      for (int j = 0; j < A.nnz_in_row[i]; j++)
+        Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
     }
+    // HPC_sparsemv end
 
-    // waxpby(nrow, 1.0, x, alpha, p, x);
-    // beta = 0.0;
-    // beta = ddot(nrow, p, Ap);
+    double alpha = 0.0;
+
     // ddot(nrow, p, Ap, &alpha); // 2*nrow ops
-    beta = 0.0;
-    for (int i = 0; i < nrow; i++)
-      beta += p[i] * Ap[i];
+    alpha = 0.0;
+    if (Ap == p)
+      for (int i = 0; i < nrow; i++)
+        alpha += p[i] * p[i];
+    else
+      for (int i = 0; i < nrow; i++)
+        alpha += p[i] * Ap[i];
     // ddot end
-    beta = rtrans / beta;
 
-    for (int i = 0; i < nrow; i++)
-      x[i] = x[i] + beta * p[i];
+    alpha = rtrans / alpha;
 
-    // waxpby(nrow, 1.0, r, -alpha, Ap, r);
-    beta = -beta;
-    for (int i = 0; i < nrow; i++)
-      r[i] = r[i] + beta * Ap[i];
+    // waxpby(nrow, 1.0, x, alpha, p, x);   // 2*nrow ops
+    alp = 1.0;
+    bta = alpha;
+    if (alp == 1.0)
+    {
+      for (int i = 0; i < nrow; i++)
+        x[i] = x[i] + bta * p[i];
+    }
+    else if (bta == 1.0)
+    {
+      for (int i = 0; i < nrow; i++)
+        x[i] = alp * x[i] + p[i];
+    }
+    else
+    {
+      for (int i = 0; i < nrow; i++)
+        x[i] = alp * x[i] + bta * p[i];
+    }
+    // waxpby end
+
+    // waxpby(nrow, 1.0, r, -alpha, Ap, r); // 2*nrow ops
+    alp = 1.0;
+    bta = -alpha;
+    if (alp == 1.0)
+    {
+      for (int i = 0; i < nrow; i++)
+        r[i] = r[i] + bta * Ap[i];
+    }
+    else if (bta == 1.0)
+    {
+      for (int i = 0; i < nrow; i++)
+        r[i] = alp * r[i] + Ap[i];
+    }
+    else
+    {
+      for (int i = 0; i < nrow; i++)
+        r[i] = alp * r[i] + bta * Ap[i];
+    }
+    // waxpby end
 
     niters = k;
   }
@@ -175,95 +258,19 @@ double HPCCG_residual(double *b, double *x,
   // Compute difference between known exact solution and computed solution
   // All processors are needed here.
 
-  precision residual = 0.0;
-  precision diff = 0;
+  double residual = 0;
 
+  // compute_residual(A.local_nrow, x, xexact, &residual);
   for (int i = 0; i < nrow; i++)
   {
-    diff = fabs(x[i] - xexact[i]);
-    if(diff > residual) residual = diff;
+    double diff = fabs(x[i] - xexact[i]);
+    if (diff > residual)
+      residual = diff;
   }
 
   return residual;
 }
 
-template <typename T>
-void printVals(T* arr, int n) {
-  for(int i = 0; i < n; i++ )
-    cout << arr[i] << " ";
-  cout << endl;
-}
-
-void executeGradient(int nrow, int ncol, double* x, double* b, double* xexact) {
-  // auto df = clad::gradient(HPCCG_residual<double>);
-  // auto df = clad::estimate_error(HPCCG_residual<double>);
-
-
-  double *x_diff = new double[nrow]();
-  clad::array_ref<double> d_x(x_diff, nrow);
-  
-  double *b_diff = new double[nrow]();
-  clad::array_ref<double> d_b(b_diff, nrow);
-
-  double *xexact_diff = new double[nrow]();
-  clad::array_ref<double> d_xexact(xexact_diff, nrow);
-
-  double *r = new double[nrow]();
-  double *r_diff = new double[nrow]();
-  clad::array_ref<double> d_r(r_diff, nrow);
-
-  double *p = new double[ncol]();
-  double *p_diff = new double[ncol]();
-  clad::array_ref<double> d_p(p_diff, ncol);
-
-  double *Ap = new double[nrow]();
-  double *Ap_diff = new double[nrow]();
-  clad::array_ref<double> d_Ap(Ap_diff, nrow);
-
-  double _final_error = 0;
-
-  // cout << "b: ";
-  // printVals(b, nrow);
-  // cout << "x: ";
-  // printVals(x, nrow);
-  // cout << "x exact: ";
-  // printVals(xexact, nrow);
-
-  HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
-
-  cout << "\nFinal error in HPCCG =" << _final_error << endl;
-
-  // cout << "Gradients are: " << endl;
-  // cout << "b: ";
-  // printVals(d_b.ptr(), nrow);
-  // cout << "x: ";
-  // printVals(d_x.ptr(), nrow);
-
-  delete[] b_diff;
-  delete[] x_diff;
-  delete[] xexact_diff;
-  delete[] p;
-  delete[] p_diff;
-  delete[] Ap;
-  delete[] Ap_diff;
-  delete[] r;
-  delete[] r_diff;
-}
-
-template <typename precision = double>
-precision executefunction(int nrow, int ncol, double* x, double* b, double* xexact) {
-  precision *r = new precision[nrow];
-  precision *p = new precision[ncol]; // In parallel case, A is rectangular
-  precision *Ap = new precision[nrow];
-
-  precision residual = HPCCG_residual<precision>(b, x, xexact, r, p, Ap);
-
-  delete[] p;
-  delete[] Ap;
-  delete[] r;
-
-  return residual;
-}
 
 } // clad
 

@@ -80,7 +80,6 @@ using std::endl;
 
 #undef DEBUG
 
-
 int main(int argc, char *argv[])
 {
   double *x, *b, *xexact;
@@ -121,7 +120,6 @@ int main(int argc, char *argv[])
   int nrow = clad::A.local_nrow;
   int ncol = clad::A.local_ncol;
 
-  
   // cout << "Float Result: " << executefunction<float>(nrow, ncol, x, b, xexact) << std::endl;
   // cout << "Double Result: " << executefunction<double>(nrow, ncol, x, b, xexact);
 
@@ -129,7 +127,7 @@ int main(int argc, char *argv[])
 
   double *x_diff = new double[nrow]();
   clad::array_ref<double> d_x(x_diff, nrow);
-  
+
   double *b_diff = new double[nrow]();
   clad::array_ref<double> d_b(b_diff, nrow);
 
@@ -150,24 +148,19 @@ int main(int argc, char *argv[])
 
   double _final_error = 0;
 
-  // cout << "b: ";
-  // printVals(b, nrow);
-  // cout << "x: ";
-  // printVals(x, nrow);
-  // cout << "x exact: ";
-  // printVals(xexact, nrow);
+  int niters = 0;
+  double normr = 0.0;
+  int max_iter = 100;
+  double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
 
-  HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
+  int d_niters = 0, d_max_iter = 0;
+  double d_tolerance = 0, d_normr = 0;
+
+  clad::HPCCG_grad(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact, d_b, d_x, &d_max_iter, &d_tolerance, &d_niters, &d_normr, d_r, d_p, d_Ap, d_xexact, _final_error);
 
   cout << "\nFinal error in HPCCG =" << _final_error << endl;
 
   clad::printErrorReport();
-
-  // cout << "Gradients are: " << endl;
-  // cout << "b: ";
-  // printVals(d_b.ptr(), nrow);
-  // cout << "x: ";
-  // printVals(d_x.ptr(), nrow);
 
   delete[] b_diff;
   delete[] x_diff;

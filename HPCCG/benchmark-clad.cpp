@@ -93,13 +93,21 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
 
   double _final_error = 0;
 
+  int niters = 0;
+  double normr = 0.0;
+  int max_iter = 100;
+  double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
+
+  int d_niters = 0, d_max_iter = 0;
+  double d_tolerance = 0, d_normr = 0;
+
   cout_suppressor suppressor;
 
   for (auto _ : state)
   {
     clad::resetErrors();
 
-    HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
+    clad::HPCCG_grad(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact, d_b, d_x, &d_max_iter, &d_tolerance, &d_niters, &d_normr, d_r, d_p, d_Ap, d_xexact, _final_error);
 
     cout << "\nFinal error in HPCCG =" << _final_error << endl;
 
@@ -122,6 +130,5 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
 }
 
 BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kSecond);
-
 
 BENCHMARK_MAIN();

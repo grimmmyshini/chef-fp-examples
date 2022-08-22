@@ -11,6 +11,7 @@ using std::endl;
 #include <iomanip>
 
 #include "benchmark/benchmark.h"
+#include "../benchmark-utils/memory-manager.hpp"
 
 #include "clad/Differentiator/Differentiator.h"
 #include "../PrintModel/ErrorFunc.h"
@@ -73,12 +74,14 @@ static void ErrorEstimateHPCCG(benchmark::State &state)
   double *r = new double[nrow]();
   double *p = new double[ncol]();
   double *Ap = new double[nrow]();
+  int max_iter = 100, niters = 0;
+  double tolerance = 0.0, normr = 0.0;
 
   double residual;
 
   for (auto _ : state)
   {
-    residual = clad::HPCCG_residual(b, x, xexact, r, p, Ap);
+    residual = clad::HPCCG(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact);
   }
 
   delete[] p;
@@ -215,6 +218,8 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   clad::array_ref<double> d_Ap(Ap_diff, nrow);
 
   double _final_error = 0, residual;
+  int max_iter = 100, d_max_iter, niters = 0, d_niters;
+  double tolerance =  0.0, d_tolerance, normr = 0, d_normr;
 
   // cout << "b: ";
   // printVals(b, nrow);
@@ -229,9 +234,9 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   {
     clad::resetErrors();
 
-    residual = clad::HPCCG_residual(b, x, xexact, r, p, Ap);
+    residual = clad::HPCCG(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact);
 
-    HPCCG_residual_grad(b, x, xexact, r, p, Ap, d_b, d_x, d_xexact, d_r, d_p, d_Ap, _final_error);
+    clad::HPCCG_grad(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact, d_b, d_x, &d_max_iter, &d_tolerance, &d_niters, &d_normr, d_r, d_p, d_Ap, d_xexact, _final_error);
     benchmark::DoNotOptimize(residual);
 
     cout << "\nFinal error in HPCCG =" << _final_error << endl;

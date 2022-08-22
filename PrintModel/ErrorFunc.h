@@ -7,6 +7,9 @@
 
 namespace clad
 {
+    void captureVarErrors(const char *name, double error, int iteration = -1);
+    void dumpVarErrorsToFile();
+    
     class ErrorStorage
     {
     private:
@@ -146,7 +149,7 @@ namespace clad
         }
 
     private:
-        constexpr const static double threshold = 1e-12;
+        constexpr const static double threshold = 1e-6;
 
         struct Report
         {
@@ -208,6 +211,10 @@ namespace clad
         ErrorReport error_report(error_map);
 
         error_report.print();
+
+        #ifdef ENABLE_ERROR_DUMP
+        dumpVarErrorsToFile();
+        #endif
     }
 
     void resetErrors()
@@ -217,8 +224,11 @@ namespace clad
 
     __attribute__((always_inline)) double getErrorVal(double dx, double x, const char *name)
     {
-        double error = std::abs(dx * x * std::numeric_limits<float>::epsilon());
+        double error = std::abs(dx * x * std::numeric_limits<float>::epsilon()); // replace x * std::numeric_limits<float>::epsilon() with avg or max error
         ErrorStorage::getInstance().set_error(name, error);
+        #ifdef ENABLE_ERROR_DUMP
+        captureVarErrors(name, error);
+        #endif
         return error;
     }
 } // clad
