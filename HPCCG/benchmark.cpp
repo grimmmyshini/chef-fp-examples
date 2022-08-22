@@ -270,4 +270,11 @@ BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kMillisecond)->Args({20, 30, 
 BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kMillisecond)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160});
 
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+    ::benchmark::RegisterMemoryManager(mm.get());
+    ::benchmark::Initialize(&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::RegisterMemoryManager(nullptr);
+}

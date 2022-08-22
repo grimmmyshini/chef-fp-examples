@@ -2,6 +2,7 @@
 #include <iostream> // necessary for 'cout'
 
 #include "benchmark/benchmark.h"
+#include "../benchmark-utils/memory-manager.hpp"
 
 int ITERATIONS;
 
@@ -89,4 +90,11 @@ BENCHMARK(ErrorEstimateSimp)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)
 BENCHMARK(ErrorEstimateSimpClad)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
 BENCHMARK(ErrorEstimateSimpAdapt)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 10000000);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+    ::benchmark::RegisterMemoryManager(mm.get());
+    ::benchmark::Initialize(&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::RegisterMemoryManager(nullptr);
+}

@@ -785,4 +785,11 @@ BENCHMARK(ErrorEstimateKMeans)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->A
 BENCHMARK(ErrorEstimateKMeansClad)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
 BENCHMARK(ErrorEstimateKMeansAdapt)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+    ::benchmark::RegisterMemoryManager(mm.get());
+    ::benchmark::Initialize(&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::RegisterMemoryManager(nullptr);
+}
