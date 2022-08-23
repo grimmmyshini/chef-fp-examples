@@ -101,9 +101,9 @@ static void ArcLenHighPrec(benchmark::State &state)
   }
 }
 
-BENCHMARK(ArcLenLowerPrec2)->RangeMultiplier(10)->Range(10000000, 100000000);
-BENCHMARK(ArcLenLowerPrec)->RangeMultiplier(10)->Range(10000000, 100000000);
-BENCHMARK(ArcLenHighPrec)->RangeMultiplier(10)->Range(10000000, 100000000);
+BENCHMARK(ArcLenLowerPrec2)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ArcLenLowerPrec)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ArcLenHighPrec)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
 
 // Define our main
 BENCHMARK_MAIN();

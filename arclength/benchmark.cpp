@@ -86,9 +86,9 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
   }
 }
 
-BENCHMARK(ErrorEstimateArcLen)->Unit(benchmark::kSecond)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kSecond)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kSecond)->RangeMultiplier(10)->Range(10000, 10000000);
+BENCHMARK(ErrorEstimateArcLen)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 10000000);
 
 // Define our main
 // BENCHMARK_MAIN();
