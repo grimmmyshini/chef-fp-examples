@@ -27,7 +27,7 @@ typedef struct OptionData_ {
 #define MAX_OPTIONS 1000
 
 OptionData data_init[] = {
-    #include "optionData.txt"
+    #include "optionData.dat"
 };
 
 
