@@ -1,7 +1,5 @@
 #!/bin/bash
 
-rm /tmp/b.txt /tmp/m.txt /tmp/o.txt
-
 bench_gen() {
     benchall -O3 ${1}.cpp ${2} -o ${1}.out -L$ws_dir/benchmark/build/src
 }

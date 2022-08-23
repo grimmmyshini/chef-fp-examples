@@ -7,6 +7,7 @@
 #include <fcntl.h>
 
 #include "benchmark/benchmark.h"
+#include "../benchmark-utils/memory-manager.hpp"
 
 #include "kmeans.h"
 #include "kmeans-adapt.h"

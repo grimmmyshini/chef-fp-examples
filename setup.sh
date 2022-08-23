@@ -201,18 +201,18 @@ setup() {
     clang -I$ws_dir/clad/inst/include -I$ws_dir/clang/tools/clang/include -I$ws_dir/llvm-project/clang/include -I$ws_dir/clang/include -I$ws_dir/llvm-project/llvm/include -fPIC -shared -fno-rtti -Wl,-undefined -Wl,suppress PrintModel.cpp -o libPrintModel.so
     cd ../blackscholes/data
     $ws_dir/clang/bin/clang++ inputGen.c -o inputGen.out
-    inputGen.out 100 100.txt
-    inputGen.out 1000 1000.txt
-    inputGen.out 10000 10000.txt
-    inputGen.out 100000 100000.txt
-    inputGen.out 1000000 1000000.txt
+    ./inputGen.out 100 100.txt
+    ./inputGen.out 1000 1000.txt
+    ./inputGen.out 10000 10000.txt
+    ./inputGen.out 100000 100000.txt
+    ./inputGen.out 1000000 1000000.txt
     cd ../../kmeans/data/inpuGen/
     $ws_dir/clang/bin/clang++ datagen.cpp -o datagen.out
-    datagen.out 100 ../100.txt -f
-    datagen.out 1000 ../1000.txt -f
-    datagen.out 10000 ../10000.txt -f
-    datagen.out 100000 ../100000.txt -f
-    datagen.out 1000000 ../1000000.txt -f
+    ./datagen.out 100 ../100.txt -f
+    ./datagen.out 1000 ../1000.txt -f
+    ./datagen.out 10000 ../10000.txt -f
+    ./datagen.out 100000 ../100000.txt -f
+    ./datagen.out 1000000 ../1000000.txt -f
     cd $ws_dir
 }
 

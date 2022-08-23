@@ -1,4 +1,5 @@
 #include "benchmark/benchmark.h"
+#include "../benchmark-utils/memory-manager.hpp"
 
 int ITERATIONS = 0;
 

@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include "benchmark/benchmark.h"
+#include "../benchmark-utils/memory-manager.hpp"
 
 #include "blackscholes.hpp"
 #include "blackscholes-adapt.hpp"
