@@ -208,11 +208,11 @@ setup() {
     ./inputGen.out 1000000 1000000.txt
     cd ../../kmeans/data/inpuGen/
     $ws_dir/clang/bin/clang++ datagen.cpp -o datagen.out
-    ./datagen.out 100 ../100.txt -f
-    ./datagen.out 1000 ../1000.txt -f
-    ./datagen.out 10000 ../10000.txt -f
-    ./datagen.out 100000 ../100000.txt -f
-    ./datagen.out 1000000 ../1000000.txt -f
+    ./datagen.out 100 -f && mv 100_34f.txt ../100.txt 
+    ./datagen.out 1000 -f && mv 1000_34f.txt ../1000.txt 
+    ./datagen.out 10000 -f && mv 10000_34f.txt ../10000.txt
+    ./datagen.out 100000 -f && mv 100000_34f.txt ../100000.txt
+    ./datagen.out 1000000 -f && mv 1000000_34f.txt ../1000000.txt
     cd $ws_dir
 }
 

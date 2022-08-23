@@ -18,7 +18,7 @@ bench_run() {
 
 run_adc() {
     bench_run ./benchmark.out $1 /tmp/b.json
-    python3 process_json.py /tmp/b.json >> $ws_dir/results.txt
+    python3 $ws_dir/clad-fp-error-est-examples/process_json.py /tmp/b.json >> $ws_dir/results.txt
 }
 
 run_mix() {
