@@ -160,7 +160,7 @@ set +a
 
 echo "Loaded configuration!"
 
-setup() {
+setup() {( set -e
     # INSTALL LLVM and Clang
     git clone https://github.com/llvm/llvm-project.git --depth=1 --single-branch --branch=llvmorg-9.0.1
     mkdir clang && cd clang
@@ -214,8 +214,19 @@ setup() {
     ./datagen.out 100000 -f && mv 100000_34f.txt ../100000.txt
     ./datagen.out 1000000 -f && mv 1000000_34f.txt ../1000000.txt
     cd $ws_dir
-}
+)}
 
 setup
+exit_status=$?
+if [ ${exit_status} -ne 0 ]; then
+  echo "!!!!!!!!!!!! Setup failed !!!!!!!!!!!"
+  exit "${exit_status}"
+fi
+
 cd clad-fp-error-est-examples
 ./runner.sh
+exit_status=$?
+if [ ${exit_status} -ne 0 ]; then
+  echo "!!!!!!!!!!! Runner failed !!!!!!!!!!!"
+  exit "${exit_status}"
+fi
