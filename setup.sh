@@ -188,7 +188,7 @@ setup() { (
     mv CoDiPack-1.9.1/ CoDiPack-1.9/
 
     # INSTALL Clad
-    pip install lit
+    pip3 install lit
     git clone https://github.com/sudo-panda/clad --depth=1 --single-branch --branch=ee-bench
     cd clad
     mkdir build && cd build
