@@ -217,7 +217,7 @@ setup() { (
     cd $ws_dir
 ); }
 
-while getopts ":a" opt; do
+while getopts "rs" opt; do
     case $opt in
     s)
         setup
@@ -257,7 +257,7 @@ while getopts ":a" opt; do
             echo "!!!!!!!!!!! Runner failed !!!!!!!!!!!"
             exit "${exit_status}"
         fi
-        
+
         exit 0
     esac
 done
