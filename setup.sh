@@ -160,7 +160,8 @@ set +a
 
 echo "Loaded configuration!"
 
-setup() {( set -e
+setup() { (
+    set -e
     # INSTALL LLVM and Clang
     git clone https://github.com/llvm/llvm-project.git --depth=1 --single-branch --branch=llvmorg-9.0.1
     mkdir clang && cd clang
@@ -208,25 +209,57 @@ setup() {( set -e
     ./inputGen.out 1000000 1000000.txt
     cd ../../kmeans/data/inpuGen/
     $ws_dir/clang/bin/clang++ datagen.cpp -o datagen.out
-    ./datagen.out 100 -f && mv 100_34f.txt ../100.txt 
-    ./datagen.out 1000 -f && mv 1000_34f.txt ../1000.txt 
+    ./datagen.out 100 -f && mv 100_34f.txt ../100.txt
+    ./datagen.out 1000 -f && mv 1000_34f.txt ../1000.txt
     ./datagen.out 10000 -f && mv 10000_34f.txt ../10000.txt
     ./datagen.out 100000 -f && mv 100000_34f.txt ../100000.txt
     ./datagen.out 1000000 -f && mv 1000000_34f.txt ../1000000.txt
     cd $ws_dir
-)}
+); }
+
+while getopts ":a" opt; do
+    case $opt in
+    s)
+        setup
+        exit_status=$?
+        if [ ${exit_status} -ne 0 ]; then
+            echo "!!!!!!!!!!!! Setup failed !!!!!!!!!!!"
+            exit "${exit_status}"
+        fi
+        exit 0
+        ;;
+    r)
+        cd clad-fp-error-est-examples
+        ./runner.sh
+        exit_status=$?
+        if [ ${exit_status} -ne 0 ]; then
+            echo "!!!!!!!!!!! Runner failed !!!!!!!!!!!"
+            exit "${exit_status}"
+        fi
+        exit 0
+        ;;
+    \?)
+        echo "Invalid option: -$OPTARG" >&2
+        exit 1
+        ;;
+    :)
+        setup
+        exit_status=$?
+        if [ ${exit_status} -ne 0 ]; then
+            echo "!!!!!!!!!!!! Setup failed !!!!!!!!!!!"
+            exit "${exit_status}"
+        fi
+
+        cd clad-fp-error-est-examples
+        ./runner.sh
+        exit_status=$?
+        if [ ${exit_status} -ne 0 ]; then
+            echo "!!!!!!!!!!! Runner failed !!!!!!!!!!!"
+            exit "${exit_status}"
+        fi
+        
+        exit 0
+    esac
+done
 
 setup
-exit_status=$?
-if [ ${exit_status} -ne 0 ]; then
-  echo "!!!!!!!!!!!! Setup failed !!!!!!!!!!!"
-  exit "${exit_status}"
-fi
-
-cd clad-fp-error-est-examples
-./runner.sh
-exit_status=$?
-if [ ${exit_status} -ne 0 ]; then
-  echo "!!!!!!!!!!! Runner failed !!!!!!!!!!!"
-  exit "${exit_status}"
-fi
