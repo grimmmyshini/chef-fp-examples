@@ -199,7 +199,7 @@ setup() { (
     # INSTALL benchmarks
     git clone https://github.com/grimmmyshini/clad-fp-error-est-examples
     cd clad-fp-error-est-examples/PrintModel
-    clang -I$ws_dir/clad/inst/include -I$ws_dir/clang/tools/clang/include -I$ws_dir/llvm-project/clang/include -I$ws_dir/clang/include -I$ws_dir/llvm-project/llvm/include -fPIC -shared -fno-rtti -Wl,-undefined -Wl,suppress PrintModel.cpp -o libPrintModel.so
+    $ws_dir/clang/bin/clang++ -I$ws_dir/clad/inst/include -I$ws_dir/clang/tools/clang/include -I$ws_dir/llvm-project/clang/include -I$ws_dir/clang/include -I$ws_dir/llvm-project/llvm/include -fPIC -shared -fno-rtti -Wl,-undefined -Wl,suppress PrintModel.cpp -o libPrintModel.so
     cd ../blackscholes/data
     $ws_dir/clang/bin/clang++ inputGen.c -o inputGen.out
     ./inputGen.out 100 100.txt
