@@ -67,7 +67,7 @@ benchall() {
         -Xclang -add-plugin -Xclang clad -Xclang -load -Xclang clad.so \
         -Xclang -plugin-arg-clad -Xclang -fcustom-estimation-model \
         -Xclang -plugin-arg-clad -Xclang $pr_mod_dir/libPrintModel.so \
-        -lstdc++ -lm -std=c++11 \
+        -lstdc++ -lm -std=c++11 -O3 \
         "$@" \
         -L$ws_dir/benchmark/build/src \
         -lpthread -lbenchmark -DCODI_ZeroAdjointReverse=0
@@ -236,6 +236,7 @@ while getopts "rs" opt; do
             echo "!!!!!!!!!!! Runner failed !!!!!!!!!!!"
             exit "${exit_status}"
         fi
+
         exit 0
         ;;
     \?)
@@ -262,4 +263,3 @@ while getopts "rs" opt; do
     esac
 done
 
-setup

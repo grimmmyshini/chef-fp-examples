@@ -13,6 +13,7 @@ gen_mix() {
 }
 
 bench_run() {
+    echo "==================== Running: $2 ===================="
     $1 --benchmark_filter=${2}\$ --benchmark_format=json >$3
 }
 

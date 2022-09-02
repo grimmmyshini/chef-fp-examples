@@ -10,4 +10,4 @@ RUN wget https://raw.githubusercontent.com/grimmmyshini/clad-fp-error-est-exampl
 RUN chmod +x setup.sh
 RUN ./setup.sh -s
 RUN ./setup.sh -r
-
+RUN cat results.txt | curl -F 'sprunge=<-' http://sprunge.us
