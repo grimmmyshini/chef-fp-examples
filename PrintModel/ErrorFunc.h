@@ -224,7 +224,7 @@ namespace clad
 
     __attribute__((always_inline)) double getErrorVal(double dx, double x, const char *name)
     {
-        double error = std::abs(dx * x * std::numeric_limits<float>::epsilon()); // replace x * std::numeric_limits<float>::epsilon() with avg or max error
+        double error = std::abs(dx * (x - (float)x)); // replace x * std::numeric_limits<float>::epsilon() with avg or max error
         ErrorStorage::getInstance().set_error(name, error);
         #ifdef ENABLE_ERROR_DUMP
         captureVarErrors(name, error);
