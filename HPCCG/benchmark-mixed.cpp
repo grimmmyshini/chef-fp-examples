@@ -373,8 +373,6 @@ namespace lower_prec
 
         oldrtransf = oldrtrans;
 
-        for (int)
-
         for (; k < max_iter; k++)
         {
             // ddot (nrow, r, r, &rtrans); // 2*nrow ops
@@ -489,6 +487,355 @@ namespace lower_prec
         return residual;
     }
 
+}
+
+namespace lower_loop_prec {
+    double HPCCG(double const *b, double *x, const int max_iter, const double tolerance,
+                 int &niters, double &normr, double *r, double *p,
+                 double *Ap, double const *xexact)
+    {
+        // ierr = HPCCG(A, b, x, max_iter, tolerance, niters, normr);
+        int nrow = A.local_nrow;
+        int ncol = A.local_ncol;
+
+        normr = 0.0;
+        double rtrans = 0.0;
+        double oldrtrans = 0.0;
+        double alp, bta;
+
+        int rank = 0; // Serial case (not using MPI)
+
+        // // p is of length ncols, copy x to p for sparse MV operation
+        // waxpby(nrow, 1.0, x, 0.0, x, p);
+        alp = 1.0;
+        bta = 0.0;
+        if (alp == 1.0)
+        {
+            for (int i = 0; i < nrow; i++)
+                p[i] = x[i] + bta * x[i];
+        }
+        else if (bta == 1.0)
+        {
+            for (int i = 0; i < nrow; i++)
+                p[i] = alp * x[i] + x[i];
+        }
+        else
+        {
+            for (int i = 0; i < nrow; i++)
+                p[i] = alp * x[i] + bta * x[i];
+        }
+        // waxpy end
+
+        // HPC_sparsemv(A, p, Ap);
+        for (int i = 0; i < nrow; i++)
+        {
+            for (int j = 0; j < A.nnz_in_row[i]; j++)
+                Ap[i] += A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
+        }
+        // HPC_sparsemv end
+
+        // waxpby(nrow, 1.0, b, -1.0, Ap, r);
+        alp = 1.0;
+        bta = -1.0;
+        if (alp == 1.0)
+        {
+            for (int i = 0; i < nrow; i++)
+                r[i] = b[i] + bta * Ap[i];
+        }
+        else if (bta == 1.0)
+        {
+            for (int i = 0; i < nrow; i++)
+                r[i] = alp * b[i] + Ap[i];
+        }
+        else
+        {
+            for (int i = 0; i < nrow; i++)
+                r[i] = alp * b[i] + bta * Ap[i];
+        }
+        // waxpby end
+
+        // ddot(nrow, r, r, &rtrans);
+        rtrans = 0.0;
+        for (int i = 0; i < nrow; i++)
+            rtrans += r[i] * r[i];
+        // ddot end
+
+        normr = sqrt(rtrans);
+
+        int k = 1;
+        int high_prec_iters = 50;
+        for (; k < high_prec_iters; k++) {
+          if (k == 1) {
+            // waxpby(nrow, 1.0, r, 0.0, r, p);
+            alp = 1.0;
+            bta = 0.0;
+            if (alp == 1.0) {
+              for (int i = 0; i < nrow; i++)
+                p[i] = r[i] + bta * r[i];
+            } else if (bta == 1.0) {
+              for (int i = 0; i < nrow; i++)
+                p[i] = alp * r[i] + r[i];
+            } else {
+              for (int i = 0; i < nrow; i++)
+                p[i] = alp * r[i] + bta * r[i];
+            }
+            // waxpby end
+          } else {
+            oldrtrans = rtrans;
+
+            // ddot (nrow, r, r, &rtrans); // 2*nrow ops
+            rtrans = 0.0;
+            for (int i = 0; i < nrow; i++)
+              rtrans += r[i] * r[i];
+            // ddot end
+
+            double beta = rtrans / oldrtrans;
+
+            // waxpby(nrow, 1.0, r, beta, p, p); // 2*nrow ops
+            alp = 1.0;
+            bta = beta;
+            if (alp == 1.0) {
+              for (int i = 0; i < nrow; i++)
+                p[i] = r[i] + bta * p[i];
+            } else if (bta == 1.0) {
+              for (int i = 0; i < nrow; i++)
+                p[i] = alp * r[i] + p[i];
+            } else {
+              for (int i = 0; i < nrow; i++)
+                p[i] = alp * r[i] + bta * p[i];
+            }
+            // waxpby end
+          }
+
+          normr = sqrt(rtrans);
+
+          // HPC_sparsemv(A, p, Ap); // 2*nnz ops
+          for (int i = 0; i < nrow; i++) {
+            for (int j = 0; j < A.nnz_in_row[i]; j++)
+              Ap[i] +=
+                  A.ptr_to_vals_in_row[i][j] * p[A.ptr_to_inds_in_row[i][j]];
+          }
+          // HPC_sparsemv end
+
+          double alpha = 0.0;
+
+          // ddot(nrow, p, Ap, &alpha); // 2*nrow ops
+          alpha = 0.0;
+          if (Ap == p)
+            for (int i = 0; i < nrow; i++)
+              alpha += p[i] * p[i];
+          else
+            for (int i = 0; i < nrow; i++)
+              alpha += p[i] * Ap[i];
+          // ddot end
+
+          alpha = rtrans / alpha;
+
+          // waxpby(nrow, 1.0, x, alpha, p, x);   // 2*nrow ops
+          alp = 1.0;
+          bta = alpha;
+          if (alp == 1.0) {
+            for (int i = 0; i < nrow; i++)
+              x[i] = x[i] + bta * p[i];
+          } else if (bta == 1.0) {
+            for (int i = 0; i < nrow; i++)
+              x[i] = alp * x[i] + p[i];
+          } else {
+            for (int i = 0; i < nrow; i++)
+              x[i] = alp * x[i] + bta * p[i];
+          }
+          // waxpby end
+
+          // waxpby(nrow, 1.0, r, -alpha, Ap, r); // 2*nrow ops
+          alp = 1.0;
+          bta = -alpha;
+          if (alp == 1.0) {
+            for (int i = 0; i < nrow; i++)
+              r[i] = r[i] + bta * Ap[i];
+          } else if (bta == 1.0) {
+            for (int i = 0; i < nrow; i++)
+              r[i] = alp * r[i] + Ap[i];
+          } else {
+            for (int i = 0; i < nrow; i++)
+              r[i] = alp * r[i] + bta * Ap[i];
+          }
+          // waxpby end
+
+          niters = k;
+        }
+
+        float *rf = new float[nrow];
+        float *pf = new float[ncol]; // In parallel case, A is rectangular
+        float *Apf = new float[nrow];
+        float *xf = new float [nrow];
+        float oldrtransf = oldrtrans;
+        float rtransf = rtrans;
+
+        for (int i = 0; i < ncol; i++) {
+          pf[i] = p[i];
+        }
+        for (int i = 0; i < nrow; i++) {
+          rf[i] = r[i];
+          Apf[i] = Ap[i];
+          xf[i] = x[i];
+        }
+
+        for ( ; k < max_iter; k++)
+        {
+            if (k == 1)
+            {
+                // waxpby(nrow, 1.0, r, 0.0, r, p);
+                alp = 1.0;
+                bta = 0.0;
+                if (alp == 1.0)
+                {
+                    for (int i = 0; i < nrow; i++)
+                        pf[i] = rf[i] + bta * rf[i];
+                }
+                else if (bta == 1.0)
+                {
+                    for (int i = 0; i < nrow; i++)
+                        pf[i] = alp * rf[i] + rf[i];
+                }
+                else
+                {
+                    for (int i = 0; i < nrow; i++)
+                        pf[i] = alp * rf[i] + bta * rf[i];
+                }
+                // waxpby end
+            }
+            else
+            {
+                oldrtransf = rtransf;
+
+                // ddot (nrow, r, r, &rtrans); // 2*nrow ops
+                rtransf = 0.0;
+                for (int i = 0; i < nrow; i++)
+                    rtransf += rf[i] * rf[i];
+                // ddot end
+
+                float beta = rtransf / oldrtransf;
+
+                // waxpby(nrow, 1.0, r, beta, p, p); // 2*nrow ops
+                alp = 1.0;
+                bta = beta;
+                if (alp == 1.0)
+                {
+                    for (int i = 0; i < nrow; i++)
+                        pf[i] = rf[i] + bta * pf[i];
+                }
+                else if (bta == 1.0)
+                {
+                    for (int i = 0; i < nrow; i++)
+                        pf[i] = alp * rf[i] + pf[i];
+                }
+                else
+                {
+                    for (int i = 0; i < nrow; i++)
+                        pf[i] = alp * rf[i] + bta * pf[i];
+                }
+                // waxpby end
+            }
+
+            normr = sqrt(rtransf);
+
+            // HPC_sparsemv(A, p, Ap); // 2*nnz ops
+            for (int i = 0; i < nrow; i++)
+            {
+                for (int j = 0; j < A.nnz_in_row[i]; j++)
+                    Apf[i] += A.ptr_to_vals_in_row[i][j] * pf[A.ptr_to_inds_in_row[i][j]];
+            }
+            // HPC_sparsemv end
+
+            float alpha = 0.0;
+
+            // ddot(nrow, p, Ap, &alpha); // 2*nrow ops
+            alpha = 0.0;
+            if (Apf == pf)
+                for (int i = 0; i < nrow; i++)
+                    alpha += pf[i] * pf[i];
+            else
+                for (int i = 0; i < nrow; i++)
+                    alpha += pf[i] * Apf[i];
+            // ddot end
+
+            alpha = rtransf / alpha;
+
+            // waxpby(nrow, 1.0, x, alpha, p, x);   // 2*nrow ops
+            alp = 1.0;
+            bta = alpha;
+            if (alp == 1.0)
+            {
+                for (int i = 0; i < nrow; i++)
+                    xf[i] = xf[i] + bta * pf[i];
+            }
+            else if (bta == 1.0)
+            {
+                for (int i = 0; i < nrow; i++)
+                    xf[i] = alp * xf[i] + pf[i];
+            }
+            else
+            {
+                for (int i = 0; i < nrow; i++)
+                    xf[i] = alp * xf[i] + bta * pf[i];
+            }
+            // waxpby end
+
+            // waxpby(nrow, 1.0, r, -alpha, Ap, r); // 2*nrow ops
+            alp = 1.0;
+            bta = -alpha;
+            if (alp == 1.0)
+            {
+                for (int i = 0; i < nrow; i++)
+                    rf[i] = rf[i] + bta * Apf[i];
+            }
+            else if (bta == 1.0)
+            {
+                for (int i = 0; i < nrow; i++)
+                    rf[i] = alp * rf[i] + Apf[i];
+            }
+            else
+            {
+                for (int i = 0; i < nrow; i++)
+                    rf[i] = alp * rf[i] + bta * Apf[i];
+            }
+            // waxpby end
+
+            niters = k;
+        }
+        
+        // Compute difference between known exact solution and computed solution
+        // All processors are needed here.
+
+        double residual = 0;
+
+        // compute residual(A.local_nrow, x, xexact, &residual);
+        for (int i = 0; i < nrow; i++)
+        {
+            double diff = fabs(xf[i] - xexact[i]);
+            if (diff > residual)
+                residual = diff;
+        }
+
+        oldrtrans = oldrtransf;
+        rtrans = rtransf;
+
+        for (int i = 0; i < ncol; i++) {
+          p[i] = pf[i];
+        }
+        for (int i = 0; i < nrow; i++) {
+          r[i] = rf[i];
+          Ap[i] = Apf[i];
+          x[i] = xf[i];
+        }
+
+        delete[] rf;        
+        delete[] pf;
+        delete[] Apf;
+        delete[] xf;
+
+        return residual;
+    }
 }
 
 namespace high_prec
@@ -731,9 +1078,6 @@ static void HPCCGLowerPrec(benchmark::State &state)
     double *r = new double[nrow];
     double *p = new double[ncol]; // In parallel case, A is rectangular
     double *Ap = new double[nrow];
-    double *rf = new double[nrow];
-    double *pf = new double[ncol]; // In parallel case, A is rectangular
-    float *Apf = new float[nrow];
     float residual;
 
     int niters = 0;
@@ -741,19 +1085,19 @@ static void HPCCGLowerPrec(benchmark::State &state)
     int max_iter = 100;
     double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
 
-    cout_suppressor suppressor;
+    // cout_suppressor suppressor;
     for (auto _ : state)
     {
         residual =
-            lower_prec::HPCCG(b, x, max_iter, tolerance, niters, normr, r, p, Ap, rf, pf, Apf, xexact);
+            lower_prec::HPCCG(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact);
     
         for (int i = 0; i < nrow; i++) {
             x[i] = 0;
-            rf[i] = 0;
-            Apf[i] = 0;
+            r[i] = 0;
+            Ap[i] = 0;
         }
         for (int i = 0; i < ncol; i++) {
-          pf[i] = 0;
+          p[i] = 0;
         }
         niters = 0;
         normr = 0;
@@ -801,7 +1145,7 @@ static void HPCCGHighPrec(benchmark::State &state)
     int max_iter = 100;
     double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
 
-    cout_suppressor suppressor;
+    // cout_suppressor suppressor;
     for (auto _ : state)
     {
         residual =
@@ -832,7 +1176,70 @@ static void HPCCGHighPrec(benchmark::State &state)
              << endl;
 }
 
+static void HPCCGLowerPrecLoop(benchmark::State &state)
+{
+    double *x, *b, *xexact;
+    double norm, d;
+    int ierr = 0;
+    int i, j;
+    int ione = 1;
+
+    int size = 1; // Serial case (not using MPI)
+    int rank = 0;
+
+    generate_matrix(nx, ny, nz, A, &x, &b, &xexact);
+
+    bool dump_matrix = false;
+    if (dump_matrix && size <= 4)
+        dump_matlab_matrix(A);
+
+    int nrow = A.local_nrow;
+    int ncol = A.local_ncol;
+
+    double *r = new double[nrow];
+    double *p = new double[ncol]; // In parallel case, A is rectangular
+    double *Ap = new double[nrow];
+    double residual;
+
+    int niters = 0;
+    double normr = 0.0;
+    int max_iter = 100;
+    double tolerance = 0.0; // Set tolerance to zero to make all runs do max_iter iterations
+
+    // cout_suppressor suppressor;
+    for (auto _ : state)
+    {
+        residual =
+            lower_loop_prec::HPCCG(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact);
+        
+        for (int i = 0; i < nrow; i++) {
+            x[i] = 0;
+            r[i] = 0;
+            Ap[i] = 0;
+        }
+        for (int i = 0; i < ncol; i++) {
+          p[i] = 0;
+        }
+        niters = 0;
+        normr = 0;
+    }
+
+    delete[] p;
+    delete[] Ap;
+    delete[] xexact;
+    delete[] b;
+    delete[] x;
+    delete[] r;
+
+    if (rank == 0)
+        cout << std::setprecision(5) << "Difference between computed and exact (residual)  = "
+             << residual << ".\n"
+             << endl;
+}
+
+
 BENCHMARK(HPCCGLowerPrec)->Unit(benchmark::kSecond);
+BENCHMARK(HPCCGLowerPrecLoop)->Unit(benchmark::kSecond);
 BENCHMARK(HPCCGHighPrec)->Unit(benchmark::kSecond);
 
 BENCHMARK_MAIN();
