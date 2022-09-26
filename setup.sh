@@ -170,7 +170,7 @@ setup() { (
     cd ..
 
     # INSTALL Google Benchmark
-    git clone https://github.com/google/benchmark
+    git clone https://github.com/google/benchmark -b v1.6.1
     cd benchmark/
     cmake -E make_directory "build"
     cmake -E chdir "build" cmake -DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release ../
