@@ -731,8 +731,8 @@ static void HPCCGLowerPrec(benchmark::State &state)
     double *r = new double[nrow];
     double *p = new double[ncol]; // In parallel case, A is rectangular
     double *Ap = new double[nrow];
-    float *rf = new float[nrow];
-    float *pf = new float[ncol]; // In parallel case, A is rectangular
+    double *rf = new double[nrow];
+    double *pf = new double[ncol]; // In parallel case, A is rectangular
     float *Apf = new float[nrow];
     float residual;
 
@@ -749,7 +749,14 @@ static void HPCCGLowerPrec(benchmark::State &state)
     
         for (int i = 0; i < nrow; i++) {
             x[i] = 0;
+            rf[i] = 0;
+            Apf[i] = 0;
         }
+        for (int i = 0; i < ncol; i++) {
+          pf[i] = 0;
+        }
+        niters = 0;
+        normr = 0;
     }
 
     delete[] p;
@@ -802,7 +809,14 @@ static void HPCCGHighPrec(benchmark::State &state)
         
         for (int i = 0; i < nrow; i++) {
             x[i] = 0;
+            r[i] = 0;
+            Ap[i] = 0;
         }
+        for (int i = 0; i < ncol; i++) {
+          p[i] = 0;
+        }
+        niters = 0;
+        normr = 0;
     }
 
     delete[] p;

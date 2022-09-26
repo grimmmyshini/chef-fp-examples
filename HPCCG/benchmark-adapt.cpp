@@ -106,6 +106,16 @@ static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
 
     AD_DEPENDENT(residual, "residual", 0.0);
     AD_report();
+    for (int i = 0; i < nrow; i++) {
+      x[i] = 0;
+      r[i] = 0;
+      Ap[i] = 0;
+    }
+    for (int i = 0; i < ncol; i++) {
+      p[i] = 0;
+    }
+    niters = 0;
+    normr = 0;
   }
 
   delete[] p;
