@@ -82,6 +82,17 @@ static void ErrorEstimateHPCCG(benchmark::State &state)
   for (auto _ : state)
   {
     residual = clad::HPCCG(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact);
+    
+    for (int i = 0; i < nrow; i++) {
+      x[i] = 0;
+      r[i] = 0;
+      Ap[i] = 0;
+    }
+    for (int i = 0; i < ncol; i++) {
+      p[i] = 0;
+    }
+    niters = 0;
+    normr = 0;
   }
 
   delete[] p;
@@ -157,6 +168,17 @@ static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
     AD_DEPENDENT(residual, "residual", 0.0);
     AD_report();
     AD_end();
+
+    for (int i = 0; i < nrow; i++) {
+      x[i] = 0;
+      r[i] = 0;
+      Ap[i] = 0;
+    }
+    for (int i = 0; i < ncol; i++) {
+      p[i] = 0;
+    }
+    niters = 0;
+    normr = 0;
   }
 
   delete[] p;
@@ -234,14 +256,22 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   {
     clad::resetErrors();
 
-    residual = clad::HPCCG(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact);
-
     clad::HPCCG_grad(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact, d_b, d_x, &d_max_iter, &d_tolerance, &d_niters, &d_normr, d_r, d_p, d_Ap, d_xexact, _final_error);
-    benchmark::DoNotOptimize(residual);
 
     cout << "\nFinal error in HPCCG =" << _final_error << endl;
 
     clad::printErrorReport();
+
+    for (int i = 0; i < nrow; i++) {
+      x[i] = 0;
+      r[i] = 0;
+      Ap[i] = 0;
+    }
+    for (int i = 0; i < ncol; i++) {
+      p[i] = 0;
+    }
+    niters = 0;
+    normr = 0;
   }
 
   // cout << "Gradients are: " << endl;
