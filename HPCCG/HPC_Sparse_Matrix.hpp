@@ -49,10 +49,13 @@ struct HPC_Sparse_Matrix_STRUCT {
   int local_nnz;
   int  * nnz_in_row;
   double ** ptr_to_vals_in_row;
+  float ** ptr_to_vals_in_row_f;
   int ** ptr_to_inds_in_row;
   double ** ptr_to_diags;
+  float ** ptr_to_diags_f;
 
   double *list_of_vals;   //needed for cleaning up memory
+  float *list_of_vals_f;   //needed for cleaning up memory
   int *list_of_inds;      //needed for cleaning up memory
 
 };
@@ -76,9 +79,17 @@ void destroyMatrix(HPC_Sparse_Matrix * &A)
   {
     delete [] A->list_of_vals;
   }
+  if(A->list_of_vals_f)
+  {
+    delete [] A->list_of_vals_f;
+  }
   if(A->ptr_to_vals_in_row !=0)
   {
     delete [] A->ptr_to_vals_in_row;
+  }
+  if(A->ptr_to_vals_in_row_f !=0)
+  {
+    delete [] A->ptr_to_vals_in_row_f;
   }
   if(A->list_of_inds)
   {
@@ -92,10 +103,13 @@ void destroyMatrix(HPC_Sparse_Matrix * &A)
   {
     delete [] A->ptr_to_diags;
   }
+  if(A->ptr_to_diags_f)
+  {
+    delete [] A->ptr_to_diags_f;
+  }
 
   delete A;
   A = 0;
 }
 
 #endif
-
