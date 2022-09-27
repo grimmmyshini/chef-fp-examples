@@ -1,8 +1,6 @@
 #include "benchmark/benchmark.h"
 #include "../benchmark-utils/memory-manager.hpp"
 
-int ITERATIONS = 0;
-
 #include "arclen.hpp"
 #include "arclen-adapt.hpp"
 
@@ -32,10 +30,10 @@ private:
 
 static void ErrorEstimateArcLen(benchmark::State &state)
 {
-    ITERATIONS = state.range(0);
+    int iters = state.range(0);
     for (auto _ : state)
     {
-        double result = do_fun(0, 0);
+        double result = do_fun<double>(iters);
 
         benchmark::DoNotOptimize(result);
     }
@@ -69,8 +67,8 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
   
   cout_suppressor suppressor;
   double result;
-  double ds1, dt1, fin_error;
-  ITERATIONS = state.range(0);
+  double fin_error;
+  int iters = state.range(0), diters  = 0;
 
   for (auto _ : state) {
     ds1 = 0, dt1 = 0;
@@ -78,8 +76,8 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
 
     clad::resetErrors();
 
-    result = do_fun(0, 0);
-    clad::do_fun_grad(0, 0, &ds1, &dt1, fin_error);
+    // result = do_fun(0, 0);
+    clad::do_fun_grad(iters, &diters, fin_error);
 
     benchmark::DoNotOptimize(fin_error);
     clad::printErrorReport();

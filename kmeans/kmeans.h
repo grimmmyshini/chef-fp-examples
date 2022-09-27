@@ -45,12 +45,13 @@
 
 typedef double fptype;
 
-template <typename T, typename P>
-__inline T euclid_dist_2(P *pt1, P *pt2, int numdims)
+template <typename H, typename L>
+__inline H euclid_dist_2(L *pt1, H *pt2, int numdims)
 {
     int i;
-    T ans = 0.0;
-    P x, y;
+    H ans = 0.0;
+    L x;
+    H y;
 
     for (i = 0; i < numdims; i++) {
         x = pt1[i];
