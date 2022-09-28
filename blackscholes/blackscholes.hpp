@@ -73,15 +73,23 @@ fptype BlkSchlsEqEuroNoDiv(fptype sptprice,
     fptype xLocal_2, xLocal_3;
     fptype inv_sqrt_2xPI = 0.39894228040143270286;
 
+    fptype clad_log_1_;
+    fptype clad_sqr_1_;
+    fptype clad_exp_1_;
+    fptype clad_exp_2_;
+    fptype clad_exp_3_;
+
     xStockPrice = sptprice;
     xStrikePrice = strike;
     xRiskFreeRate = rate;
     xVolatility = volatility;
 
     xTime = time;
-    xSqrtTime = sqrt(xTime);
+    clad_sqr_1_ = xTime;
+    xSqrtTime = sqrt(clad_sqr_1_);
 
-    logValues = log(sptprice / strike);
+    clad_log_1_ = sptprice / strike;
+    logValues = log(clad_log_1_);
 
     xLogTerm = logValues;
 
@@ -114,7 +122,8 @@ fptype BlkSchlsEqEuroNoDiv(fptype sptprice,
     xInput = InputX;
 
     // Compute NPrimeX term common to both four & six decimal accuracy calcs
-    expValues = exp(-0.5f * InputX * InputX);
+    clad_exp_1_ = -0.5f * InputX * InputX;
+    expValues = exp(clad_exp_1_);
     xNPrimeofX = expValues;
     xNPrimeofX = xNPrimeofX * inv_sqrt_2xPI;
 
@@ -164,7 +173,8 @@ fptype BlkSchlsEqEuroNoDiv(fptype sptprice,
     xInput = InputX;
 
     // Compute NPrimeX term common to both four & six decimal accuracy calcs
-    expValues = exp(-0.5f * InputX * InputX);
+    clad_exp_2_ = -0.5f * InputX * InputX
+    expValues = exp(clad_exp_2_);
     xNPrimeofX = expValues;
     xNPrimeofX = xNPrimeofX * inv_sqrt_2xPI;
 
@@ -199,7 +209,8 @@ fptype BlkSchlsEqEuroNoDiv(fptype sptprice,
     NofXd2 = OutputX;
     // -------------------------- NofXd2 = CNDF(d2) END ------------------------
 
-    FutureValueX = strike * (exp(-(rate) * (time)));
+    clad_exp_3_ = -(rate) * (time);
+    FutureValueX = strike * (exp(clad_exp_3_));
     if (otype == 0)
     {
         OptionPrice = (sptprice * NofXd1) - (FutureValueX * NofXd2);

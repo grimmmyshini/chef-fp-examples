@@ -4,21 +4,20 @@
 #include <cmath>
 
 // defines the simpsons rule for integral estimation of sin( x * pi ) in [a,b]
-template <typename prec>
-prec simpsons(prec a, prec b) {
-  int n = ITERATIONS;
-  prec pi = M_PI;
-  prec h = (b - a) / (2.0 * n);
-  prec x = a;
-  prec tmp, x_pi, sin_x_pi;
+template <typename highprec, typename lowPrec = highprec>
+highprec simpsons(lowPrec a, lowPrec b, int n) {
+  highprec pi = M_PI;
+  lowPrec h = (b - a) / (2.0 * n);
+  highprec x = a;
+  lowPrec tmp, x_pi, sin_x_pi;
   x_pi = a * pi;
-  sin_x_pi = sin(x_pi);
-  prec fa = sin_x_pi;
+  sin_x_pi = pi * sin(x_pi);
+  lowPrec fa = sin_x_pi;
   
   x_pi = b * pi;
-  sin_x_pi = sin(x_pi);
-  prec fb = sin_x_pi;
-  prec s1 = fa + fb;
+  sin_x_pi = pi * sin(x_pi);
+  lowPrec fb = sin_x_pi;
+  highprec s1 = fa + fb;
 
   for (int l = 0; l < n; l++) {
     x = x + h;

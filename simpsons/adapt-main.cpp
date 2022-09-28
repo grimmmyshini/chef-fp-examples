@@ -13,7 +13,7 @@ int main() {
   AD_INDEPENDENT(a, "a");
   AD_INDEPENDENT(b, "b");
   
-  AD_real result = adapt::simpsons(a, b);
+  AD_real result = adapt::simpsons(a, b, 1000);
 
   AD_DEPENDENT(result, "result", 0.0);
   AD_report();

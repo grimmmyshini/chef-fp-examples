@@ -9,10 +9,8 @@
 namespace adapt
 {
   // defines the simpsons rule for integral estimation.
-  AD_real simpsons(AD_real a, AD_real b)
+  AD_real simpsons(AD_real a, AD_real b, int n)
   {
-    int n = ITERATIONS;
-
     AD_real pi = M_PI;
 
     AD_real h = (b - a) / (2.0 * n);
