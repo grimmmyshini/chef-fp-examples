@@ -159,14 +159,14 @@ int main(int argc, char **argv)
     {
         for (k = start; k < end; k++)
         {
-            /* Calling main function to calculate option value based on
+            /* Calling clad error estimation to calculate option value based on
              * Black & Scholes's equation.
              */
             price = BlkSchlsEqEuroNoDiv(sptprice[k], strike[k],
                                         rate[k], volatility[k], otime[k],
                                         otype[k]);
 
-            float _d_sptprice = 0, _d_strike = 0, _d_rate = 0, _d_volatility = 0, _d_time = 0;
+            double _d_sptprice = 0, _d_strike = 0, _d_rate = 0, _d_volatility = 0, _d_time = 0;
             int _d_otype = 0;
             double final_error = 0;
 
@@ -193,41 +193,8 @@ int main(int argc, char **argv)
 
     // -------------------------- bs_thread END -----------------------------
 
-    // Write prices to output file
-    file = fopen(outputFile, "w");
-    if (file == NULL)
-    {
-        printf("ERROR: Unable to open file `%s'.\n", outputFile);
-        exit(1);
-    }
-    rv = fprintf(file, "%i\n", numOptions);
-    if (rv < 0)
-    {
-        printf("ERROR: Unable to write to file `%s'.\n", outputFile);
-        fclose(file);
-        exit(1);
-    }
-    for (i = 0; i < numOptions; i++)
-    {
-        rv = fprintf(file, "%.18f\n", prices[i]);
-        if (rv < 0)
-        {
-            printf("ERROR: Unable to write to file `%s'.\n", outputFile);
-            fclose(file);
-            exit(1);
-        }
-    }
-    rv = fclose(file);
-    if (rv != 0)
-    {
-        printf("ERROR: Unable to close file `%s'.\n", outputFile);
-        exit(1);
-    }
-
     delete[] buffer2;
     delete[] buffer;
     delete[] data;
     delete[] prices;
-
-    return 0;
 }

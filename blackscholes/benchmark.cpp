@@ -34,7 +34,7 @@ private:
 };
 
 
-static void ErrorEstimateBlkSol(benchmark::State &state)
+static void BlackScholes(benchmark::State &state)
 {
     // clad::estimate_error(BlkSchlsEqEuroNoDiv);
     FILE *file;
@@ -191,7 +191,7 @@ static void ErrorEstimateBlkSol(benchmark::State &state)
     delete[] prices;
 }
 
-static void ErrorEstimateBlkSolAdapt(benchmark::State &state)
+static void BlackScholes_Adapt(benchmark::State &state)
 {
     FILE *file;
     int i;
@@ -347,7 +347,7 @@ static void ErrorEstimateBlkSolAdapt(benchmark::State &state)
     delete[] prices;
 }
 
-static void ErrorEstimateBlkSolClad(benchmark::State &state)
+static void BlackScholes_Clad(benchmark::State &state)
 {
     // clad::estimate_error(BlkSchlsEqEuroNoDiv);
     FILE *file;
@@ -473,14 +473,14 @@ static void ErrorEstimateBlkSolClad(benchmark::State &state)
         {
             for (k = start; k < end; k++)
             {
-                /* Calling main function to calculate option value based on
+                /* Calling clad error estimation to calculate option value based on
                  * Black & Scholes's equation.
                  */
                 price = BlkSchlsEqEuroNoDiv(sptprice[k], strike[k],
                                             rate[k], volatility[k], otime[k],
                                             otype[k]);
 
-                float _d_sptprice = 0, _d_strike = 0, _d_rate = 0, _d_volatility = 0, _d_time = 0;
+                double _d_sptprice = 0, _d_strike = 0, _d_rate = 0, _d_volatility = 0, _d_time = 0;
                 int _d_otype = 0;
                 double final_error = 0;
 
@@ -516,9 +516,9 @@ static void ErrorEstimateBlkSolClad(benchmark::State &state)
     delete[] prices;
 }
 
-BENCHMARK(ErrorEstimateBlkSol)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(ErrorEstimateBlkSolClad)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(ErrorEstimateBlkSolAdapt)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2);
+BENCHMARK(BlackScholes)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(BlackScholes_Clad)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(BlackScholes_Adapt)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2);
 
 // BENCHMARK_MAIN();
 int main(int argc, char** argv)
