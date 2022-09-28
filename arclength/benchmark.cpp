@@ -1,6 +1,8 @@
 #include "benchmark/benchmark.h"
 #include "../benchmark-utils/memory-manager.hpp"
 
+int ITERATIONS;
+
 #include "arclen.hpp"
 #include "arclen-adapt.hpp"
 
@@ -28,18 +30,18 @@ private:
   std::streambuf *old;
 };
 
-static void ErrorEstimateArcLen(benchmark::State &state)
+static void ArcLength(benchmark::State &state)
 {
     int iters = state.range(0);
     for (auto _ : state)
     {
-        double result = do_fun<double>(iters);
+        double result = do_fun<long double>(iters);
 
         benchmark::DoNotOptimize(result);
     }
 }
 
-static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
+static void ArcLength_Adapt(benchmark::State& state) {
     cout_suppressor suppressor;
 
     using namespace adapt;
@@ -62,7 +64,7 @@ static void ErrorEstimateArcLenAdapt(benchmark::State& state) {
     }
 }
 
-static void ErrorEstimateArcLenClad(benchmark::State& state) {
+static void ArcLength_Clad(benchmark::State& state) {
 //   auto df = clad::estimate_error(clad::do_fun);
   
   cout_suppressor suppressor;
@@ -71,7 +73,6 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
   int iters = state.range(0), diters  = 0;
 
   for (auto _ : state) {
-    ds1 = 0, dt1 = 0;
     fin_error = 0;
 
     clad::resetErrors();
@@ -84,9 +85,9 @@ static void ErrorEstimateArcLenClad(benchmark::State& state) {
   }
 }
 
-BENCHMARK(ErrorEstimateArcLen)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(ErrorEstimateArcLenClad)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(ErrorEstimateArcLenAdapt)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 10000000);
+BENCHMARK(ArcLength)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ArcLength_Clad)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ArcLength_Adapt)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 10000000);
 
 // Define our main
 // BENCHMARK_MAIN();
