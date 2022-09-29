@@ -1,3 +1,0 @@
-[submodule "blackscholes/fastapprox"]
-	path = blackscholes/fastapprox
-	url = git@github.com:etheory/fastapprox.git
