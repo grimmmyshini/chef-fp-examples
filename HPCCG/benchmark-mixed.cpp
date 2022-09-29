@@ -19,10 +19,6 @@ using std::endl;
 
 #undef DEBUG
 
-#define nx 30
-#define ny 40
-#define nz 1600
-
 struct cout_suppressor {
   cout_suppressor() : buffer(), old(std::cout.rdbuf(buffer.rdbuf())) {}
 
@@ -511,13 +507,16 @@ double HPCCG(double const* b, double* x, const int max_iter,
 
 } // namespace high_prec
 
-static void HPCCGBench(benchmark::State& state) {
-  int opts = state.range(0);
+void HPCCG_MixedPrecision(benchmark::State& state) {
   double *x, *b, *xexact;
   double norm, d;
   int ierr = 0;
   int i, j;
   int ione = 1;
+
+  int nx = state.range(0);
+  int ny = state.range(1);
+  int nz = state.range(2);
 
   int size = 1; // Serial case (not using MPI)
 
@@ -542,38 +541,20 @@ static void HPCCGBench(benchmark::State& state) {
       0.0; // Set tolerance to zero to make all runs do max_iter iterations
 
   cout_suppressor suppressor;
-  if (opts == 0) {
-    for (auto _ : state) {
-      residual = high_prec::HPCCG(b, x, max_iter, tolerance, niters, normr, r,
-                                  p, Ap, xexact);
+  for (auto _ : state) {
+    residual = lower_loop_prec::HPCCG(b, x, max_iter, tolerance, niters,
+                                      normr, r, p, Ap, xexact);
 
-      for (int i = 0; i < nrow; i++) {
-        x[i] = 0;
-        r[i] = 0;
-        Ap[i] = 0;
-      }
-      for (int i = 0; i < ncol; i++) {
-        p[i] = 0;
-      }
-      niters = 0;
-      normr = 0;
+    for (int i = 0; i < nrow; i++) {
+      x[i] = 0;
+      r[i] = 0;
+      Ap[i] = 0;
     }
-  } else {
-    for (auto _ : state) {
-      residual = lower_loop_prec::HPCCG(b, x, max_iter, tolerance, niters,
-                                        normr, r, p, Ap, xexact);
-
-      for (int i = 0; i < nrow; i++) {
-        x[i] = 0;
-        r[i] = 0;
-        Ap[i] = 0;
-      }
-      for (int i = 0; i < ncol; i++) {
-        p[i] = 0;
-      }
-      niters = 0;
-      normr = 0;
+    for (int i = 0; i < ncol; i++) {
+      p[i] = 0;
     }
+    niters = 0;
+    normr = 0;
   }
 
   delete[] p;
@@ -589,8 +570,77 @@ static void HPCCGBench(benchmark::State& state) {
        << endl;
 }
 
-// 0 -> High Precision Version
-// 1 -> Low Precision with loop splitting
-BENCHMARK(HPCCGBench)->Unit(benchmark::kSecond)->Arg(0)->Arg(1)->Iterations(5);
+static void HPCCG_HighPrecision(benchmark::State& state) {
+  double *x, *b, *xexact;
+  double norm, d;
+  int ierr = 0;
+  int i, j;
+  int ione = 1;
 
-BENCHMARK_MAIN();
+  int nx = state.range(0);
+  int ny = state.range(1);
+  int nz = state.range(2);
+
+  int size = 1; // Serial case (not using MPI)
+
+  generate_matrix(nx, ny, nz, A, &x, &b, &xexact);
+
+  bool dump_matrix = false;
+  if (dump_matrix && size <= 4)
+    dump_matlab_matrix(A);
+
+  int nrow = A.local_nrow;
+  int ncol = A.local_ncol;
+
+  double* r = new double[nrow];
+  double* p = new double[ncol]; // In parallel case, A is rectangular
+  double* Ap = new double[nrow];
+  double residual;
+
+  int niters = 0;
+  double normr = 0.0;
+  int max_iter = 100;
+  double tolerance =
+      0.0; // Set tolerance to zero to make all runs do max_iter iterations
+
+  cout_suppressor suppressor;
+  for (auto _ : state) {
+    residual = high_prec::HPCCG(b, x, max_iter, tolerance, niters, normr, r,
+                                p, Ap, xexact);
+
+    for (int i = 0; i < nrow; i++) {
+      x[i] = 0;
+      r[i] = 0;
+      Ap[i] = 0;
+    }
+    for (int i = 0; i < ncol; i++) {
+      p[i] = 0;
+    }
+    niters = 0;
+    normr = 0;
+  }
+
+  delete[] p;
+  delete[] Ap;
+  delete[] xexact;
+  delete[] b;
+  delete[] x;
+  delete[] r;
+
+  cout << std::setprecision(5)
+       << "Difference between computed and exact (residual)  = " << residual
+       << ".\n"
+       << endl;
+}
+
+BENCHMARK(HPCCG_MixedPrecision)->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+BENCHMARK(HPCCG_HighPrecision)->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+
+// BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+    ::benchmark::RegisterMemoryManager(mm.get());
+    ::benchmark::Initialize(&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::RegisterMemoryManager(nullptr);
+}

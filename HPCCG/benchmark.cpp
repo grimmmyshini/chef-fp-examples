@@ -48,7 +48,7 @@ private:
   std::streambuf *old;
 };
 
-static void ErrorEstimateHPCCG(benchmark::State &state)
+static void HPCCG(benchmark::State &state)
 {
   double *x, *b, *xexact;
   double norm, d;
@@ -104,7 +104,7 @@ static void ErrorEstimateHPCCG(benchmark::State &state)
   delete[] b;
 }
 
-static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
+static void HPCCG_Adapt(benchmark::State &state)
 {
   HPC_Sparse_Matrix *A;
   AD_real *x, *b;
@@ -191,7 +191,7 @@ static void ErrorEstimateHPCCGAdapt(benchmark::State &state)
   delete A;
 }
 
-static void ErrorEstimateHPCCGClad(benchmark::State &state)
+static void HPCCG_Clad(benchmark::State &state)
 {
   double *x, *b, *xexact;
   double norm, d;
@@ -295,9 +295,9 @@ static void ErrorEstimateHPCCGClad(benchmark::State &state)
   delete[] b;
 }
 
-BENCHMARK(ErrorEstimateHPCCG)->Unit(benchmark::kMillisecond)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
-BENCHMARK(ErrorEstimateHPCCGClad)->Unit(benchmark::kMillisecond)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
-BENCHMARK(ErrorEstimateHPCCGAdapt)->Unit(benchmark::kMillisecond)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160});
+BENCHMARK(HPCCG)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+BENCHMARK(HPCCG_Clad)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+BENCHMARK(HPCCG_Adapt)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160});
 
 
 // BENCHMARK_MAIN();
