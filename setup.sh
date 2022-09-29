@@ -163,7 +163,7 @@ echo "Loaded configuration!"
 setup() { (
     set -e
     # INSTALL LLVM and Clang
-    git clone https://github.com/llvm/llvm-project.git --depth=1 --single-branch --branch=llvmorg-9.0.1
+    git clone https://github.com/llvm/llvm-project.git --depth=1 --single-branch --branch=llvmorg-13.0.1
     mkdir clang && cd clang
     cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm-project/llvm/
     make -j6
