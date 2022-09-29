@@ -85,9 +85,9 @@ static void ArcLength_Clad(benchmark::State& state) {
   }
 }
 
-BENCHMARK(ArcLength)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(ArcLength_Clad)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(ArcLength_Adapt)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10000, 10000000);
+BENCHMARK(ArcLength)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ArcLength_Clad)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ArcLength_Adapt)->RangeMultiplier(10)->Range(10000, 10000000);
 
 // Define our main
 // BENCHMARK_MAIN();
