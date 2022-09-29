@@ -1,5 +1,4 @@
 #include "benchmark/benchmark.h"
-#include "../benchmark-utils/memory-manager.hpp"
 
 #include <random>
 #include <cmath>
