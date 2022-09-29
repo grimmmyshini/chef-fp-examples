@@ -3,15 +3,15 @@
 OUTPUT_PROCESSING_SCRIPT=$ws_dir/clad-fp-error-est-examples/process_output.py
 
 bench_gen() {
-    benchall -O3 ${1}.cpp ${2} -o ${1}.out -L$ws_dir/benchmark/build/src
+    benchall -O3 ${1}.cpp ${@:2} -o ${1}.out -L$ws_dir/benchmark/build/src
 }
 
 gen_adc() {
-    bench_gen benchmark -DMEMORY_PROFILER
+    bench_gen benchmark -DMEMORY_PROFILER $@
 }
 
 gen_mix() {
-    bench_gen benchmark-mixed
+    bench_gen benchmark-mixed -DMEMORY_PROFILER $@
 }
 
 bench_run() {
