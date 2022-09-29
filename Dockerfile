@@ -1,9 +1,9 @@
-FROM ubuntu:bionic
+FROM ubuntu:jammy
 
 RUN apt -y update
 RUN apt -y upgrade
 RUN apt install -y build-essential
-RUN apt install -y wget cmake gcc git python3 python3-pip curl
+RUN apt install -y wget cmake gcc git python3 python3-pip curl time
 
 WORKDIR /code
 RUN wget https://raw.githubusercontent.com/grimmmyshini/clad-fp-error-est-examples/main/setup.sh
