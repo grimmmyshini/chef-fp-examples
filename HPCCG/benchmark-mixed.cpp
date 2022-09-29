@@ -634,8 +634,8 @@ static void HPCCG_HighPrecision(benchmark::State& state) {
        << endl;
 }
 
-BENCHMARK(HPCCG_MixedPrecision)->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
-BENCHMARK(HPCCG_HighPrecision)->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+BENCHMARK(HPCCG_MixedPrecision)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+BENCHMARK(HPCCG_HighPrecision)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
 
 // BENCHMARK_MAIN();
 int main(int argc, char** argv)
