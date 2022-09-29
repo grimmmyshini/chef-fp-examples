@@ -64,26 +64,26 @@ run_adc ArcLength_Adapt/1000000
 run_adc ArcLength_Adapt/10000000
 cd ..
 
-# echo "" >>$ws_dir/results.txt
+echo "" >>$ws_dir/results.txt
 
-# cd blackscholes
-# gen_adc
-# run_adc BlackScholes/0
-# run_adc BlackScholes/1
-# run_adc BlackScholes/2
-# run_adc BlackScholes/3
-# run_adc BlackScholes/4
-# run_adc BlackScholes_Clad/0
-# run_adc BlackScholes_Clad/1
-# run_adc BlackScholes_Clad/2
-# run_adc BlackScholes_Clad/3
-# run_adc BlackScholes_Clad/4
-# run_adc BlackScholes_Adapt/0
-# run_adc BlackScholes_Adapt/1
-# run_adc BlackScholes_Adapt/2
-# cd ..
+cd blackscholes
+gen_adc
+run_adc BlackScholes/0
+run_adc BlackScholes/1
+run_adc BlackScholes/2
+run_adc BlackScholes/3
+run_adc BlackScholes/4
+run_adc BlackScholes_Clad/0
+run_adc BlackScholes_Clad/1
+run_adc BlackScholes_Clad/2
+run_adc BlackScholes_Clad/3
+run_adc BlackScholes_Clad/4
+run_adc BlackScholes_Adapt/0
+run_adc BlackScholes_Adapt/1
+run_adc BlackScholes_Adapt/2
+cd ..
 
-# echo "" >>$ws_dir/results.txt
+echo "" >>$ws_dir/results.txt
 
 cd HPCCG
 gen_adc
@@ -107,7 +107,7 @@ run_adc HPCCG_Adapt/20/30/160
 run_adc HPCCG_Adapt/20/30/320
 cd ..
 
-# echo "" >>$ws_dir/results.txt
+echo "" >>$ws_dir/results.txt
 
 cd kmeans
 gen_adc
@@ -147,7 +147,7 @@ run_adc Simpsons_Adapt/1000000
 run_adc Simpsons_Adapt/10000000
 cd ..
 
-# -------------------------------- Mixed Precision -------------------------------
+# # -------------------------------- Mixed Precision -------------------------------
 
 echo "" >>$ws_dir/results.txt
 
@@ -163,6 +163,28 @@ run_mix ArcLength_HighPrecision/100000
 run_mix ArcLength_HighPrecision/1000000
 run_mix ArcLength_HighPrecision/10000000
 run_mix ArcLength_HighPrecision/100000000
+cd ..
+
+echo "" >>$ws_dir/results.txt
+
+cd blackscholes
+run_mix Blackscholes_MP/0/0
+run_mix Blackscholes_MP/0/1
+run_mix Blackscholes_MP/0/2
+run_mix Blackscholes_MP/0/3
+run_mix Blackscholes_MP/0/4
+run_mix Blackscholes_MP/1/0
+run_mix Blackscholes_MP/1/1
+run_mix Blackscholes_MP/1/2
+run_mix Blackscholes_MP/1/3
+run_mix Blackscholes_MP/1/4
+gen_mix -DFASTEXP=On
+echo "With fast exp:" >>$ws_dir/results.txt
+run_mix Blackscholes_MP/1/0
+run_mix Blackscholes_MP/1/1
+run_mix Blackscholes_MP/1/2
+run_mix Blackscholes_MP/1/3
+run_mix Blackscholes_MP/1/4
 cd ..
 
 echo "" >>$ws_dir/results.txt
