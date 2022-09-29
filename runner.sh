@@ -109,23 +109,23 @@ cd ..
 
 # echo "" >>$ws_dir/results.txt
 
-# cd kmeans
-# gen_adc
-# run_adc ErrorEstimateKMeans/0
-# run_adc ErrorEstimateKMeans/1
-# run_adc ErrorEstimateKMeans/2
-# run_adc ErrorEstimateKMeans/3
-# run_adc ErrorEstimateKMeans/4
-# run_adc ErrorEstimateKMeansClad/0
-# run_adc ErrorEstimateKMeansClad/1
-# run_adc ErrorEstimateKMeansClad/2
-# run_adc ErrorEstimateKMeansClad/3
-# run_adc ErrorEstimateKMeansClad/4
-# run_adc ErrorEstimateKMeansAdapt/0
-# run_adc ErrorEstimateKMeansAdapt/1
-# run_adc ErrorEstimateKMeansAdapt/2
-# run_adc ErrorEstimateKMeansAdapt/3
-# cd ..
+cd kmeans
+gen_adc
+run_adc KMeans/0
+run_adc KMeans/1
+run_adc KMeans/2
+run_adc KMeans/3
+run_adc KMeans/4
+run_adc KMeans_Clad/0
+run_adc KMeans_Clad/1
+run_adc KMeans_Clad/2
+run_adc KMeans_Clad/3
+run_adc KMeans_Clad/4
+run_adc KMeans_Adapt/0
+run_adc KMeans_Adapt/1
+run_adc KMeans_Adapt/2
+run_adc KMeans_Adapt/3
+cd ..
 
 echo "" >>$ws_dir/results.txt
 
@@ -181,6 +181,32 @@ run_mix HPCCG_HighPrecision/20/30/40
 run_mix HPCCG_HighPrecision/20/30/80
 run_mix HPCCG_HighPrecision/20/30/160
 run_mix HPCCG_HighPrecision/20/30/320
+cd ..
+
+echo "" >>$ws_dir/results.txt
+
+cd kmeans
+gen_mix
+run_mix EuclidDist_MixedPrecision/10/3
+run_mix EuclidDist_MixedPrecision/10/10
+run_mix EuclidDist_MixedPrecision/100/10
+run_mix EuclidDist_MixedPrecision/100/100
+run_mix EuclidDist_MixedPrecision/1000/100
+run_mix EuclidDist_HighPrecision/10/3
+run_mix EuclidDist_HighPrecision/10/10
+run_mix EuclidDist_HighPrecision/100/10
+run_mix EuclidDist_HighPrecision/100/100
+run_mix EuclidDist_HighPrecision/1000/100
+run_mix KMeans_MixedPrecision/0
+run_mix KMeans_MixedPrecision/1
+run_mix KMeans_MixedPrecision/2
+run_mix KMeans_MixedPrecision/3
+run_mix KMeans_MixedPrecision/4
+run_mix KMeans_HighPrecision/0
+run_mix KMeans_HighPrecision/1
+run_mix KMeans_HighPrecision/2
+run_mix KMeans_HighPrecision/3
+run_mix KMeans_HighPrecision/4
 cd ..
 
 echo "" >>$ws_dir/results.txt
