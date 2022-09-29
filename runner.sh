@@ -27,18 +27,19 @@ run_bench() {
     FILE=$ws_dir/results.txt
     rm -f JSON_FILE
 
-    echo "==================== Running: $BENCHMARK_NAME ADAPT Vs. CLAD ===================="
     MEM_USAGE=$(bench_run $BENCHMARK_EXEC $BENCHMARK_NAME $JSON_FILE)
     python3 $OUTPUT_PROCESSING_SCRIPT $JSON_FILE $MEM_USAGE >>$FILE
 }
 
 run_adc() {
     # Takes 1 argument: benchmark_filter input/benchmark name;
+    echo "==================== Running: $1 ADAPT Vs. CLAD ===================="
     run_bench ./benchmark.out $1 /tmp/b.json
 }
 
 run_mix() {
     # Takes 1 argument: benchmark_filter input/benchmark name;
+    echo "==================== Running: $1 Mixed Precision ===================="
     run_bench ./benchmark-mixed.out $1 /tmp/m.json
 }
 
@@ -62,6 +63,7 @@ run_adc ArcLength_Adapt/10000
 run_adc ArcLength_Adapt/100000
 run_adc ArcLength_Adapt/1000000
 run_adc ArcLength_Adapt/10000000
+run_adc ArcLength_Adapt/100000000
 cd ..
 
 echo "" >>$ws_dir/results.txt
@@ -81,6 +83,8 @@ run_adc BlackScholes_Clad/4
 run_adc BlackScholes_Adapt/0
 run_adc BlackScholes_Adapt/1
 run_adc BlackScholes_Adapt/2
+run_adc BlackScholes_Adapt/3
+run_adc BlackScholes_Adapt/4
 cd ..
 
 echo "" >>$ws_dir/results.txt
@@ -125,6 +129,7 @@ run_adc KMeans_Adapt/0
 run_adc KMeans_Adapt/1
 run_adc KMeans_Adapt/2
 run_adc KMeans_Adapt/3
+run_adc KMeans_Adapt/4
 cd ..
 
 echo "" >>$ws_dir/results.txt
@@ -145,6 +150,7 @@ run_adc Simpsons_Adapt/10000
 run_adc Simpsons_Adapt/100000
 run_adc Simpsons_Adapt/1000000
 run_adc Simpsons_Adapt/10000000
+run_adc Simpsons_Adapt/100000000
 cd ..
 
 # # -------------------------------- Mixed Precision -------------------------------
