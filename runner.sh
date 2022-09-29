@@ -46,181 +46,197 @@ python3 $OUTPUT_PROCESSING_SCRIPT >$ws_dir/results.txt
 
 # --------------------------------- ADAPT vs. CLAD -----------------------------------
 
-cd arclength
-gen_adc
-run_adc ArcLength/10000
-run_adc ArcLength/100000
-run_adc ArcLength/1000000
-run_adc ArcLength/10000000
-run_adc ArcLength/100000000
-run_adc ArcLength_Clad/10000
-run_adc ArcLength_Clad/100000
-run_adc ArcLength_Clad/1000000
-run_adc ArcLength_Clad/10000000
-run_adc ArcLength_Clad/100000000
-run_adc ArcLength_Adapt/10000
-run_adc ArcLength_Adapt/100000
-run_adc ArcLength_Adapt/1000000
-run_adc ArcLength_Adapt/10000000
-cd ..
-
-# echo "" >>$ws_dir/results.txt
-
-# cd blackscholes
+# cd arclength
 # gen_adc
-# run_adc BlackScholes/0
-# run_adc BlackScholes/1
-# run_adc BlackScholes/2
-# run_adc BlackScholes/3
-# run_adc BlackScholes/4
-# run_adc BlackScholes_Clad/0
-# run_adc BlackScholes_Clad/1
-# run_adc BlackScholes_Clad/2
-# run_adc BlackScholes_Clad/3
-# run_adc BlackScholes_Clad/4
-# run_adc BlackScholes_Adapt/0
-# run_adc BlackScholes_Adapt/1
-# run_adc BlackScholes_Adapt/2
+# run_adc ArcLength/10000
+# run_adc ArcLength/100000
+# run_adc ArcLength/1000000
+# run_adc ArcLength/10000000
+# run_adc ArcLength/100000000
+# run_adc ArcLength_Clad/10000
+# run_adc ArcLength_Clad/100000
+# run_adc ArcLength_Clad/1000000
+# run_adc ArcLength_Clad/10000000
+# run_adc ArcLength_Clad/100000000
+# run_adc ArcLength_Adapt/10000
+# run_adc ArcLength_Adapt/100000
+# run_adc ArcLength_Adapt/1000000
+# run_adc ArcLength_Adapt/10000000
+# cd ..
+
+# # echo "" >>$ws_dir/results.txt
+
+# # cd blackscholes
+# # gen_adc
+# # run_adc BlackScholes/0
+# # run_adc BlackScholes/1
+# # run_adc BlackScholes/2
+# # run_adc BlackScholes/3
+# # run_adc BlackScholes/4
+# # run_adc BlackScholes_Clad/0
+# # run_adc BlackScholes_Clad/1
+# # run_adc BlackScholes_Clad/2
+# # run_adc BlackScholes_Clad/3
+# # run_adc BlackScholes_Clad/4
+# # run_adc BlackScholes_Adapt/0
+# # run_adc BlackScholes_Adapt/1
+# # run_adc BlackScholes_Adapt/2
+# # cd ..
+
+# # echo "" >>$ws_dir/results.txt
+
+# cd HPCCG
+# gen_adc
+# run_adc HPCCG/20/30/10
+# run_adc HPCCG/20/30/20
+# run_adc HPCCG/20/30/40
+# run_adc HPCCG/20/30/80
+# run_adc HPCCG/20/30/160
+# run_adc HPCCG/20/30/320
+# run_adc HPCCG_Clad/20/30/10
+# run_adc HPCCG_Clad/20/30/20
+# run_adc HPCCG_Clad/20/30/40
+# run_adc HPCCG_Clad/20/30/80
+# run_adc HPCCG_Clad/20/30/160
+# run_adc HPCCG_Clad/20/30/320
+# run_adc HPCCG_Adapt/20/30/10
+# run_adc HPCCG_Adapt/20/30/20
+# run_adc HPCCG_Adapt/20/30/40
+# run_adc HPCCG_Adapt/20/30/80
+# run_adc HPCCG_Adapt/20/30/160
+# run_adc HPCCG_Adapt/20/30/320
+# cd ..
+
+# # echo "" >>$ws_dir/results.txt
+
+# cd kmeans
+# gen_adc
+# run_adc KMeans/0
+# run_adc KMeans/1
+# run_adc KMeans/2
+# run_adc KMeans/3
+# run_adc KMeans/4
+# run_adc KMeans_Clad/0
+# run_adc KMeans_Clad/1
+# run_adc KMeans_Clad/2
+# run_adc KMeans_Clad/3
+# run_adc KMeans_Clad/4
+# run_adc KMeans_Adapt/0
+# run_adc KMeans_Adapt/1
+# run_adc KMeans_Adapt/2
+# run_adc KMeans_Adapt/3
 # cd ..
 
 # echo "" >>$ws_dir/results.txt
 
-cd HPCCG
-gen_adc
-run_adc HPCCG/20/30/10
-run_adc HPCCG/20/30/20
-run_adc HPCCG/20/30/40
-run_adc HPCCG/20/30/80
-run_adc HPCCG/20/30/160
-run_adc HPCCG/20/30/320
-run_adc HPCCG_Clad/20/30/10
-run_adc HPCCG_Clad/20/30/20
-run_adc HPCCG_Clad/20/30/40
-run_adc HPCCG_Clad/20/30/80
-run_adc HPCCG_Clad/20/30/160
-run_adc HPCCG_Clad/20/30/320
-run_adc HPCCG_Adapt/20/30/10
-run_adc HPCCG_Adapt/20/30/20
-run_adc HPCCG_Adapt/20/30/40
-run_adc HPCCG_Adapt/20/30/80
-run_adc HPCCG_Adapt/20/30/160
-run_adc HPCCG_Adapt/20/30/320
+# cd simpsons
+# gen_adc
+# run_adc Simpsons/10000
+# run_adc Simpsons/100000
+# run_adc Simpsons/1000000
+# run_adc Simpsons/10000000
+# run_adc Simpsons/100000000
+# run_adc Simpsons_Clad/10000
+# run_adc Simpsons_Clad/100000
+# run_adc Simpsons_Clad/1000000
+# run_adc Simpsons_Clad/10000000
+# run_adc Simpsons_Clad/100000000
+# run_adc Simpsons_Adapt/10000
+# run_adc Simpsons_Adapt/100000
+# run_adc Simpsons_Adapt/1000000
+# run_adc Simpsons_Adapt/10000000
+# cd ..
+
+# # -------------------------------- Mixed Precision -------------------------------
+
+# echo "" >>$ws_dir/results.txt
+
+# cd arclength
+# gen_mix
+# run_mix ArcLength_MixedPrecision/10000
+# run_mix ArcLength_MixedPrecision/100000
+# run_mix ArcLength_MixedPrecision/1000000
+# run_mix ArcLength_MixedPrecision/10000000
+# run_mix ArcLength_MixedPrecision/100000000
+# run_mix ArcLength_HighPrecision/10000
+# run_mix ArcLength_HighPrecision/100000
+# run_mix ArcLength_HighPrecision/1000000
+# run_mix ArcLength_HighPrecision/10000000
+# run_mix ArcLength_HighPrecision/100000000
+# cd ..
+
+# echo "" >>$ws_dir/results.txt
+
+cd blackscholes
+gen_mix -DFASTEXP=On
+run_mix Blackscholes_MP/0/0
+run_mix Blackscholes_MP/1/0
+run_mix Blackscholes_MP/0/1
+run_mix Blackscholes_MP/1/1
+run_mix Blackscholes_MP/0/2
+run_mix Blackscholes_MP/1/2
+run_mix Blackscholes_MP/0/3
+run_mix Blackscholes_MP/1/3
+run_mix Blackscholes_MP/0/4
+run_mix Blackscholes_MP/1/4
 cd ..
 
 # echo "" >>$ws_dir/results.txt
 
-cd kmeans
-gen_adc
-run_adc KMeans/0
-run_adc KMeans/1
-run_adc KMeans/2
-run_adc KMeans/3
-run_adc KMeans/4
-run_adc KMeans_Clad/0
-run_adc KMeans_Clad/1
-run_adc KMeans_Clad/2
-run_adc KMeans_Clad/3
-run_adc KMeans_Clad/4
-run_adc KMeans_Adapt/0
-run_adc KMeans_Adapt/1
-run_adc KMeans_Adapt/2
-run_adc KMeans_Adapt/3
-cd ..
+# cd HPCCG
+# gen_mix
+# run_mix HPCCG_MixedPrecision/20/30/10
+# run_mix HPCCG_MixedPrecision/20/30/20
+# run_mix HPCCG_MixedPrecision/20/30/40
+# run_mix HPCCG_MixedPrecision/20/30/80
+# run_mix HPCCG_MixedPrecision/20/30/160
+# run_mix HPCCG_MixedPrecision/20/30/320
+# run_mix HPCCG_HighPrecision/20/30/10
+# run_mix HPCCG_HighPrecision/20/30/20
+# run_mix HPCCG_HighPrecision/20/30/40
+# run_mix HPCCG_HighPrecision/20/30/80
+# run_mix HPCCG_HighPrecision/20/30/160
+# run_mix HPCCG_HighPrecision/20/30/320
+# cd ..
 
-echo "" >>$ws_dir/results.txt
+# echo "" >>$ws_dir/results.txt
 
-cd simpsons
-gen_adc
-run_adc Simpsons/10000
-run_adc Simpsons/100000
-run_adc Simpsons/1000000
-run_adc Simpsons/10000000
-run_adc Simpsons/100000000
-run_adc Simpsons_Clad/10000
-run_adc Simpsons_Clad/100000
-run_adc Simpsons_Clad/1000000
-run_adc Simpsons_Clad/10000000
-run_adc Simpsons_Clad/100000000
-run_adc Simpsons_Adapt/10000
-run_adc Simpsons_Adapt/100000
-run_adc Simpsons_Adapt/1000000
-run_adc Simpsons_Adapt/10000000
-cd ..
+# cd kmeans
+# gen_mix
+# run_mix EuclidDist_MixedPrecision/10/3
+# run_mix EuclidDist_MixedPrecision/10/10
+# run_mix EuclidDist_MixedPrecision/100/10
+# run_mix EuclidDist_MixedPrecision/100/100
+# run_mix EuclidDist_MixedPrecision/1000/100
+# run_mix EuclidDist_HighPrecision/10/3
+# run_mix EuclidDist_HighPrecision/10/10
+# run_mix EuclidDist_HighPrecision/100/10
+# run_mix EuclidDist_HighPrecision/100/100
+# run_mix EuclidDist_HighPrecision/1000/100
+# run_mix KMeans_MixedPrecision/0
+# run_mix KMeans_MixedPrecision/1
+# run_mix KMeans_MixedPrecision/2
+# run_mix KMeans_MixedPrecision/3
+# run_mix KMeans_MixedPrecision/4
+# run_mix KMeans_HighPrecision/0
+# run_mix KMeans_HighPrecision/1
+# run_mix KMeans_HighPrecision/2
+# run_mix KMeans_HighPrecision/3
+# run_mix KMeans_HighPrecision/4
+# cd ..
 
-# -------------------------------- Mixed Precision -------------------------------
+# echo "" >>$ws_dir/results.txt
 
-echo "" >>$ws_dir/results.txt
-
-cd arclength
-gen_mix
-run_mix ArcLength_MixedPrecision/10000
-run_mix ArcLength_MixedPrecision/100000
-run_mix ArcLength_MixedPrecision/1000000
-run_mix ArcLength_MixedPrecision/10000000
-run_mix ArcLength_MixedPrecision/100000000
-run_mix ArcLength_HighPrecision/10000
-run_mix ArcLength_HighPrecision/100000
-run_mix ArcLength_HighPrecision/1000000
-run_mix ArcLength_HighPrecision/10000000
-run_mix ArcLength_HighPrecision/100000000
-cd ..
-
-echo "" >>$ws_dir/results.txt
-
-cd HPCCG
-gen_mix
-run_mix HPCCG_MixedPrecision/20/30/10
-run_mix HPCCG_MixedPrecision/20/30/20
-run_mix HPCCG_MixedPrecision/20/30/40
-run_mix HPCCG_MixedPrecision/20/30/80
-run_mix HPCCG_MixedPrecision/20/30/160
-run_mix HPCCG_MixedPrecision/20/30/320
-run_mix HPCCG_HighPrecision/20/30/10
-run_mix HPCCG_HighPrecision/20/30/20
-run_mix HPCCG_HighPrecision/20/30/40
-run_mix HPCCG_HighPrecision/20/30/80
-run_mix HPCCG_HighPrecision/20/30/160
-run_mix HPCCG_HighPrecision/20/30/320
-cd ..
-
-echo "" >>$ws_dir/results.txt
-
-cd kmeans
-gen_mix
-run_mix EuclidDist_MixedPrecision/10/3
-run_mix EuclidDist_MixedPrecision/10/10
-run_mix EuclidDist_MixedPrecision/100/10
-run_mix EuclidDist_MixedPrecision/100/100
-run_mix EuclidDist_MixedPrecision/1000/100
-run_mix EuclidDist_HighPrecision/10/3
-run_mix EuclidDist_HighPrecision/10/10
-run_mix EuclidDist_HighPrecision/100/10
-run_mix EuclidDist_HighPrecision/100/100
-run_mix EuclidDist_HighPrecision/1000/100
-run_mix KMeans_MixedPrecision/0
-run_mix KMeans_MixedPrecision/1
-run_mix KMeans_MixedPrecision/2
-run_mix KMeans_MixedPrecision/3
-run_mix KMeans_MixedPrecision/4
-run_mix KMeans_HighPrecision/0
-run_mix KMeans_HighPrecision/1
-run_mix KMeans_HighPrecision/2
-run_mix KMeans_HighPrecision/3
-run_mix KMeans_HighPrecision/4
-cd ..
-
-echo "" >>$ws_dir/results.txt
-
-cd simpsons
-gen_mix
-run_mix Simpsons_MixedPrecision/10000
-run_mix Simpsons_MixedPrecision/100000
-run_mix Simpsons_MixedPrecision/1000000
-run_mix Simpsons_MixedPrecision/10000000
-run_mix Simpsons_MixedPrecision/100000000
-run_mix Simpsons_HighPrecision/10000
-run_mix Simpsons_HighPrecision/100000
-run_mix Simpsons_HighPrecision/1000000
-run_mix Simpsons_HighPrecision/10000000
-run_mix Simpsons_HighPrecision/100000000
-cd ..
+# cd simpsons
+# gen_mix
+# run_mix Simpsons_MixedPrecision/10000
+# run_mix Simpsons_MixedPrecision/100000
+# run_mix Simpsons_MixedPrecision/1000000
+# run_mix Simpsons_MixedPrecision/10000000
+# run_mix Simpsons_MixedPrecision/100000000
+# run_mix Simpsons_HighPrecision/10000
+# run_mix Simpsons_HighPrecision/100000
+# run_mix Simpsons_HighPrecision/1000000
+# run_mix Simpsons_HighPrecision/10000000
+# run_mix Simpsons_HighPrecision/100000000
+# cd ..
