@@ -12,6 +12,7 @@ using std::endl;
 #include <string>
 
 #include "benchmark/benchmark.h"
+#include "../benchmark-utils/memory-manager.hpp"
 
 #include "HPC_Sparse_Matrix.hpp"
 #include "dump_matlab_matrix.hpp"
