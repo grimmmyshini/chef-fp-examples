@@ -1,5 +1,5 @@
 #include <cmath>
-#include "fastonebigheader.h"
+#include "fastapprox/fastapprox/src/fastonebigheader.h"
 
 typedef double fptype;
 #define INPUT_LINE_FORMAT "%lf %lf %lf %lf %lf %lf %c %lf %lf"
@@ -72,10 +72,10 @@ fptype ApproxBlkSchlsEqEuroNoDiv(fptype sptprice,
 
     xTime = time;
     clad_sqr_xSqrtTime_ = xTime;
-    xSqrtTime = fastpow(clad_sqr_xSqrtTime_, 0.5);
+    xSqrtTime = fasterpow(clad_sqr_xSqrtTime_, 0.5);
 
     clad_log_logValues_ = sptprice / strike;
-    logValues = fastlog(clad_log_logValues_);
+    logValues = fasterlog(clad_log_logValues_);
 
     xLogTerm = logValues;
 
