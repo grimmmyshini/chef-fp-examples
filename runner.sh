@@ -25,6 +25,7 @@ run_bench() {
     BENCHMARK_NAME=$2
     JSON_FILE=$3
     FILE=$ws_dir/results.txt
+    rm -f JSON_FILE
 
     echo "==================== Running: $BENCHMARK_NAME ADAPT Vs. CLAD ===================="
     MEM_USAGE=$(bench_run $BENCHMARK_EXEC $BENCHMARK_NAME $JSON_FILE)
