@@ -72,10 +72,10 @@ fptype ApproxBlkSchlsEqEuroNoDiv(fptype sptprice,
 
     xTime = time;
     clad_sqr_xSqrtTime_ = xTime;
-    xSqrtTime = fasterpow(clad_sqr_xSqrtTime_, 0.5);
+    xSqrtTime = fastpow(clad_sqr_xSqrtTime_, 0.5);
 
     clad_log_logValues_ = sptprice / strike;
-    logValues = fasterlog(clad_log_logValues_);
+    logValues = fastlog(clad_log_logValues_);
 
     xLogTerm = logValues;
 
