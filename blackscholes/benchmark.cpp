@@ -516,9 +516,9 @@ static void BlackScholes_Clad(benchmark::State &state)
     delete[] prices;
 }
 
-BENCHMARK(BlackScholes)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(BlackScholes_Clad)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(BlackScholes_Adapt)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2);
+BENCHMARK(BlackScholes)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(BlackScholes_Clad)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(BlackScholes_Adapt)->Arg(0)->Arg(1)->Arg(2);
 
 // BENCHMARK_MAIN();
 int main(int argc, char** argv)
