@@ -6,6 +6,9 @@
 #include <cassert>
 #include <algorithm>
 
+// Fast approx
+#include "fastonebigheader.h"
+
 namespace clad
 {
     void captureVarErrors(const char *name, double error, int iteration = -1);
@@ -231,5 +234,28 @@ namespace clad
         captureVarErrors(name, error);
         #endif
         return error;
+    }
+
+    __attribute__((always_inline)) double doApprox(double dx, double x, const char* cname) {
+      char name[50];
+      int i = 0;
+      while (cname[i++] != '\0')
+        name[i - 1] = cname[i - 1];
+      char *token = strtok(name, "_");
+      if (strcmp(token, "clad"))
+        return 0;
+      token = strtok(NULL, "_");
+      double error;
+      if (!strcmp(token, "exp"))
+        error = std::fabs(dx * (exp(x) - fastexp(x)));
+      else if (!strcmp(token, "log"))
+        error = std::fabs(dx * (log(x) - fastlog(x)));
+      else if (!strcmp(token, "sqr"))
+        error = std::fabs(dx * (sqrt(x) - fastpow(x, 0.5)));
+      else
+        return 0;
+
+      ErrorStorage::getInstance().set_error(cname, error);
+      return error;
     }
 } // clad

@@ -15,6 +15,7 @@
 #include "clad/Differentiator/Differentiator.h"
 #include "../PrintModel/ErrorFunc.h"
 
+#include "derivative-approx.hpp"
 #include "Derivative.hpp"
 
 // Precision to use for calculations
@@ -170,11 +171,18 @@ int main(int argc, char **argv)
             int _d_otype = 0;
             double final_error = 0;
 
+            #ifdef APPROX 
+            approx::BlkSchlsEqEuroNoDiv_grad(sptprice[k], strike[k], rate[k], volatility[k],
+                                           otime[k], otype[k], &_d_sptprice, &_d_strike,
+                                           &_d_rate, &_d_volatility, &_d_time, &_d_otype,
+                                           final_error);
+            #else
             clad::BlkSchlsEqEuroNoDiv_grad(sptprice[k], strike[k], rate[k], volatility[k],
                                            otime[k], otype[k], &_d_sptprice, &_d_strike,
                                            &_d_rate, &_d_volatility, &_d_time, &_d_otype,
                                            final_error);
-
+            #endif
+            
             prices[k] = price;
 
 #ifdef ERR_CHK
