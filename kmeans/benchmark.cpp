@@ -41,7 +41,7 @@ private:
   std::streambuf *old;
 };
 
-static void ErrorEstimateKMeans(benchmark::State &state)
+static void KMeans(benchmark::State &state)
 {
     // auto df = clad::estimate_error(euclid_dist_2<double, double>);
     int opt;
@@ -280,7 +280,7 @@ static void ErrorEstimateKMeans(benchmark::State &state)
     free(buf);
 }
 
-static void ErrorEstimateKMeansAdapt(benchmark::State &state)
+static void KMeans_Adapt(benchmark::State &state)
 {
     int opt;
     extern char *optarg;
@@ -529,7 +529,7 @@ static void ErrorEstimateKMeansAdapt(benchmark::State &state)
     free(buf);
 }
 
-static void ErrorEstimateKMeansClad(benchmark::State &state)
+static void KMeans_Clad(benchmark::State &state)
 {
     // auto df = clad::estimate_error(euclid_dist_2<double, double>);
     int opt;
@@ -782,9 +782,9 @@ static void ErrorEstimateKMeansClad(benchmark::State &state)
     free(buf);
 }
 
-BENCHMARK(ErrorEstimateKMeans)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(ErrorEstimateKMeansClad)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(ErrorEstimateKMeansAdapt)->Unit(benchmark::kMillisecond)->Arg(0)->Arg(1)->Arg(2)->Arg(3);
+BENCHMARK(KMeans)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(KMeans_Clad)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(KMeans_Adapt)->Arg(0)->Arg(1)->Arg(2)->Arg(3);
 
 // BENCHMARK_MAIN();
 int main(int argc, char** argv)
