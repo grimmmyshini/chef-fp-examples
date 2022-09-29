@@ -15,7 +15,7 @@ int main() {
   
   AD_real result = adapt::simpsons(a, b, 1000);
 
-  AD_DEPENDENT(result, "result", 0.0);
+  AD_DEPENDENT(result, "result", 1E-6);
   AD_report();
   AD_end();
 }

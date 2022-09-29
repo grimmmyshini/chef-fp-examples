@@ -1,6 +1,5 @@
-
-
 #include "benchmark/benchmark.h"
+#include "../benchmark-utils/memory-manager.hpp"
 #include <math.h>
 #ifdef VERBOSE 
 #include <iostream>
@@ -8,7 +7,7 @@
 
 #include "simpsons.hpp"
 
-static void SimpLowerPrec(benchmark::State &state)
+static void Simpsons_MixedPrecision(benchmark::State &state)
 {
     int n = state.range(0);
     float a = 0, b = 1;
@@ -29,7 +28,7 @@ static void SimpLowerPrec(benchmark::State &state)
     }
 }
 
-static void SimpHighPrec(benchmark::State &state)
+static void Simpsons_HighPrecision(benchmark::State &state)
 {
     int n = state.range(0);
     double a = 0, b = 1;
@@ -43,7 +42,15 @@ static void SimpHighPrec(benchmark::State &state)
     }
 }
 
-BENCHMARK(SimpLowerPrec)->Unit(benchmark::kSecond)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(SimpHighPrec)->Unit(benchmark::kSecond)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(Simpsons_MixedPrecision)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(Simpsons_HighPrecision)->RangeMultiplier(10)->Range(10000, 100000000);
 
-BENCHMARK_MAIN();
+// Define our main
+// BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+    ::benchmark::RegisterMemoryManager(mm.get());
+    ::benchmark::Initialize(&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::RegisterMemoryManager(nullptr);
+}
