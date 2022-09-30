@@ -174,6 +174,7 @@ cd ..
 echo "" >>$ws_dir/results.txt
 
 cd blackscholes
+gen_mix
 run_mix Blackscholes_MP/0/0
 run_mix Blackscholes_MP/0/1
 run_mix Blackscholes_MP/0/2
