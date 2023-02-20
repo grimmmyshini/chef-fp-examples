@@ -3,13 +3,13 @@ if [ -z "${ws_dir}" ]; then
     export ws_dir=/code
     echo "Setting ws_dir"
 fi
-OUTPUT_PROCESSING_SCRIPT=$ws_dir/clad-fp-error-est-examples/process_output.py
+OUTPUT_PROCESSING_SCRIPT=$ws_dir/chef-fp-examples/process_output.py
 
 benchall() {
     clang++-13 \
         -Xclang -add-plugin -Xclang clad -Xclang -load -Xclang clad.so \
         -Xclang -plugin-arg-clad -Xclang -fcustom-estimation-model \
-        -Xclang -plugin-arg-clad -Xclang $ws_dir/clad-fp-error-est-examples/PrintModel/libPrintModel.so \
+        -Xclang -plugin-arg-clad -Xclang $ws_dir/chef-fp-examples/PrintModel/libPrintModel.so \
         -lstdc++ -lm -std=c++11 -O3 \
         "$@" \
         -L$ws_dir/benchmark/build/src \

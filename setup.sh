@@ -3,7 +3,7 @@
 set -a
 
 ws_dir=$(dirname "$(readlink -f "$0")")
-clad_bm_dir=$ws_dir/clad-fp-error-est-examples
+clad_bm_dir=$ws_dir/chef-fp-examples
 pr_mod_dir=$clad_bm_dir/PrintModel
 
 cplusincludepath_add() {
@@ -197,8 +197,8 @@ setup() { (
     cd ../..
 
     # INSTALL benchmarks
-    git clone https://github.com/grimmmyshini/clad-fp-error-est-examples
-    cd clad-fp-error-est-examples/PrintModel
+    git clone https://github.com/grimmmyshini/chef-fp-examples
+    cd chef-fp-examples/PrintModel
     $ws_dir/clang/bin/clang++ -I$ws_dir/clad/inst/include -I$ws_dir/clang/tools/clang/include -I$ws_dir/llvm-project/clang/include -I$ws_dir/clang/include -I$ws_dir/llvm-project/llvm/include -fPIC -shared -fno-rtti -Wl,-undefined -Wl,suppress PrintModel.cpp -o libPrintModel.so
     cd ../blackscholes/data
     $ws_dir/clang/bin/clang++ inputGen.c -o inputGen.out
@@ -229,7 +229,7 @@ while getopts "rs" opt; do
         exit 0
         ;;
     r)
-        cd clad-fp-error-est-examples
+        cd chef-fp-examples
         ./runner.sh
         exit_status=$?
         if [ ${exit_status} -ne 0 ]; then
@@ -251,7 +251,7 @@ while getopts "rs" opt; do
             exit "${exit_status}"
         fi
 
-        cd clad-fp-error-est-examples
+        cd chef-fp-examples
         ./runner.sh
         exit_status=$?
         if [ ${exit_status} -ne 0 ]; then
