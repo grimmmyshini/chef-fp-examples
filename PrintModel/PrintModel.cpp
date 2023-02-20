@@ -5,7 +5,7 @@
 
 // Here we use the BuildOp function provided by clad to build a multiplication
 // expression that clad can generate code for.
-clang::Expr* PrintModel::AssignError(clad::StmtDiff refExpr, std::string name) {
+clang::Expr* PrintModel::AssignError(clad::StmtDiff refExpr, const std::string &name) {
     // Next, build a llvm vector-like container to store the parameters
     // of the function call.
     llvm::SmallVector<clang::Expr*, 3> params{refExpr.getExpr_dx(), refExpr.getExpr(), clad::utils::CreateStringLiteral(m_Context, name)};

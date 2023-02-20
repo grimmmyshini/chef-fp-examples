@@ -9,5 +9,5 @@ public:
       : FPErrorEstimationModel(builder) {}
   // Return an expression of the following kind:
   //  dfdx * delta_x
-  clang::Expr* AssignError(clad::StmtDiff refExpr, std::string name) override;
+  clang::Expr* AssignError(clad::StmtDiff refExpr, const std::string &name) override;
 };
