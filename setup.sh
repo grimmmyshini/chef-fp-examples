@@ -189,7 +189,7 @@ setup() { (
 
     # INSTALL Clad
     pip3 install lit
-    git clone https://github.com/sudo-panda/clad --depth=1 --single-branch --branch=ee-bench
+    git clone https://github.com/vgvassilev/clad --depth=1 --single-branch --branch=v1.1
     cd clad
     mkdir build && cd build
     cmake .. -DCMAKE_BUILD_TYPE=Debug -DLLVM_DIR=$ws_dir/clang/lib/cmake/llvm/ -DClang_DIR=$ws_dir/clang/lib/cmake/clang -DCMAKE_INSTALL_PREFIX=../inst -DLLVM_EXTERNAL_LIT="$(which lit)"
