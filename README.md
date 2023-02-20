@@ -25,7 +25,7 @@ docker run -it --rm cheffp:Dockerfile /bin/bash
 To run the benchmarks run the docker image and execute:
 
 ```bash
-cd /code/clad-fp-error-est-examples
+cd /code/chef-fp-examples
 ./runner.sh
 ```
 
@@ -80,7 +80,7 @@ To compile use the following command:
 clang++-13 \
         -Xclang -add-plugin -Xclang clad -Xclang -load -Xclang clad.so \
         -Xclang -plugin-arg-clad -Xclang -fcustom-estimation-model \
-        -Xclang -plugin-arg-clad -Xclang /code/clad-fp-error-est-examples/PrintModel/libPrintModel.so \
+        -Xclang -plugin-arg-clad -Xclang /code/chef-fp-examples/PrintModel/libPrintModel.so \
         -lstdc++ -lm -std=c++11 -O3 \
         source.cpp
 ```

@@ -25,9 +25,9 @@ RUN cd clad && \
     cmake .. -DCMAKE_BUILD_TYPE=Release -DLLVM_DIR=/usr/lib/llvm-13 -DClang_DIR=/usr/lib/llvm-13 -DCMAKE_INSTALL_PREFIX=../inst -DLLVM_EXTERNAL_LIT="$(which lit)" && \
     make -j6 && make install -j6
 
-COPY . clad-fp-error-est-examples/
+COPY . chef-fp-examples/
 
-WORKDIR /code/clad-fp-error-est-examples
+WORKDIR /code/chef-fp-examples
 
 RUN cd PrintModel && \
     clang++-13 -I$PWD/../../clad/inst/include \
@@ -51,7 +51,7 @@ RUN cd kmeans/data/inpuGen/ && \
 
 WORKDIR /code
 
-RUN echo "export CPLUS_INCLUDE_PATH=\$CPLUS_INCLUDE_PATH:/code/CoDiPack-1.9.1/include:/code/benchmark/include:/code/adapt-fp:/code/clad/include:/code/clad-fp-error-est-examples/PrintModel" >> $HOME/.bashrc
+RUN echo "export CPLUS_INCLUDE_PATH=\$CPLUS_INCLUDE_PATH:/code/CoDiPack-1.9.1/include:/code/benchmark/include:/code/adapt-fp:/code/clad/include:/code/chef-fp-examples/PrintModel" >> $HOME/.bashrc
 RUN echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/code/clad/build/lib" >> $HOME/.bashrc
 RUN echo "export LIBRARY_PATH=\$LIBRARY_PATH:/code/benchmark/build/src" >> $HOME/.bashrc
 RUN echo "export CODIPACK_HOME=/code/CoDiPack-1.9.1"
