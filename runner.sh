@@ -1,6 +1,20 @@
 #!/bin/bash
-
+if [ -z "${ws_dir}" ]; then
+    export ws_dir=/code
+    echo "Setting ws_dir"
+fi
 OUTPUT_PROCESSING_SCRIPT=$ws_dir/clad-fp-error-est-examples/process_output.py
+
+benchall() {
+    clang++-13 \
+        -Xclang -add-plugin -Xclang clad -Xclang -load -Xclang clad.so \
+        -Xclang -plugin-arg-clad -Xclang -fcustom-estimation-model \
+        -Xclang -plugin-arg-clad -Xclang $ws_dir/clad-fp-error-est-examples/PrintModel/libPrintModel.so \
+        -lstdc++ -lm -std=c++11 -O3 \
+        "$@" \
+        -L$ws_dir/benchmark/build/src \
+        -lpthread -lbenchmark -DCODI_ZeroAdjointReverse=0
+}
 
 bench_gen() {
     benchall -O3 ${1}.cpp ${@:2} -o ${1}.out -L$ws_dir/benchmark/build/src
