@@ -29,6 +29,9 @@ COPY . chef-fp-examples/
 
 WORKDIR /code/chef-fp-examples
 
+RUN chmod +x ./runChefResults.sh
+RUN chmod +x ./runner.sh
+
 RUN cd PrintModel && \
     clang++-13 -I$PWD/../../clad/inst/include \
         -I/usr/include/llvm-13 -I/usr/lib/llvm-13/include \
@@ -54,4 +57,4 @@ WORKDIR /code
 RUN echo "export CPLUS_INCLUDE_PATH=\$CPLUS_INCLUDE_PATH:/code/CoDiPack-1.9.1/include:/code/benchmark/include:/code/adapt-fp:/code/clad/include:/code/chef-fp-examples/PrintModel" >> $HOME/.bashrc
 RUN echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/code/clad/build/lib" >> $HOME/.bashrc
 RUN echo "export LIBRARY_PATH=\$LIBRARY_PATH:/code/benchmark/build/src" >> $HOME/.bashrc
-RUN echo "export CODIPACK_HOME=/code/CoDiPack-1.9.1"
+RUN echo "export CODIPACK_HOME=/code/CoDiPack-1.9.1" >> $HOME/.bashrc
