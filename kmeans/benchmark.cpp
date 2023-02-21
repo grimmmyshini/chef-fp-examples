@@ -529,7 +529,7 @@ static void KMeans_Adapt(benchmark::State &state)
     free(buf);
 }
 
-static void KMeans_Clad(benchmark::State &state)
+static void KMeans_CHEFFP(benchmark::State &state)
 {
     // auto df = clad::estimate_error(euclid_dist_2<double, double>);
     int opt;
@@ -783,7 +783,7 @@ static void KMeans_Clad(benchmark::State &state)
 }
 
 BENCHMARK(KMeans)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(KMeans_Clad)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(KMeans_CHEFFP)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
 BENCHMARK(KMeans_Adapt)->Arg(0)->Arg(1)->Arg(2)->Arg(3);
 
 // BENCHMARK_MAIN();

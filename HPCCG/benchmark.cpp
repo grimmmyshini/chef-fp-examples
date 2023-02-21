@@ -191,7 +191,7 @@ static void HPCCG_Adapt(benchmark::State &state)
   delete A;
 }
 
-static void HPCCG_Clad(benchmark::State &state)
+static void HPCCG_CHEFFP(benchmark::State &state)
 {
   double *x, *b, *xexact;
   double norm, d;
@@ -296,7 +296,7 @@ static void HPCCG_Clad(benchmark::State &state)
 }
 
 BENCHMARK(HPCCG)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
-BENCHMARK(HPCCG_Clad)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
+BENCHMARK(HPCCG_CHEFFP)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160})->Args({20, 30, 320});
 BENCHMARK(HPCCG_Adapt)->Args({20, 30, 10})->Args({20, 30, 20})->Args({20, 30, 40})->Args({20, 30, 80})->Args({20, 30, 160});
 
 

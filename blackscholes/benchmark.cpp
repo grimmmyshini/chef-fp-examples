@@ -347,7 +347,7 @@ static void BlackScholes_Adapt(benchmark::State &state)
     delete[] prices;
 }
 
-static void BlackScholes_Clad(benchmark::State &state)
+static void BlackScholes_CHEFFP(benchmark::State &state)
 {
     // clad::estimate_error(BlkSchlsEqEuroNoDiv);
     FILE *file;
@@ -517,7 +517,7 @@ static void BlackScholes_Clad(benchmark::State &state)
 }
 
 BENCHMARK(BlackScholes)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
-BENCHMARK(BlackScholes_Clad)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
+BENCHMARK(BlackScholes_CHEFFP)->Arg(0)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
 BENCHMARK(BlackScholes_Adapt)->Arg(0)->Arg(1)->Arg(2);
 
 // BENCHMARK_MAIN();

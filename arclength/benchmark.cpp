@@ -64,7 +64,7 @@ static void ArcLength_Adapt(benchmark::State& state) {
     }
 }
 
-static void ArcLength_Clad(benchmark::State& state) {
+static void ArcLength_CHEFFP(benchmark::State& state) {
 //   auto df = clad::estimate_error(clad::do_fun);
   
   cout_suppressor suppressor;
@@ -86,7 +86,7 @@ static void ArcLength_Clad(benchmark::State& state) {
 }
 
 BENCHMARK(ArcLength)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(ArcLength_Clad)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(ArcLength_CHEFFP)->RangeMultiplier(10)->Range(10000, 100000000);
 BENCHMARK(ArcLength_Adapt)->RangeMultiplier(10)->Range(10000, 10000000);
 
 // Define our main

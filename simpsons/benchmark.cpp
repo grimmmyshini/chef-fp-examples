@@ -67,7 +67,7 @@ static void Simpsons_Adapt(benchmark::State &state)
     }
 }
 
-static void Simpsons_Clad(benchmark::State &state)
+static void Simpsons_CHEFFP(benchmark::State &state)
 {
     ITERATIONS = state.range(0);
     // clad::estimate_error(simpsons<double>);
@@ -84,7 +84,7 @@ static void Simpsons_Clad(benchmark::State &state)
 }
 
 BENCHMARK(Simpsons)->RangeMultiplier(10)->Range(10000, 100000000);
-BENCHMARK(Simpsons_Clad)->RangeMultiplier(10)->Range(10000, 100000000);
+BENCHMARK(Simpsons_CHEFFP)->RangeMultiplier(10)->Range(10000, 100000000);
 BENCHMARK(Simpsons_Adapt)->RangeMultiplier(10)->Range(10000, 10000000);
 
 // BENCHMARK_MAIN();
