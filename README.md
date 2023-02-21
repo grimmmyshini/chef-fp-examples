@@ -22,7 +22,7 @@ docker run -it --rm cheffp:Dockerfile /bin/bash
 
 ## Run the CHEF-FP vs ADAPT benchmarks in the docker image
 
-To run the benchmarks run the docker image and execute:
+To run the benchmarks, run the docker image and execute:
 
 ```bash
 cd /code/chef-fp-examples
@@ -46,12 +46,9 @@ int main() {
 }
 ```
 
-Include the `ErrorFunc.h` header in `PrintModel/` directory.
-Then, Mark the function you want to run error estimation on using
-`clad::error_estimate` and run the generated function using `execute`.
-In this example we use the error estimation model used in the paper so we
-can print the mixed precision analysis using `clad::printErrorReport()`.
-So finally it will look like something like this:
+Include the `ErrorFunc.h` header from the `PrintModel/` directory.
+Then, mark the function you want to run error estimation on using
+`clad::estimate_error` and run the generated function using `execute`. The following example uses the error estimation model defined in the paper allowing us to print the mixed precision analysis results through `clad::printErrorReport()`:
 
 ```c++
 #include "clad/Differentiator/Differentiator.h"
@@ -72,6 +69,9 @@ int main() {
 
     // Print the mixed precision configuration
     clad::printErrorReport();
+
+    // Optionally print clad's estimated error 
+    // std::cout << final_error;
 }
 ```
 
@@ -92,4 +92,4 @@ And run it:
 
 ## Create your own custom models
 
-To create your own custom models go through `/code/clad/demos/ErrorEstimation/CustomModel/README.md` or it's [online version](https://github.com/vgvassilev/clad/blob/v1.1/demos/ErrorEstimation/CustomModel/README.md)
+To create your own custom models you can refer `/code/clad/demos/ErrorEstimation/CustomModel/README.md` in the docker container or it's [online version](https://github.com/vgvassilev/clad/blob/v1.1/demos/ErrorEstimation/CustomModel/README.md)
