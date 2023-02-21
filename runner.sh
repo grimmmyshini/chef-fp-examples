@@ -47,7 +47,7 @@ run_bench() {
 
 run_adc() {
     # Takes 1 argument: benchmark_filter input/benchmark name;
-    echo "==================== Running: $1 ADAPT Vs. CLAD ===================="
+    echo "==================== Running: $1 ADAPT Vs. CHEF-FP ===================="
     run_bench ./benchmark.out $1 /tmp/b.json
 }
 
@@ -59,7 +59,7 @@ run_mix() {
 
 python3 $OUTPUT_PROCESSING_SCRIPT >$ws_dir/results.txt
 
-# --------------------------------- ADAPT vs. CLAD -----------------------------------
+# --------------------------------- ADAPT vs. CHEF-FP -----------------------------------
 
 cd arclength
 gen_adc
