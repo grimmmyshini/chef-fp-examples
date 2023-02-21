@@ -158,8 +158,6 @@ int main(int argc, char *argv[])
 
   clad::HPCCG_grad(b, x, max_iter, tolerance, niters, normr, r, p, Ap, xexact, d_b, d_x, &d_max_iter, &d_tolerance, &d_niters, &d_normr, d_r, d_p, d_Ap, d_xexact, _final_error);
 
-  cout << "\nFinal error in HPCCG =" << _final_error << endl;
-
   clad::printErrorReport();
 
   delete[] b_diff;

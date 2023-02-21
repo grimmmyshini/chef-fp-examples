@@ -314,7 +314,7 @@ int kmeans(int isBinaryFile, int nclusters, char* filename, float threshold, lon
     // cluster end
   }
 
-  // clad::printErrorReport();
+  clad::printErrorReport();
 
   // printf("number of Clusters %d\n", nclusters);
   // printf("number of Attributes %d\n\n", numAttributes);
@@ -371,10 +371,10 @@ int main(int argc, char** argv) {
     usage(argv[0]);
     
   long int timeAvg = 0;
-  for (int i = 0; i < 10; i++) {
-    printf("Iteration %i\n", i);
+  // for (int i = 0; i < 10; i++) {
+    // printf("Iteration %i\n", i);
     kmeans(isBinaryFile, nclusters, filename, threshold, timeAvg);
-  }
-  timeAvg = timeAvg / 10;
-  printf("Time for euclid: %ld", timeAvg);
+  // }
+  // timeAvg = timeAvg / 10;
+  // printf("Time for euclid: %ld", timeAvg);
 }

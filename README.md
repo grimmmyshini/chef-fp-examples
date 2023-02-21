@@ -1,5 +1,7 @@
 # CHEF-FP examples repository
 
+> NOTE: Some of these scripts and commands might take upto several minutes to finish (depending on your machine).
+
 This repository contains benchmarks for CHEF-FP comparing it against the state of the art ADAPT-FP tool.
 
 ## Building a docker image for setting up CHEF-FP
@@ -30,6 +32,13 @@ cd /code/chef-fp-examples
 ```
 
 The results of the benchmark will be in the `/code/results.txt` file.
+
+To run the benchmarks with CHEF-FP's error reports, run:
+
+```bash
+cd /code/chef-fp-examples
+./runChefResults.sh
+```
 
 ## Using CHEF-FP for floating point error estimation
 
