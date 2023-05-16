@@ -1,6 +1,6 @@
 FROM ubuntu:jammy
 
-RUN apt -y update
+RUN apt -y update --fix-missing
 RUN apt -y upgrade
 RUN apt install -y build-essential
 RUN apt install -y wget cmake gcc git python3 python3-pip curl time
