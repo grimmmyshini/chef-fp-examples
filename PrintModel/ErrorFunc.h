@@ -247,11 +247,11 @@ namespace clad
       token = strtok(NULL, "_");
       double error;
       if (!strcmp(token, "exp"))
-        error = std::fabs(dx * (exp(x) - fastexp(x)));
+        error = std::fabs(dx * (exp(x) - fastexp(x)) / exp(x));
       else if (!strcmp(token, "log"))
-        error = std::fabs(dx * (log(x) - fastlog(x)));
+        error = std::fabs(dx * (log(x) - fastlog(x)) * exp(x));
       else if (!strcmp(token, "sqr"))
-        error = std::fabs(dx * (sqrt(x) - fastpow(x, 0.5)));
+        error = std::fabs(dx * (sqrt(x) - fastpow(x, 0.5)) * 2 * sqrt(x));
       else
         return 0;
 
