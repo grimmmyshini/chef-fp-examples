@@ -40,7 +40,10 @@ cd /code/chef-fp-examples
 ./runChefResults.sh
 ```
 
-## Using CHEF-FP for floating point error estimation
+## Using CHEF-FP for mixed precision analysis
+
+To follow this tutorial, you can either use the docker image or [install clad]
+(https://clad.readthedocs.io/en/latest/user/InstallationAndUsage.html) and [build the PrintModel](PrintModel/README.md) on your system.
 
 Lets take the following code as an example:
 
