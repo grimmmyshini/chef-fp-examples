@@ -42,8 +42,9 @@ cd /code/chef-fp-examples
 
 ## Using CHEF-FP for mixed precision analysis
 
-To follow this tutorial, you can either use the docker image or [install clad]
-(https://clad.readthedocs.io/en/latest/user/InstallationAndUsage.html) and [build the PrintModel](PrintModel/README.md) on your system.
+To follow this tutorial, you can either use the docker image or 
+[install clad](https://clad.readthedocs.io/en/latest/user/InstallationAndUsage.html)
+and [build the PrintModel](PrintModel/README.md) on your system.
 
 Lets take the following code as an example:
 
